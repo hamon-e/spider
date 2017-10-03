@@ -6,11 +6,8 @@ AUdpServer::AUdpServer(boost::asio::io_service &ioService, int port)
 }
 
 void AUdpServer::start() {
-
     this->_socket.async_receive(
     boost::asio::null_buffers(),
-    // boost::asio::buffer(this->c),
-    // this->_clientEndpoint,
     [this](boost::system::error_code, std::size_t size) {
         boost::system::error_code ec;
         size_t available = this->_socket.available();
