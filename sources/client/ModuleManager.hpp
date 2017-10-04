@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <boost/function.hpp>
 #include <boost/thread/thread.hpp>
 
 #include "IModule.hpp"
@@ -22,6 +23,7 @@ private:
     struct Library {
         std::string name;
         boost::shared_ptr<IModule> module;
+        boost::function<module_t> creator;
     };
 
 private:

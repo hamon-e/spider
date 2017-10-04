@@ -11,7 +11,7 @@
 #include "ModuleManager.hpp"
 
 int main() {
-  ModuleManager mod("../");
+  ModuleManager mod;
   mod.run();
   return 0;
 }
