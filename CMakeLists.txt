@@ -21,7 +21,7 @@ set(EXE_CLIENT_NAME spider_client)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 
-set(SOURCE_FILES ./sources/client/main.cpp)
+set(SOURCE_FILES ./sources/client/main.cpp sources/client/ModuleManager.cpp sources/client/ModuleManager.hpp)
 
 if(Boost_FOUND)
 include_directories(${Boost_INCLUDE_DIRS})
