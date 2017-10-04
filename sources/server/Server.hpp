@@ -1,9 +1,10 @@
-#include "AUdpServer.hpp"
+#include "APacketServer.hpp"
 
-class Server : public AUdpServer {
+class Server : public APacketServer {
 public:
-    Server(boost::asio::io_service &io_service, int port);
+    Server(boost::asio::io_service &ioService, int port);
 
 private:
-    void acceptCallback(boost::system::error_code ec, std::string req, boost::asio::ip::udp::endpoint client_endpoint);
+    bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &client_endpoint);
+    void packetHandler(Packet &packet);
 };

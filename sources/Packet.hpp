@@ -1,16 +1,22 @@
+#pragma once
+
 #include <sstream>
+#include <ostream>
 #include <unordered_map>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include "EnumClassHash.hpp"
 
 class Packet {
 public:
-    static const std::size_t defaultSize = 1024;
+    static std::size_t const defaultSize = 1024;
+    static char const partSeparator = '|';
 
-enum Field {
+    using partPair = std::pair<std::size_t, std::size_t>;
+
+enum class Field {
     ID,
+    COOKIE,
     CHECKSUM,
     TIMESTAMP,
     PART,
@@ -18,22 +24,21 @@ enum Field {
 };
 
 public:
-    Packet() {
-
-    }
-
+    Packet() {}
+    Packet(std::string const &data);
 public:
     void set(Packet::Field field, std::string const &value);
     void set(Packet::Field field, std::string &&value);
 
 public:
-    std::string stringify(bool pretty) const;
+    bool checksum() const;
+    std::pair<std::size_t, std::size_t>getPartPair() const;
+
+public:
+    std::string stringify(bool pretty = false) const;
 
 public:
     std::vector<Packet> split(std::size_t size = Packet::defaultSize) const;
-
-public:
-    bool checksum() const;
 
 private:
     std::string calcChecksum() const;
@@ -45,3 +50,5 @@ private:
 private:
     boost::property_tree::ptree _ptree;
 };
+
+std::ostream &operator<<(std::ostream &stream, Packet const &packet);
