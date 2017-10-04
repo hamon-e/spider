@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Wed Oct 04 18:03:49 2017 Benoit Hamon
-// Last update Wed Oct 04 19:42:37 2017 Benoit Hamon
+// Last update Wed Oct 04 20:07:50 2017 Benoit Hamon
 //
 
 #include <iostream>
@@ -13,6 +13,7 @@
 #include <boost/dll/import.hpp>
 #include <boost/function.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/thread/thread.hpp>
 
 #include "IModule.hpp"
 
@@ -40,6 +41,7 @@ class ModuleManager {
   private:
     std::string _dirname;
     std::vector<Library> _libraries;
+    boost::thread_group _threads;
     ModuleCommunication _moduleCommunication;
 };
 
@@ -71,7 +73,7 @@ void ModuleManager::runLibrary(std::string const &libraryName) {
   try {
     creator = boost::dll::import_alias<module_t>(shared_library_path, "create_module");
     boost::shared_ptr<IModule> plugin = creator();
-    plugin->start(this->_moduleCommunication);
+    this->_threads.create_thread(boost::bind(&IModule::start, plugin.get(), this->_moduleCommunication));
     this->_libraries.push_back({libraryName, plugin});
   } catch (std::exception) {
     this->_libraries.push_back({libraryName, nullptr});
@@ -95,6 +97,7 @@ void ModuleManager::run() {
     this->runLibraries();
     sleep(1);
   }
+  this->_threads.join_all();
 }
 
 int main() {
