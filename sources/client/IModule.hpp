@@ -6,22 +6,7 @@
 
 #include <string>
 
-class ModuleCommunication {
-public:
-    ModuleCommunication() {};
-    ~ModuleCommunication() {};
-
-public:
-    struct Order {
-        std::string name;
-        std::string value;
-    };
-
-public:
-    void add(std::string const &module, std::string const &name, std::string const &value = "");
-    void add(std::string const &module, Order const &order);
-    Order get(std::string const &module);
-};
+#include "ModuleCommunication.hpp"
 
 class IModule {
 public:
