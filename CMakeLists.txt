@@ -5,6 +5,13 @@
 cmake_minimum_required(VERSION 3.6)
 project(cpp_spider)
 
+set(BOOST_ROOT "C:/local/boost_1_65_1")
+find_package(Boost 1.36.0 COMPONENTS date_time filesystem system)
+
+if(Boost_FOUND)
+include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 set(EXE_SERVER_NAME spider_serveur)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 set(SOURCE_FILES ./sources/server/main.cpp)
@@ -21,3 +28,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 set(SOURCE_FILES ./sources/client/main.cpp)
 
 add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
+
+#############################################################################
+#############  Cmake CLIENT MODULE : KEYBOARD  ##############################
+#############################################################################
+
+set(KEYBOARD_NAME module_keyboard)
+
+
+if(Boost_FOUND)
+set(SOURCE_FILES sources/client/modules/ModuleKeyboard.cpp sources/client/IModule.hpp)
+add_library(${KEYBOARD_NAME} SHARED ${SOURCE_FILES})
+target_link_libraries(${KEYBOARD_NAME} ${Boost_LIBRARIES})
+endif()
