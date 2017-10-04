@@ -33,16 +33,11 @@ public:
     std::vector<Packet> split(std::size_t size = Packet::defaultSize) const;
 
 public:
-    std::string getChecksum() const;
-    bool checksum();
+    bool checksum() const;
 
 private:
+    std::string calcChecksum() const;
     void updateChecksum();
-
-private:
-    std::size_t getNbSplit(std::size_t size = Packet::defaultSize) const {
-        return 0;
-    }
 
 private:
     static const std::unordered_map<Packet::Field, std::string, EnumClassHash> fields;
