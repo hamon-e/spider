@@ -39,15 +39,15 @@ std::vector<Packet> Packet::split(std::size_t size) const {
     return res;
 }
 
-std::string Packet::getChecksum() const {
+std::string Packet::calcChecksum() const {
     std::hash<std::string> hash_fn;
     return std::to_string(hash_fn(this->_ptree.get(Packet::fields.at(Packet::DATA), "")));
 }
 
 void Packet::updateChecksum() {
-    this->set(Packet::CHECKSUM, this->getChecksum());
+    this->set(Packet::CHECKSUM, this->calcChecksum());
 }
 
-bool Packet::checksum() {
-    return this->getChecksum() == this->_ptree.get(Packet::fields.at(Packet::CHECKSUM), "");
+bool Packet::checksum() const {
+    return this->calcChecksum() == this->_ptree.get(Packet::fields.at(Packet::CHECKSUM), "");
 }
