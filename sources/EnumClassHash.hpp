@@ -1,3 +1,5 @@
+#pragma once
+
 struct EnumClassHash
 {
     template <typename T>
