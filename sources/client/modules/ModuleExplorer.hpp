@@ -17,8 +17,7 @@ public:
     static boost::shared_ptr<ModuleExplorer> create();
 
 private:
-    void sendDir(std::string const &path);
-
-private:
-    bool _running;
+    void changeDir(std::string const &path);
+    std::vector<std::string> readDir();
+    void sendFiles();
 };
