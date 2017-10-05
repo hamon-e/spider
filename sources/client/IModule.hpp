@@ -11,9 +11,4 @@
 class IModule {
 public:
     virtual void start(ModuleCommunication &com) = 0;
-    virtual void stop() = 0;
-
-public:
-    virtual void setParams() = 0;
-    virtual void setParams(std::string const &name, std::string const &value) = 0;
 };
