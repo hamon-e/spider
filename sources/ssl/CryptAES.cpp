@@ -5,13 +5,14 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:14:40 2017 Benoit Hamon
-// Last update Thu Oct 05 22:12:04 2017 Benoit Hamon
+// Last update Thu Oct 05 22:31:16 2017 Benoit Hamon
 //
 
 #include <stdexcept>
 #include <string.h>
 #include <fstream>
 #include "CryptAES.hpp"
+#include "Base64.hpp"
 
 CryptAES::CryptAES() {
   this->_aesEncryptContext = EVP_CIPHER_CTX_new();
@@ -99,46 +100,63 @@ bool CryptAES::genKey() {
 
 bool CryptAES::getKey(KeyType type, std::string &key) {
   unsigned char *store = type == AES_IV ? this->_aesIv : this->_aesKey;
+  std::string tmp;
 
   if (!store)
     return false;
-  key.assign((char *)store);
+  tmp.assign(store, store + AES_KEYLEN / 8);
+  key.assign(Base64::encrypt(tmp));
   return true;
 }
 
 bool CryptAES::setKey(KeyType type, std::string const &key) {
   unsigned char **store = type == AES_IV ? &this->_aesIv : &this->_aesKey;
 
-  *store = (unsigned char *)strdup(key.c_str());
+  *store = (unsigned char *)strndup(Base64::decrypt(key).c_str(), AES_KEYLEN / 8);
   if (!*store)
     return false;
   return true;
 }
 
-bool CryptAES::setKeyFromFile(KeyType type, std::string const &filename) {
+bool CryptAES::saveKeyInFile(KeyType type, std::string const &filename) {
+  std::string tmp;
+  if (type == AES_IV) {
+    if (!this->_aesIv)
+      return false;
+    tmp.assign(this->_aesIv, this->_aesIv + AES_KEYLEN / 8);
+  }
+  else {
+    if (!this->_aesKey)
+      return false;
+    tmp.assign(this->_aesKey, this->_aesKey + AES_KEYLEN / 8);
+  }
+
   try {
     std::ofstream file(filename);
-    if (type == AES_IV)
-      file << this->_aesKey;
-    else
-      file << this->_aesIv;
+    file << Base64::encrypt(tmp);
     file.close();
   } catch (std::exception) {
     return false;
   }
+
   return true;
 }
 
-bool CryptAES::saveKeyInFile(KeyType type, std::string const &filename) {
+bool CryptAES::setKeyFromFile(KeyType type, std::string const &filename) {
+  std::string tmp;
+
   try {
     std::ifstream file(filename);
-    if (type == AES_IV)
-      file >> this->_aesKey;
-    else
-      file >> this->_aesIv;
+    file >> tmp;
     file.close();
   } catch (std::exception) {
     return false;
   }
+
+  tmp = Base64::decrypt(tmp);
+  if (type == AES_IV)
+    this->_aesIv = (unsigned char *)strndup(tmp.c_str(), AES_KEYLEN / 8);
+  else
+    this->_aesKey = (unsigned char *)strndup(tmp.c_str(), AES_KEYLEN / 8);
   return true;
 }
