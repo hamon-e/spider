@@ -6,13 +6,11 @@ public:
 
 public:
     void send(std::string const &cookie,
-              std::string const &timestamp,
               std::string const &type,
               std::string const &data,
               boost::asio::ip::udp::endpoint &clientEndpoint,
               std::string const &id);
     void send(std::string const &cookie,
-              std::string const &timestamp,
               std::string const &type,
               std::string const &data,
               boost::asio::ip::udp::endpoint &clientEndpoint);

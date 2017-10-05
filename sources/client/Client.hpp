@@ -8,12 +8,10 @@ public:
 
 public:
     void send(std::string const &cookie,
-              std::string const &timestamp,
               std::string const &type,
               std::string const &data,
               std::string const &id);
     void send(std::string const &cookie,
-              std::string const &timestamp,
               std::string const &type,
               std::string const &data);
 

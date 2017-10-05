@@ -20,17 +20,16 @@ void Client::packetHandler(Packet &packet) {
 }
 
 void Client::send(std::string const &cookie,
-                  std::string const &timestamp,
                   std::string const &type,
                   std::string const &data,
                   std::string const &id) {
-    this->sendPacket(id, cookie, timestamp, type, data, this->_serverEndpoint);
+    this->sendPacket(id, cookie, type, data, this->_serverEndpoint);
 }
 void Client::send(std::string const &cookie,
-                  std::string const &timestamp,
                   std::string const &type,
                   std::string const &data) {
-    this->send(cookie, timestamp, type, data, std::to_string(Client::id++));
+    std::cout << Client::id << std::endl;
+    this->send(cookie, type, data, std::to_string(Client::id++));
 }
 
 // void Client::send(std::string const &msg) {

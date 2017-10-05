@@ -1,23 +1,22 @@
 #include <stdexcept>
-
 #include "MapDB.hpp"
 
 void MapDB::insert(std::string const &collection, IDataBase::ptree const &doc) {
     auto node = this->_db.find(collection);
     if (node == this->_db.end()) {
-        // this->_db.insert(collection, { 1, doc });
-        // this->_db.emplace(collection, std::vector<ptree>(doc));
         this->_db.emplace(collection, std::vector<IDataBase::ptree>(1, doc));
+    } else {
+        node->second.push_back(doc);
     }
 }
 
 bool MapDB::cmpQuery(IDataBase::ptree const &doc, IDataBase::ptree const &query) {
     for (auto field : query) {
         if (doc.get_child(field.first) == field.second) {
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 

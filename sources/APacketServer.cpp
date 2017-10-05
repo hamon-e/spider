@@ -1,3 +1,6 @@
+#include <ctime>
+#include <sstream>
+
 #include "APacketServer.hpp"
 #include "MapDB.hpp"
 
@@ -13,14 +16,13 @@ APacketServer::APacketServer(boost::asio::io_service &ioService, int port, IData
 void APacketServer::sendPacket(std::string const &id,
                                std::string const &cookie,
                                std::string const &type,
-                               std::string const &timestamp,
                                std::string const &data,
                                boost::asio::ip::udp::endpoint &to) {
     Packet packet;
+
     packet.set(Packet::Field::ID, id);
     packet.set(Packet::Field::COOKIE, cookie);
     packet.set(Packet::Field::TYPE, type);
-    packet.set(Packet::Field::TIMESTAMP, timestamp);
     packet.set(Packet::Field::DATA, data);
     for (auto part : packet.split()) {
         std::string msg(std::move(part.stringify()));

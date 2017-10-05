@@ -1,6 +1,6 @@
 #include <sstream>
 #include <boost/property_tree/json_parser.hpp>
-
+#include <ctime>
 #include "Packet.hpp"
 
 std::unordered_map<Packet::Field, std::string, EnumClassHash> const Packet::fields = {
@@ -29,7 +29,7 @@ std::string Packet::stringify(bool pretty) const {
 }
 
 void Packet::set(Packet::Field field, std::string &&value) {
-    this->_ptree.put(Packet::fields.at(field), value);
+    this->_ptree.put(Packet::fields.at(field), std::move(value));
 }
 
 void Packet::set(Packet::Field field, std::string const &value) {
@@ -49,16 +49,15 @@ Packet::PartPair Packet::getPartPair() const {
 }
 
 std::vector<Packet> Packet::split(size_t size) const {
-    // std::string data = json::stringify(this->_ptree.get_child(Packet::fields.at(Packet::Field::DATA)), false);
     std::string data = this->_ptree.get(Packet::fields.at(Packet::Field::DATA), "");
     size_t nbPacket = ((data.size() - 1) / size) + 1;
     size_t part = 1;
     std::vector<Packet> res(nbPacket);
     std::string totalPart = std::to_string(nbPacket);
-
     for (Packet &packet : res) {
         packet.set(Packet::Field::ID, this->_ptree.get(Packet::fields.at(Packet::Field::ID), "0"));
-        packet.set(Packet::Field::TIMESTAMP, "0");
+        packet.set(Packet::Field::TIMESTAMP, std::to_string(std::time(nullptr)));
+        packet.set(Packet::Field::COOKIE, this->_ptree.get(Packet::fields.at(Packet::Field::COOKIE), ""));
         packet.set(Packet::Field::PART, std::move(std::to_string(part)));
         packet.set(Packet::Field::TOTALPART, totalPart);
         packet.set(Packet::Field::DATA, std::move(data.substr((part - 1) * size, size)));
@@ -76,11 +75,12 @@ Packet Packet::join(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet(*it);
     ++it;
     std::string data = packet.get<Packet::Field::DATA, std::string>();
-    data.resize(data.size() * packets.size());
+    data.reserve(data.size() * packets.size());
     for (; it != packets.end(); ++it) {
-        data += packet.get<Packet::Field::DATA, std::string>();
+        data += (*it).get(Packet::fields.at(Packet::Field::DATA), "");
     }
-    packet.set(Packet::Field::DATA, data);
+
+    packet.set(Packet::Field::DATA, std::move(data));
     packet.set(Packet::Field::PART, "1");
     packet.set(Packet::Field::TOTALPART, "1");
     return packet;

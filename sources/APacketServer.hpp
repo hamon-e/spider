@@ -14,7 +14,6 @@ public:
         std::string const &id,
         std::string const &cookie,
         std::string const &type,
-        std::string const &timestamp,
         std::string const &data,
         boost::asio::ip::udp::endpoint &to
         );

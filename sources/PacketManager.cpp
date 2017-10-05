@@ -33,12 +33,11 @@ void PacketManager::complete(Packet &part) {
         } catch (std::exception &) {
         }
     } else {
-        this->_db.insert(PacketManager::dataColName, part.getPtree());
+        this->_db.insert(PacketManager::partsColName, part.getPtree());
     }
 }
 
 void PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
-    std::cout << packet << std::endl;
     this->_handler(packet);
 }

@@ -10,9 +10,7 @@ int main(int argc, char const *argv[]) {
         std::cerr << "Usage : " << argv[0] << " port" << std::endl;
         return 1;
     }
-    // std::hash<std::string> hasher;
-    // std::cout << hasher("azeaze") << std::endl;
-    //
+
     boost::asio::io_service ioService;
     Server server(ioService, std::atoi(argv[1]));
     server.start();

@@ -26,9 +26,9 @@ void AUdpServer::listen() {
         boost::asio::null_buffers(),
         [this](boost::system::error_code, std::size_t size) {
             boost::system::error_code ec;
-            size_t available = this->_socket.available();
+            std::size_t available = this->_socket.available();
             std::string req;
-            req.resize(available + 1);
+            req.resize(available + 1, '\0');
             this->_socket.receive_from(boost::asio::buffer(&(req[0]), req.size()), this->_clientEndpoint, 0, ec);
             this->requestHandler(ec, std::move(req), std::move(this->_clientEndpoint));
             this->listen();
