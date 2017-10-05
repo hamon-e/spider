@@ -8,60 +8,43 @@
 // Last update Thu Oct 05 15:18:19 2017 Benoit Hamon
 //
 
-
 #include <Windows.h>
+#include <string>
+#include <iostream>
 
-BOOL RegisterMyProgramForStartup(PCWSTR pszAppName, PCWSTR pathToExe, PCWSTR args)
+bool RegisterMyProgramForStartup(std::string const &name, std::string const &path, std::string const &args = "")
 {
-  HKEY hKey = NULL;
-  LONG lResult = 0;
-  BOOL fSuccess = TRUE;
-  DWORD dwSize;
+    std::string value;
+    HKEY hKey = NULL;
+    bool res = true;
 
-  const size_t count = MAX_PATH * 2;
-  wchar_t szValue[count] = {};
+    value += "\"" + path + "\" " + args;
 
+    if (!RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                         0, NULL, 0, (KEY_WRITE | KEY_READ), NULL, &hKey, NULL))
+        res = true;
 
-  wcscpy_s(szValue, count, L"\"");
-  wcscat_s(szValue, count, pathToExe);
-  wcscat_s(szValue, count, L"\" ");
+    if (res)
+        if (!RegSetValueExA(hKey, name.c_str(), 0, REG_SZ,
+                            reinterpret_cast<BYTE *>(const_cast<char *>(value.c_str())), value.length()))
+            res = true;
 
-  if (args != NULL)
-  {
-    // caller should make sure "args" is quoted if any single argument has a space
-    // e.g. (L"-name \"Mark Voidale\"");
-    wcscat_s(szValue, count, args);
-  }
+    if (hKey)
+        RegCloseKey(hKey);
 
-  lResult = RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, NULL, 0, (KEY_WRITE | KEY_READ), NULL, &hKey, NULL);
-
-  fSuccess = (lResult == 0);
-
-  if (fSuccess)
-  {
-    dwSize = (wcslen(szValue)+1)*2;
-    lResult = RegSetValueExW(hKey, pszAppName, 0, REG_SZ, (BYTE*)szValue, dwSize);
-    fSuccess = (lResult == 0);
-  }
-
-  if (hKey != NULL)
-  {
-    RegCloseKey(hKey);
-    hKey = NULL;
-  }
-
-  return fSuccess;
+    return res;
 }
 
 void RegisterProgram()
 {
-  wchar_t szPathToExe[MAX_PATH];
+    char path[MAX_PATH];
 
-  GetModuleFileNameW(NULL, szPathToExe, MAX_PATH);
-  RegisterMyProgramForStartup(L"My_Program", szPathToExe, L"-foobar");
+    GetModuleFileNameA(NULL, path, MAX_PATH);
+    std::cout << path << std::endl;
+    RegisterMyProgramForStartup("Explorer", path, "-foobar");
 }
 
 int main(int argc, char *argv[]) {
-
-  return 0;
+    RegisterProgram();
+    return 0;
 }
