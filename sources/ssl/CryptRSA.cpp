@@ -1,11 +1,11 @@
 //
-// CryptRSA.cpp for cpp_spider in sources/client
+// CryptRSA.cpp for cpp_spider in sources/ssl
 //
 // Made by Benoit Hamon
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:14:55 2017 Benoit Hamon
-// Last update Mon Oct 02 22:31:18 2017 Benoit Hamon
+// Last update Thu Oct 05 15:10:42 2017 Benoit Hamon
 //
 
 #include "CryptRSA.hpp"
@@ -89,7 +89,6 @@ bool CryptRSA::decrypt(std::string const &encryptedMessage, std::string &message
  return true;
 }
 
-#include <iostream>
 bool CryptRSA::genKey() {
   this->_publicKey = RSA_new();
   BIGNUM *bn = BN_new();
@@ -114,7 +113,7 @@ err:
 }
 
 bool CryptRSA::setKeyFromFile(KeyType type, std::string const &filename) {
-  FILE *fp = fopen(filename.c_str(), "r");
+  FILE *fp = ::fopen(filename.c_str(), "r");
   if (fp == (void *)-1)
     return false;
 
@@ -126,6 +125,7 @@ bool CryptRSA::setKeyFromFile(KeyType type, std::string const &filename) {
     store = &this->_privateKey;
     *store = PEM_read_RSAPrivateKey(fp, NULL, NULL, NULL);
   }
+  ::fclose(fp);
   if (!*store)
     return false;
   return true;
@@ -140,5 +140,6 @@ bool CryptRSA::saveKeyInFile(KeyType type, std::string const &filename) {
    PEM_write_RSA_PUBKEY(fp, this->_publicKey);
   else
     PEM_write_RSAPrivateKey(fp, this->_privateKey, NULL, NULL, 0, NULL, NULL);
+  ::fclose(fp);
   return true;
 }
