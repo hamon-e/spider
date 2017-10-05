@@ -44,12 +44,25 @@ std::vector<std::string> ModuleExplorer::readDir() {
   return res;
 }
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 void ModuleExplorer::sendFiles() {
   auto files = this->readDir();
+  boost::property_tree::ptree ptree;
 
+  ptree.put("directory", boost::filesystem::current_path());
+
+  boost::property_tree::ptree names;
   for (auto &elem : files) {
-    std::cout << elem << std::endl;
+    boost::property_tree::ptree tmp;
+    tmp.put("", elem);
+    names.push_back(std::make_pair("", tmp));
   }
+
+  ptree.add_child("files", names);
+
+  std::cout << ptree << std::endl;
 }
 
 BOOST_DLL_ALIAS(ModuleExplorer::create, create_module)
