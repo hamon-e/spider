@@ -21,7 +21,7 @@ public:
 public:
     void add(std::string const &module, std::string const &name, std::string const &value = "");
     void add(std::string const &module, Order const &order);
-    Order get(std::string const &module);
+    bool get(std::string const &module, Order &order);
 
 private:
     struct ModOrder {

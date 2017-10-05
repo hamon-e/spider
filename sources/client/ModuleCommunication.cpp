@@ -20,17 +20,17 @@ void ModuleCommunication::add(std::string const &module, Order const &order) {
   this->add(module, order.name, order.value);
 }
 
-ModuleCommunication::Order ModuleCommunication::get(std::string const &module) {
-  Order order;
+bool ModuleCommunication::get(std::string const &module, Order &order) {
 
   this->_mutex.lock();
   for (auto it = this->_orders.begin(); it != this->_orders.end(); ++it) {
     if ((*it).module == module) {
       order = {(*it).name, (*it).value};
       this->_orders.erase(it);
-      break;
+      this->_mutex.unlock();
+      return true;
     }
   }
   this->_mutex.unlock();
-  return order;
+  return false;
 }
