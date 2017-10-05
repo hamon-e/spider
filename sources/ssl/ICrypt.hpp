@@ -15,6 +15,7 @@
 #include <openssl/aes.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
+
 #include <string>
 
 class ICrypt {
