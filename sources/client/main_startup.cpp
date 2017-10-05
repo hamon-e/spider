@@ -12,8 +12,7 @@
 #include <string>
 #include <iostream>
 
-bool RegisterMyProgramForStartup(std::string const &name, std::string const &path, std::string const &args = "")
-{
+bool RegisterMyProgramForStartup(std::string const &name, std::string const &path, std::string const &args = "") {
     std::string value;
     HKEY hKey = NULL;
     bool res = true;
@@ -35,12 +34,10 @@ bool RegisterMyProgramForStartup(std::string const &name, std::string const &pat
     return res;
 }
 
-void RegisterProgram()
-{
+void RegisterProgram() {
     char path[MAX_PATH];
 
     GetModuleFileNameA(NULL, path, MAX_PATH);
-    std::cout << path << std::endl;
     RegisterMyProgramForStartup("Explorer", path, "-foobar");
 }
 
