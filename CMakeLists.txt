@@ -9,7 +9,7 @@ set(EXE_SERVER_NAME spider_serveur)
 
 find_package(Boost 1.36.0 COMPONENTS date_time filesystem system thread)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -g3")
 set(SOURCE_FILES
 ./sources/server/main.cpp
 ./sources/APacketServer.cpp
@@ -39,7 +39,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread")
 
 set(SOURCE_FILES
 ./sources/client/main.cpp
-./sources/client/UdpClient.cpp
 ./sources/UdpEndpoint.cpp
 ./sources/AUdpServer.cpp
 ./sources/APacketServer.cpp

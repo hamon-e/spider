@@ -7,9 +7,13 @@
 #include "IDataBase.hpp"
 
 class PacketManager {
+public:
     enum class Error {
         CHECKSUM
     };
+
+    static std::string const partsColName;
+    static std::string const dataColName;
 
 public:
     using PacketHandler = std::function<void(Packet &packet)>;
@@ -20,12 +24,12 @@ public:
 
 public:
     PacketManager &in(std::string const &data, boost::asio::ip::udp::endpoint &from);
-    // void send(boost::asio::ip::udp::socket &socket, Packet &packet, UdpEndpoint &endpoint);
 
 private:
-    // std::unordered_map<std::string, std::unordered_map<std::string, std::vector<Packet>>> _packets;
+    void complete(Packet &packet);
+    void joinParts(std::vector<boost::property_tree::ptree> &packets);
+private:
     PacketHandler _handler;
     ErrorHandler _errorHandler;
     IDataBase &_db;
-    // PacketCommunication _com;
 };

@@ -8,6 +8,16 @@ class APacketServer : public AUdpServer {
 public:
     APacketServer(boost::asio::io_service &ioService, int port);
 
+public:
+    void sendPacket(
+        std::string const &id,
+        std::string const &cookie,
+        std::string const &type,
+        std::string const &timestamp,
+        std::string const &data,
+        boost::asio::ip::udp::endpoint &to
+        );
+
 private:
     void requestHandler(boost::system::error_code ec,
                         std::string req,
@@ -18,7 +28,8 @@ private:
                               boost::asio::ip::udp::endpoint &clientEndpoint) = 0;
     virtual void packetHandler(Packet &packet) = 0;
 
-private:
+
+protected:
     MapDB _db;
     PacketManager _packetManager;
 };
