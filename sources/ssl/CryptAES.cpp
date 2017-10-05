@@ -1,15 +1,16 @@
 //
-// CryptAES.cpp for cpp_spider in sources/client
+// CryptAES.cpp for cpp_spider in sources/ssl
 //
 // Made by Benoit Hamon
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:14:40 2017 Benoit Hamon
-// Last update Mon Oct 02 19:27:07 2017 Benoit Hamon
+// Last update Thu Oct 05 22:12:04 2017 Benoit Hamon
 //
 
 #include <stdexcept>
 #include <string.h>
+#include <fstream>
 #include "CryptAES.hpp"
 
 CryptAES::CryptAES() {
@@ -111,5 +112,33 @@ bool CryptAES::setKey(KeyType type, std::string const &key) {
   *store = (unsigned char *)strdup(key.c_str());
   if (!*store)
     return false;
+  return true;
+}
+
+bool CryptAES::setKeyFromFile(KeyType type, std::string const &filename) {
+  try {
+    std::ofstream file(filename);
+    if (type == AES_IV)
+      file << this->_aesKey;
+    else
+      file << this->_aesIv;
+    file.close();
+  } catch (std::exception) {
+    return false;
+  }
+  return true;
+}
+
+bool CryptAES::saveKeyInFile(KeyType type, std::string const &filename) {
+  try {
+    std::ifstream file(filename);
+    if (type == AES_IV)
+      file >> this->_aesKey;
+    else
+      file >> this->_aesIv;
+    file.close();
+  } catch (std::exception) {
+    return false;
+  }
   return true;
 }

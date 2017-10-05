@@ -1,11 +1,11 @@
 //
-// ICrypt.hpp for cpp_spider in sources/client
+// ICrypt.hpp for cpp_spider in sources/ssl
 //
 // Made by Benoit Hamon
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:12:55 2017 Benoit Hamon
-// Last update Mon Oct 02 19:07:57 2017 Benoit Hamon
+// Last update Thu Oct 05 22:04:49 2017 Benoit Hamon
 //
 
 #pragma once
@@ -31,6 +31,12 @@ class ICrypt {
     virtual bool genKey() = 0;
     virtual bool setKey(KeyType type, std::string const &key) = 0;
     virtual bool getKey(KeyType type, std::string &key) = 0;
+
+  public:
     virtual bool encrypt(std::string const &message, std::string &encryptedMessage) = 0;
     virtual bool decrypt(std::string const &encryptedMessage, std::string &message) = 0;
+
+  public:
+    virtual bool setKeyFromFile(KeyType type, std::string const &filename);
+    virtual bool saveKeyInFile(KeyType type, std::string const &filename);
 };
