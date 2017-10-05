@@ -7,7 +7,6 @@ Client::Client(boost::asio::io_service &ioService, std::string const &host, std:
 {
     boost::asio::ip::udp::resolver resolver(ioService);
     this->_serverEndpoint = *resolver.resolve({boost::asio::ip::udp::v4(), host, port});
-
 }
 
 bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint) {

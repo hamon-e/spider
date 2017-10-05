@@ -17,8 +17,7 @@ std::unordered_map<Packet::Field, std::string, EnumClassHash> const Packet::fiel
 Packet::Packet(std::string const &data) {
     std::stringstream ss;
     ss << data;
-    boost::property_tree::ptree ptree;
-    boost::property_tree::json_parser::read_json(ss, ptree);
+    boost::property_tree::json_parser::read_json(ss, this->_ptree);
 }
 
 Packet::Packet(boost::property_tree::ptree const &ptree)
@@ -82,6 +81,8 @@ Packet Packet::join(std::vector<boost::property_tree::ptree> &packets) {
         data += packet.get<Packet::Field::DATA, std::string>();
     }
     packet.set(Packet::Field::DATA, data);
+    packet.set(Packet::Field::PART, "1");
+    packet.set(Packet::Field::TOTALPART, "1");
     return packet;
 }
 

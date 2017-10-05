@@ -17,7 +17,6 @@ set(SOURCE_FILES
 ./sources/PacketManager.cpp
 ./sources/server/Server.cpp
 ./sources/UdpEndpoint.cpp
-./sources/PacketCommunication.cpp
 ./sources/Packet.cpp
 ./sources/json.cpp
 ./sources/MapDB.cpp

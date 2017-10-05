@@ -2,11 +2,12 @@
 
 #include "AUdpServer.hpp"
 #include "PacketManager.hpp"
+#include "IDataBase.hpp"
 #include "MapDB.hpp"
 
 class APacketServer : public AUdpServer {
 public:
-    APacketServer(boost::asio::io_service &ioService, int port);
+    APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db = new MapDB());
 
 public:
     void sendPacket(
@@ -30,6 +31,6 @@ private:
 
 
 protected:
-    MapDB _db;
+    IDataBase *_db;
     PacketManager _packetManager;
 };

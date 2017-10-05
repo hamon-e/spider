@@ -28,7 +28,10 @@ void PacketManager::complete(Packet &part) {
     if ((packets.size() + 1) == part.get<Packet::Field::TOTALPART, std::size_t>(0)) {
         packets.push_back(std::move(part.getPtree()));
         this->joinParts(packets);
-        this->_db.remove(PacketManager::partsColName, query);
+        try {
+            this->_db.remove(PacketManager::partsColName, query);
+        } catch (std::exception &) {
+        }
     } else {
         this->_db.insert(PacketManager::dataColName, part.getPtree());
     }
@@ -36,5 +39,6 @@ void PacketManager::complete(Packet &part) {
 
 void PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
+    std::cout << packet << std::endl;
     this->_handler(packet);
 }

@@ -1,10 +1,11 @@
 #include "APacketServer.hpp"
 #include "MapDB.hpp"
 
-APacketServer::APacketServer(boost::asio::io_service &ioService, int port)
+APacketServer::APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db)
     : AUdpServer(ioService, port),
+      _db(db),
       _packetManager(
-        this->_db,
+        *this->_db,
         [this](Packet &packet) { this->packetHandler(packet); }
       )
 {}

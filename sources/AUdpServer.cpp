@@ -30,10 +30,6 @@ void AUdpServer::listen() {
             std::string req;
             req.resize(available + 1);
             this->_socket.receive_from(boost::asio::buffer(&(req[0]), req.size()), this->_clientEndpoint, 0, ec);
-            std::cout << "req :" << req << std::endl;
-            if (ec) {
-                std::cout << "err : " << ec << std::endl;
-            }
             this->requestHandler(ec, std::move(req), std::move(this->_clientEndpoint));
             this->listen();
         }

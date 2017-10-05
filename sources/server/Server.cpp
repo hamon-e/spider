@@ -14,7 +14,7 @@ bool Server::requestCheck(boost::system::error_code &,
 }
 
 void Server::packetHandler(Packet &packet) {
-    this->_db.insert(PacketManager::dataColName, packet.getPtree());
+    this->_db->insert(PacketManager::dataColName, packet.getPtree());
 }
 
 void Server::send(std::string const &cookie,
