@@ -8,136 +8,80 @@
 // Last update Thu Oct 05 11:02:34 2017 Benoit Hamon
 //
 
-#include <QtWidgets>
 
 #include "ModuleImage.hpp"
 
-Screenshot::Screenshot()
-    :  screenshotLabel(new QLabel(this))
+#include <Windows.h>
+#include <gdiplus.h>
+using namespace Gdiplus;
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 {
-    screenshotLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    screenshotLabel->setAlignment(Qt::AlignCenter);
+    UINT  num = 0;          // number of image encoders
+    UINT  size = 0;         // size of the image encoder array in bytes
 
-    const QRect screenGeometry = QApplication::desktop()->screenGeometry(this);
-    screenshotLabel->setMinimumSize(screenGeometry.width() / 8, screenGeometry.height() / 8);
+    ImageCodecInfo* pImageCodecInfo = NULL;
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(screenshotLabel);
+    GetImageEncodersSize(&num, &size);
+    if(size == 0)
+        return -1;  // Failure
 
-    QGroupBox *optionsGroupBox = new QGroupBox(tr("Options"), this);
-    delaySpinBox = new QSpinBox(optionsGroupBox);
-    delaySpinBox->setSuffix(tr(" s"));
-    delaySpinBox->setMaximum(60);
+    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    if(pImageCodecInfo == NULL)
+        return -1;  // Failure
 
-    connect(delaySpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &Screenshot::updateCheckBox);
+    GetImageEncoders(num, size, pImageCodecInfo);
 
-    hideThisWindowCheckBox = new QCheckBox(tr("Hide This Window"), optionsGroupBox);
-
-    QGridLayout *optionsGroupBoxLayout = new QGridLayout(optionsGroupBox);
-    optionsGroupBoxLayout->addWidget(new QLabel(tr("Screenshot Delay:"), this), 0, 0);
-    optionsGroupBoxLayout->addWidget(delaySpinBox, 0, 1);
-    optionsGroupBoxLayout->addWidget(hideThisWindowCheckBox, 1, 0, 1, 2);
-
-    mainLayout->addWidget(optionsGroupBox);
-
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    newScreenshotButton = new QPushButton(tr("New Screenshot"), this);
-    connect(newScreenshotButton, &QPushButton::clicked, this, &Screenshot::newScreenshot);
-    buttonsLayout->addWidget(newScreenshotButton);
-    QPushButton *saveScreenshotButton = new QPushButton(tr("Save Screenshot"), this);
-    connect(saveScreenshotButton, &QPushButton::clicked, this, &Screenshot::saveScreenshot);
-    buttonsLayout->addWidget(saveScreenshotButton);
-    QPushButton *quitScreenshotButton = new QPushButton(tr("Quit"), this);
-    quitScreenshotButton->setShortcut(Qt::CTRL + Qt::Key_Q);
-    connect(quitScreenshotButton, &QPushButton::clicked, this, &QWidget::close);
-    buttonsLayout->addWidget(quitScreenshotButton);
-    buttonsLayout->addStretch();
-    mainLayout->addLayout(buttonsLayout);
-
-    shootScreen();
-    delaySpinBox->setValue(5);
-
-    setWindowTitle(tr("Screenshot"));
-    resize(300, 200);
-}
-
-void Screenshot::resizeEvent(QResizeEvent * /* event */)
-{
-    QSize scaledSize = originalPixmap.size();
-    scaledSize.scale(screenshotLabel->size(), Qt::KeepAspectRatio);
-    if (!screenshotLabel->pixmap() || scaledSize != screenshotLabel->pixmap()->size())
-        updateScreenshotLabel();
-}
-
-void Screenshot::newScreenshot()
-{
-    if (hideThisWindowCheckBox->isChecked())
-        hide();
-    newScreenshotButton->setDisabled(true);
-
-    QTimer::singleShot(delaySpinBox->value() * 1000, this, &Screenshot::shootScreen);
-}
-
-void Screenshot::saveScreenshot()
-{
-    const QString format = "png";
-    QString initialPath = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
-    if (initialPath.isEmpty())
-        initialPath = QDir::currentPath();
-    initialPath += tr("/untitled.") + format;
-
-    QFileDialog fileDialog(this, tr("Save As"), initialPath);
-    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-    fileDialog.setFileMode(QFileDialog::AnyFile);
-    fileDialog.setDirectory(initialPath);
-    QStringList mimeTypes;
-    foreach (const QByteArray &bf, QImageWriter::supportedMimeTypes())
-        mimeTypes.append(QLatin1String(bf));
-    fileDialog.setMimeTypeFilters(mimeTypes);
-    fileDialog.selectMimeTypeFilter("image/" + format);
-    fileDialog.setDefaultSuffix(format);
-    if (fileDialog.exec() != QDialog::Accepted)
-        return;
-    const QString fileName = fileDialog.selectedFiles().first();
-    if (!originalPixmap.save(fileName)) {
-        QMessageBox::warning(this, tr("Save Error"), tr("The image could not be saved to \"%1\".")
-                             .arg(QDir::toNativeSeparators(fileName)));
+    for(UINT j = 0; j < num; ++j)
+    {
+        if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
+        {
+            *pClsid = pImageCodecInfo[j].Clsid;
+            free(pImageCodecInfo);
+            return j;  // Success
+        }
     }
+    free(pImageCodecInfo);
+    return -1;  // Failure
 }
 
-void Screenshot::shootScreen()
-{
-    QScreen *screen = QGuiApplication::primaryScreen();
-    if (const QWindow *window = windowHandle())
-        screen = window->screen();
-    if (!screen)
-        return;
+int main() {
 
-    if (delaySpinBox->value() != 0)
-        QApplication::beep();
+// get the device context of the screen
+    HDC hScreenDC = CreateDC("DISPLAY", NULL, NULL, NULL);
+// and a device context to put it in
+    HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 
-    originalPixmap = screen->grabWindow(0);
-    updateScreenshotLabel();
+    int width = GetDeviceCaps(hScreenDC, HORZRES);
+    int height = GetDeviceCaps(hScreenDC, VERTRES);
 
-    newScreenshotButton->setDisabled(false);
-    if (hideThisWindowCheckBox->isChecked())
-        show();
-}
+// maybe worth checking these are positive values
+    HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, width, height);
 
-void Screenshot::updateCheckBox()
-{
-    if (delaySpinBox->value() == 0) {
-        hideThisWindowCheckBox->setDisabled(true);
-        hideThisWindowCheckBox->setChecked(false);
-    } else {
-        hideThisWindowCheckBox->setDisabled(false);
-    }
-}
+// get a new bitmap
+    HBITMAP hOldBitmap = (HBITMAP) SelectObject(hMemoryDC, hBitmap);
 
-void Screenshot::updateScreenshotLabel()
-{
-    screenshotLabel->setPixmap(originalPixmap.scaled(screenshotLabel->size(),
-                                                     Qt::KeepAspectRatio,
-                                                     Qt::SmoothTransformation));
+    BitBlt(hMemoryDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY);
+    hBitmap = (HBITMAP) SelectObject(hMemoryDC, hOldBitmap);
+
+// clean up
+    DeleteDC(hMemoryDC);
+    DeleteDC(hScreenDC);
+
+
+    GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+    //HBITMAP hBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL), "babe.bmp", IMAGE_BITMAP, 0,0, LR_LOADFROMFILE);
+    Bitmap *image = new Bitmap(hBitmap, NULL);
+
+    CLSID myClsId;
+    int retVal = GetEncoderClsid(L"image/bmp", &myClsId);
+
+    image->Save(L"output.bmp", &myClsId, NULL);
+    delete image;
+
+    GdiplusShutdown(gdiplusToken);
+    return 0;
 }
