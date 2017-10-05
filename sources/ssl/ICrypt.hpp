@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:12:55 2017 Benoit Hamon
-// Last update Thu Oct 05 22:04:49 2017 Benoit Hamon
+// Last update Thu Oct 05 22:13:51 2017 Benoit Hamon
 //
 
 #pragma once
@@ -37,6 +37,6 @@ class ICrypt {
     virtual bool decrypt(std::string const &encryptedMessage, std::string &message) = 0;
 
   public:
-    virtual bool setKeyFromFile(KeyType type, std::string const &filename);
-    virtual bool saveKeyInFile(KeyType type, std::string const &filename);
+    virtual bool setKeyFromFile(KeyType type, std::string const &filename) = 0;
+    virtual bool saveKeyInFile(KeyType type, std::string const &filename) = 0;
 };
