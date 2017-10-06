@@ -11,5 +11,5 @@
 
 class IModule {
 public:
-    virtual void start(ModuleCommunication &com) = 0;
+    virtual void start(IModuleCommunication *com) = 0;
 };

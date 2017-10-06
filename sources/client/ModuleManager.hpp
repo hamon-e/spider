@@ -10,7 +10,7 @@
 #include "IModule.hpp"
 #include "Client.hpp"
 
-typedef boost::shared_ptr<IModule> (module_t)(Client &);
+typedef boost::shared_ptr<IModule> (module_t)();
 
 class ModuleManager {
 public:
@@ -33,7 +33,6 @@ private:
     std::vector<std::string> readDirectory();
 
 private:
-    Client &_client;
     std::string _dirname;
     std::vector<Library> _libraries;
     boost::thread_group _threads;

@@ -10,7 +10,8 @@
 #include "ModuleManager.hpp"
 #include "Client.hpp"
 
-ModuleManager::ModuleManager(Client &client, std::string const &dirname) : _client(client), _dirname(dirname) {}
+ModuleManager::ModuleManager(Client &client, std::string const &dirname)
+  : _moduleCommunication(client), _dirname(dirname) {}
 
 ModuleManager::~ModuleManager() {}
 
@@ -36,9 +37,9 @@ void ModuleManager::runLibrary(std::string const &libraryName) {
     std::cout << libraryName << std::endl;
     try {
         creator = boost::dll::import_alias<module_t>(shared_library_path, "create_module");
-        boost::shared_ptr<IModule> plugin = creator(this->_client);
+        boost::shared_ptr<IModule> plugin = creator();
         this->_threads.create_thread(boost::bind(&IModule::start, plugin.get(),
-						 boost::ref(this->_moduleCommunication)));
+						 &this->_moduleCommunication));
         this->_libraries.push_back({libraryName, plugin, creator});
     } catch (std::exception) {
         this->_libraries.push_back({libraryName, nullptr, creator});
