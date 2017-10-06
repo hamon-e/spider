@@ -20,5 +20,5 @@ public:
     virtual void add(std::string const &module, std::string const &name, std::string const &value = "") = 0;
     virtual void add(std::string const &module, Order const &order) = 0;
     virtual bool get(std::string const &module, Order &order) = 0;
-    virtual void send(std::string const &module, boost::property_tree::ptree const &data) = 0;
+    virtual void send(boost::property_tree::ptree const &data) = 0;
 };

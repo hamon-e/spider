@@ -34,11 +34,10 @@ bool ModuleCommunication::get(std::string const &module, Order &order) {
   return false;
 }
 
-void ModuleCommunication::send(std::string const &module,
-			       boost::property_tree::ptree const &data) {
+void ModuleCommunication::send(boost::property_tree::ptree const &data) {
   std::stringstream ss;
   boost::property_tree::json_parser::write_json(ss, data);
 
-  this->_client.send("Cookie", module, ss.str());
+  this->_client.send("Cookie", "", ss.str());
   std::cout << ss.str() << std::endl;
 }
