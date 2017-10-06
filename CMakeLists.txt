@@ -95,3 +95,21 @@ set(KEYBOARD_NAME module_keyboard)
 set(SOURCE_FILES sources/client/modules/ModuleKeyboard.cpp sources/client/IModule.hpp)
 add_library(${KEYBOARD_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${KEYBOARD_NAME} ${Boost_LIBRARIES})
+
+#############################################################################
+#####################  Cmake Server HTTP  ###################################
+#############################################################################
+
+set(HTTP_NAME http_server)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread")
+
+set(SOURCE_FILES ./sources/server/https_examples.cpp)
+
+add_executable(${HTTP_NAME} ${SOURCE_FILES})
+target_link_libraries(${HTTP_NAME} ${Boost_LIBRARIES})
+target_link_libraries(${HTTP_NAME} ${OPENSSL_LIBRARIES})
+
+target_include_directories(${HTTP_NAME} PUBLIC
+    ./libs
+)
