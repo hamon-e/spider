@@ -9,13 +9,14 @@
 
 #include "ModuleExplorer.hpp"
 
-ModuleExplorer::ModuleExplorer(Client &client) : _client(client) {}
+ModuleExplorer::ModuleExplorer(IModuleCommunication *moduleCommunication)
+  : _moduleCommunication(moduleCommunication) {}
 
-void ModuleExplorer::start(ModuleCommunication &com) {
-  ModuleCommunication::Order order;
+void ModuleExplorer::start() {
+  IModuleCommunication::Order order;
 
   while (true) {
-    if (com.get("Explorer", order)) {
+    if (this->_moduleCommunication->get("Explorer", order)) {
       if (order.name == "chdir")
 	this->changeDir(order.value);
       else if (order.name == "readdir")
@@ -24,9 +25,9 @@ void ModuleExplorer::start(ModuleCommunication &com) {
   }
 }
 
-boost::shared_ptr<ModuleExplorer> ModuleExplorer::create(Client &client) {
+boost::shared_ptr<ModuleExplorer> ModuleExplorer::create(IModuleCommunication *moduleCommunication) {
     return boost::shared_ptr<ModuleExplorer>(
-            new ModuleExplorer(client)
+            new ModuleExplorer(moduleCommunication)
     );
 }
 
@@ -64,11 +65,7 @@ void ModuleExplorer::sendFiles() {
 
   ptree.add_child("files", names);
 
-
-  std::stringstream ss;
-  boost::property_tree::json_parser::write_json(ss, ptree);
-
-  std::cout << ss.str() << std::endl;
+  this->_moduleCommunication->send("Explorer", ptree);
 }
 
 BOOST_DLL_ALIAS(ModuleExplorer::create, create_module)

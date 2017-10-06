@@ -6,10 +6,9 @@
 
 #include <string>
 
-#include "ModuleCommunication.hpp"
-#include "Client.hpp"
+#include "IModuleCommunication.hpp"
 
 class IModule {
 public:
-    virtual void start(IModuleCommunication *com) = 0;
+    virtual void start() = 0;
 };
