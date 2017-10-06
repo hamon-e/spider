@@ -102,7 +102,7 @@ target_link_libraries(${KEYBOARD_NAME} ${Boost_LIBRARIES})
 
 set(HTTP_NAME http_server)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 
 set(SOURCE_FILES ./sources/server/https_examples.cpp)
 

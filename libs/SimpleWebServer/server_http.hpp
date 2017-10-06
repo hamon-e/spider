@@ -8,7 +8,7 @@
 #include <map>
 #include <mutex>
 #include <sstream>
-#include <thread>
+#include <boost/thread.hpp>
 #include <unordered_set>
 
 #ifdef USE_STANDALONE_ASIO
@@ -386,7 +386,7 @@ namespace SimpleWeb {
     bool internal_io_service = false;
 
     std::unique_ptr<asio::ip::tcp::acceptor> acceptor;
-    std::vector<std::thread> threads;
+    std::vector<boost::thread> threads;
 
     std::shared_ptr<std::unordered_set<Connection *>> connections;
     std::shared_ptr<std::mutex> connections_mutex;

@@ -122,8 +122,8 @@ int main() {
 
   // Get example simulating heavy work in a separate thread
   server.resource["^/work$"]["GET"] = [](shared_ptr<HttpsServer::Response> response, shared_ptr<HttpsServer::Request> /*request*/) {
-    thread work_thread([response] {
-      this_thread::sleep_for(chrono::seconds(5));
+    boost::thread work_thread([response] {
+	boost::this_thread::sleep_for(boost::chrono::seconds(5));
       response->write("Work done");
     });
     work_thread.detach();
@@ -213,38 +213,7 @@ int main() {
     // Handle errors here
   };
 
-  thread server_thread([&server]() {
-    // Start server
-    server.start();
-  });
-
-  // Wait for server to start so that the client can connect
-  this_thread::sleep_for(chrono::seconds(1));
-
-  // Client examples
-  // Second create() parameter set to false: no certificate verification
-  HttpsClient client("localhost:8080", false);
-
-  string json_string = "{\"firstName\": \"John\",\"lastName\": \"Smith\",\"age\": 25}";
-
-  // Synchronous request examples
-  try {
-    auto r1 = client.request("GET", "/match/123");
-    cout << r1->content.rdbuf() << endl; // Alternatively, use the convenience function r1->content.string()
-
-    auto r2 = client.request("POST", "/string", json_string);
-    cout << r2->content.rdbuf() << endl;
-  }
-  catch(const SimpleWeb::system_error &e) {
-    cerr << "Client request error: " << e.what() << endl;
-  }
-
-  // Asynchronous request example
-  client.request("POST", "/json", json_string, [](shared_ptr<HttpsClient::Response> response, const SimpleWeb::error_code &ec) {
-    if(!ec)
-      cout << response->content.rdbuf() << endl;
-  });
-  client.io_service->run();
+  boost::thread server_thread([&server]() {server.start();});
 
   server_thread.join();
 }
