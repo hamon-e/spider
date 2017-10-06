@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "IModule.hpp"
+#include "../IModule.hpp"
 
 class ModuleExplorer : public IModule {
 public:

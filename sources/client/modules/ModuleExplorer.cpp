@@ -64,7 +64,15 @@ void ModuleExplorer::sendFiles() {
 
   ptree.add_child("files", names);
 
-  std::cout << ptree << std::endl;
+
+  std::stringstream ss;
+  boost::property_tree::json_parser::write_json(ss, ptree);
+
+  std::cout << ss.str() << std::endl;
 }
 
 BOOST_DLL_ALIAS(ModuleExplorer::create, create_module)
+int main(int argc, char *argv[]) {
+
+  return 0;
+}

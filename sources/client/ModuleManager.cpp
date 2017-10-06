@@ -17,7 +17,7 @@ ModuleManager::~ModuleManager() {}
 std::vector<std::string> ModuleManager::readDirectory() {
     boost::filesystem::path p(this->_dirname);
     std::vector<std::string> res;
-    std::regex regex(".+\\.dll");
+    std::regex regex(".+\\.so");
 
     if (is_directory(p)) {
         for (auto &entry : boost::make_iterator_range(boost::filesystem::directory_iterator(p), {})) {
@@ -60,6 +60,7 @@ void ModuleManager::runLibraries() {
 void ModuleManager::run() {
     while (true) {
         this->runLibraries();
+	this->_moduleCommunication.add("Explorer", "readdir");
         sleep(1);
     }
     this->_threads.join_all();
