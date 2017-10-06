@@ -4,7 +4,7 @@
 
 #include "ModuleCommunication.hpp"
 
-ModuleCommunication::ModuleCommunication() {}
+ModuleCommunication::ModuleCommunication(Client &client) : _client(client) {}
 
 ModuleCommunication::~ModuleCommunication() {}
 
@@ -21,7 +21,6 @@ void ModuleCommunication::add(std::string const &module, Order const &order) {
 }
 
 bool ModuleCommunication::get(std::string const &module, Order &order) {
-
   this->_mutex.lock();
   for (auto it = this->_orders.begin(); it != this->_orders.end(); ++it) {
     if ((*it).module == module) {
@@ -33,4 +32,13 @@ bool ModuleCommunication::get(std::string const &module, Order &order) {
   }
   this->_mutex.unlock();
   return false;
+}
+
+void ModuleCommunication::send(std::string const &module,
+			       boost::property_tree::ptree const &data) {
+  std::stringstream ss;
+  boost::property_tree::json_parser::write_json(ss, data);
+
+  this->_client.send("Cookie", module, ss.str());
+  std::cout << ss.str() << std::endl;
 }
