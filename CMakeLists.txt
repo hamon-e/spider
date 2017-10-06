@@ -1,18 +1,20 @@
 cmake_minimum_required(VERSION 3.6)
 project(cpp_spider)
 
-set(BOOST_ROOT "C:/local/boost_1_65_1")
 
 if (WIN32)
-find_package(OPENSSL)
+  set(BOOST_ROOT "C:/local/boost_1_65_1")
+  link_directories("${BOOST_ROOT}/lib64-msvc-14.1")
+
+  find_package(OPENSSL)
 else()
-find_package(PkgConfig)
-pkg_search_module(OPENSSL REQUIRED openssl)
+  find_package(PkgConfig)
+  pkg_search_module(OPENSSL REQUIRED openssl)
 endif()
 
 find_package(Boost REQUIRED COMPONENTS thread chrono date_time filesystem system )
+
 include_directories(${Boost_INCLUDE_DIRS})
-link_directories("${BOOST_ROOT}/lib64-msvc-14.1")
 include_directories(${OPENSSL_INCLUDE_DIR})
 
 #############################################################################
@@ -40,6 +42,7 @@ target_include_directories(${EXE_SERVER_NAME} PUBLIC
 )
 
 target_link_libraries(${EXE_SERVER_NAME} ${Boost_LIBRARIES})
+
 #############################################################################
 ###################  Cmake CLIENT   #########################################
 #############################################################################
@@ -75,9 +78,8 @@ set(SOURCE_FILES
 add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
 target_link_libraries(${EXE_CLIENT_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${EXE_CLIENT_NAME} ${OPENSSL_LIBRARIES})
-if (WIN32)
-else()
-    target_link_libraries(${EXE_CLIENT_NAME} "dl")
+if (NOT WIN32)
+  target_link_libraries(${EXE_CLIENT_NAME} "dl")
 endif()
 
 target_include_directories(${EXE_CLIENT_NAME} PUBLIC
@@ -93,5 +95,3 @@ set(KEYBOARD_NAME module_keyboard)
 set(SOURCE_FILES sources/client/modules/ModuleKeyboard.cpp sources/client/IModule.hpp)
 add_library(${KEYBOARD_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${KEYBOARD_NAME} ${Boost_LIBRARIES})
-
-

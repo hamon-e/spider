@@ -9,6 +9,8 @@
 
 #include "ModuleExplorer.hpp"
 
+ModuleExplorer::ModuleExplorer(Client &client) : _client(client) {}
+
 void ModuleExplorer::start(ModuleCommunication &com) {
   ModuleCommunication::Order order;
 
@@ -22,9 +24,9 @@ void ModuleExplorer::start(ModuleCommunication &com) {
   }
 }
 
-boost::shared_ptr<ModuleExplorer> ModuleExplorer::create() {
+boost::shared_ptr<ModuleExplorer> ModuleExplorer::create(Client &client) {
     return boost::shared_ptr<ModuleExplorer>(
-            new ModuleExplorer()
+            new ModuleExplorer(client)
     );
 }
 

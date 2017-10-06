@@ -7,6 +7,7 @@
 #include <string>
 
 #include "ModuleCommunication.hpp"
+#include "Client.hpp"
 
 class IModule {
 public:

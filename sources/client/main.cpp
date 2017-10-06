@@ -9,18 +9,14 @@
 // Last update Wed Oct 04 20:07:50 2017 Benoit Hamon
 //
 
-#include <thread>
+#include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
 #include "Client.hpp"
 #include "ModuleManager.hpp"
 
 int main(int argc, char const *argv[]) {
-  ModuleManager mod;
     boost::asio::io_service ioService;
-
-  mod.run();
-
 
     if (argc < 3) {
         return 1;
@@ -29,13 +25,13 @@ int main(int argc, char const *argv[]) {
     Client client(ioService, argv[1], argv[2]);
     client.send("Nicolas", "plain_text", "helloazeazeazeazeazeazeaz");
     client.start();
-    std::thread input([&client]() {
-        std::string line;
-        while (getline(std::cin, line)) {
-            client.send("Nicolas", "caca", line);
-        }
-    });
+
+    boost::thread modules([&client]() {
+	ModuleManager mod(client);
+	mod.run();
+	});
+
     ioService.run();
-    input.join();
+    modules.join();
     return 0;
 }
