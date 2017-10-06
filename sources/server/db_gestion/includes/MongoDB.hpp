@@ -2,8 +2,8 @@
 // Created by golitij on 03/10/17.
 //
 
-#ifndef CPP_SPIDER_DB_GESTION_HPP
-#define CPP_SPIDER_DB_GESTION_HPP
+#ifndef CPP_SPIDER_MongoDB_HPP
+#define CPP_SPIDER_MongoDB_HPP
 
 #include <cstdint>
 #include <iostream>
@@ -17,6 +17,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/iostreams/stream.hpp>
 #include "IDataBase.hpp"
+#include "ADataBase.hpp"
 
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
@@ -25,7 +26,7 @@ using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::open_document;
 
-class db_gestion : public IDataBase
+class MongoDB : public ADataBase
 {
     mongocxx::client *_mongodb_client;
     mongocxx::database _db_access;
@@ -34,14 +35,16 @@ class db_gestion : public IDataBase
 
     void _generate_builder(ptree const &doc);
 public:
-    db_gestion(std::string const &client_name = "cpp_spider");
-    ~db_gestion();
-    void insert(ptree const &doc);
+    MongoDB(std::string const &client_name = "cpp_spider");
+    ~MongoDB();
     void set_collection_name(std::string const & coll_name = "JoneDoe");
-    std::vector<ptree> find(ptree const &query);
-    void update(ptree const &query, ptree const &update);
-    void remove(ptree const &query);
+
+    virtual void insert(ptree const &doc);
+    virtual std::vector<ptree> find(ptree const &query);
+    virtual ptree findOne(ptree const &query);
+    virtual void update(ptree const &query, ptree const &update);
+    virtual void remove(ptree const &query);
 };
 
 
-#endif //CPP_SPIDER_DB_GESTION_HPP
+#endif //CPP_SPIDER_MongoDB_HPP
