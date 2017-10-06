@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <boost/property_tree/ptree.hpp>
 
 class IDataBase {
