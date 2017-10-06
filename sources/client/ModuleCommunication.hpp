@@ -10,7 +10,7 @@
 #include "IModuleCommunication.hpp"
 #include "Client.hpp"
 
-class ModuleCommunication : IModuleCommunication {
+class ModuleCommunication : public IModuleCommunication {
 public:
     ModuleCommunication(Client &client);
     ~ModuleCommunication();
