@@ -13,9 +13,13 @@
 using namespace boost::filesystem;
 
 void LocalDB::insert(ptree const &doc) {
-    std::string filename = doc.get<std::string>("timestamp") + ".json";
+    std::string filename = doc.get<std::string>("checksum") + ".json";
 
-    boost::property_tree::write_json(filename, doc);
+    try {
+        boost::property_tree::write_json(filename, doc);
+    } catch (boost::property_tree::json_parser_error &error) {
+
+    }
 }
 
 boost::property_tree::ptree LocalDB::findOne(ptree const &query) {
@@ -26,12 +30,15 @@ boost::property_tree::ptree LocalDB::findOne(ptree const &query) {
 
     for (directory_iterator it(targetDir); it != end_it; ++it) {
         std::cout << it->path().string() << std::endl;
-        if (is_regular_file(it->path()) && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
-            boost::property_tree::read_json(it->path().string(), result);
-            std::cout << "tata" << std::endl;
+        if (is_regular_file(it->path())
+            && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
+            try {
+                boost::property_tree::read_json(it->path().string(), result);
+                if (this->searchQuery(const_cast<ptree &>(query), result))
+                    return result;
+            } catch (boost::property_tree::json_parser_error &error) {
 
-            if (this->searchQuery(const_cast<ptree &>(query), result))
-                return result;
+            }
         }
     }
     throw std::out_of_range("No corresponding file");
@@ -42,12 +49,17 @@ std::vector<boost::property_tree::ptree> LocalDB::find(ptree const &query) {
     directory_iterator end_it;
 
     for (directory_iterator it("."); it != end_it; ++it) {
-        if (is_regular_file(it->path()) && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
+        if (is_regular_file(it->path())
+            && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
             ptree tmp;
 
-            boost::property_tree::read_json(it->path().string(), tmp);
-            if (this->searchQuery(const_cast<ptree &>(query), tmp))
-                result.push_back(tmp);
+            try {
+                boost::property_tree::read_json(it->path().string(), tmp);
+                if (this->searchQuery(const_cast<ptree &>(query), tmp))
+                    result.push_back(tmp);
+            } catch (boost::property_tree::json_parser_error &error) {
+
+            }
         }
     }
     return result;
@@ -57,14 +69,23 @@ void LocalDB::update(ptree const &query, ptree const &update) {
     directory_iterator end_it;
 
     for (directory_iterator it("."); it != end_it; ++it) {
-        if (is_regular_file(it->path()) && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
+        if (is_regular_file(it->path())
+            && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
             ptree tmp;
 
-            boost::property_tree::read_json(it->path().string(), tmp);
-            if (this->searchQuery(const_cast<ptree &>(query), tmp)) {
-                this->updatePTree(const_cast<ptree &>(update), tmp);
+            try {
+                boost::property_tree::read_json(it->path().string(), tmp);
+                if (this->searchQuery(const_cast<ptree &>(query), tmp)) {
+                    this->updatePTree(const_cast<ptree &>(update), tmp);
 
-                boost::property_tree::write_json(it->path().string(), tmp);
+                    try {
+                        boost::property_tree::write_json(it->path().string(), tmp);
+                    } catch (boost::property_tree::json_parser_error &error) {
+
+                    }
+                }
+            } catch (boost::property_tree::json_parser_error &error) {
+
             }
         }
     }
@@ -74,12 +95,21 @@ void LocalDB::remove(ptree const &query) {
     directory_iterator end_it;
 
     for (directory_iterator it("."); it != end_it; ++it) {
-        if (is_regular_file(it->path()) && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
+        if (is_regular_file(it->path())
+            && it->path().string().substr(it->path().string().find_last_of('.') + 1) == "json") {
             ptree tmp;
-            boost::property_tree::read_json(it->path().string(), tmp);
 
+            try {
+                boost::property_tree::read_json(it->path().string(), tmp);
+            } catch (boost::property_tree::json_parser_error &error) {
+
+            }
             if (this->searchQuery(const_cast<ptree &>(query), tmp)) {
-                boost::filesystem::remove(it->path());
+                try {
+                    boost::filesystem::remove(it->path());
+                } catch (boost::filesystem::filesystem_error &error) {
+
+                }
             }
         }
     }

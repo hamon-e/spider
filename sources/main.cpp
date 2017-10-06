@@ -13,6 +13,7 @@ int main()
     pt::ptree tree;
 
     tree.put("timestamp", 1);
+    tree.put("checksum", 3);
     tree.put("id", 1);
     tree.put("data.key", "qeqqeweqwe");
     tree.put("data.process", "skype");
@@ -20,6 +21,7 @@ int main()
     pt::ptree tree2;
 
     tree2.put("timestamp", 2);
+    tree.put("checksum", 5);
     tree2.put("data.key", "qeqqeweqwe");
     tree2.put("data.process", "discord");
     tree2.put("id", 2);
