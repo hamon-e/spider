@@ -1,0 +1,24 @@
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <iostream>
+
+int main(int, char**)
+{
+    mongocxx::instance inst{};
+    mongocxx::client conn{mongocxx::uri{}};
+    bsoncxx::builder::stream::document document{};
+    std::vector<bsoncxx::document::value> documents;
+    for(int i = 0; i < 100; i++)
+      
+    auto collection = conn["e"]["testcollection"];
+    document << "hello" << "world";
+    std::cout << "ok\n";
+    collection.insert_one(document.view());
+    auto cursor = collection.find({});
+
+    for (auto&& doc : cursor) {
+        std::cout << bsoncxx::to_json(doc) << std::endl;
+    }
+}

@@ -1,0 +1,1 @@
+/bin/c++    -rdynamic CMakeFiles/bulk_write.dir/bulk_write.o  -o bulk_write  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 

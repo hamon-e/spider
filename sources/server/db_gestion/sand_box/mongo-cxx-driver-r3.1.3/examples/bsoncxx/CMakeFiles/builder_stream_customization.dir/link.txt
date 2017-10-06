@@ -1,0 +1,1 @@
+/bin/c++    -rdynamic CMakeFiles/builder_stream_customization.dir/builder_stream_customization.o  -o builder_stream_customization  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lbsoncxx 

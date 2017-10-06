@@ -1,0 +1,3 @@
+/home/golitij/cpp_a1/sand_box/test_mgDBcXXX/CMakeFiles/rebuild_cache.dir
+/home/golitij/cpp_a1/sand_box/test_mgDBcXXX/CMakeFiles/test_mgDBcXXX.dir
+/home/golitij/cpp_a1/sand_box/test_mgDBcXXX/CMakeFiles/edit_cache.dir
