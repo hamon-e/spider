@@ -10,20 +10,29 @@
 
 #pragma once
 
+#include <gdiplus.h>
+
 #include "../IModule.hpp"
 #include "../IModuleCommunication.hpp"
 
-class ModuleExplorer : public IModule {
+class ModuleImage : public IModule {
 public:
-    ModuleExplorer(IModuleCommunication *);
+    ModuleImage(IModuleCommunication *);
+    ~ModuleImage();
 
 public:
     void start() override;
 
 public:
-    static boost::shared_ptr<ModuleExplorer> create(IModuleCommunication *);
+    static boost::shared_ptr<ModuleImage> create(IModuleCommunication *);
 
 private:
+    void takeScrenshot(std::wstring const &filename);
+    void saveImage(HBITMAP &hbitmap, std::wstring const &filename);
+    void ModuleImage::sendImage(std::string const *filename);
+
+public:
+    bool GetEncoderClsid(wchar_t const *format, CLSID* pClsid);
 
 private:
     IModuleCommunication *_moduleCommunication;
