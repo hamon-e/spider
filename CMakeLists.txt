@@ -17,7 +17,16 @@ add_executable(${EXE_SERVER_NAME} ${SOURCE_FILES})
 set(EXE_CLIENT_NAME spider_client)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+find_package(Boost 1.36.0 COMPONENTS date_time filesystem system thread)
 
-set(SOURCE_FILES ./sources/client/main.cpp)
+if(Boost_FOUND)
 
-add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
+    include_directories(${Boost_INCLUDE_DIRS})
+
+    set(SOURCE_FILES sources/LocalDB.cpp sources/LocalDB.hpp sources/main.cpp sources/ADataBase.cpp sources/ADataBase.hpp)
+
+    add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
+
+    target_link_libraries(${EXE_CLIENT_NAME} ${Boost_LIBRARIES})
+
+endif()

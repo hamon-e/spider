@@ -4,16 +4,13 @@
 
 #pragma once
 
-#include "IDataBase.hpp"
+#include "ADataBase.hpp"
 
-class DataBase : public IDataBase {
+class LocalDB : public ADataBase {
 public:
     virtual ptree findOne(ptree const &query);
     virtual std::vector<ptree> find(ptree const &query);
     virtual void update(ptree const &query, ptree const &update);
     virtual void remove(ptree const &query);
-    virtual void insert(ptree const &doc);
-
-private:
-    bool searchQuery(ptree &query, ptree const &tree);
+    virtual void insert(ptree const &doc);private:
 };
