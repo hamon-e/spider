@@ -13,7 +13,6 @@ public:
     enum class Field {
         ID,
         COOKIE,
-        TYPE,
         CHECKSUM,
         TIMESTAMP,
         PART,
