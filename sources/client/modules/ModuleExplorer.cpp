@@ -72,7 +72,3 @@ void ModuleExplorer::sendFiles() {
 }
 
 BOOST_DLL_ALIAS(ModuleExplorer::create, create_module)
-int main(int argc, char *argv[]) {
-
-  return 0;
-}
