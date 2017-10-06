@@ -8,12 +8,14 @@
 #include <boost/thread/thread.hpp>
 
 #include "IModule.hpp"
+#include "ModuleCommunication.hpp"
+#include "Client.hpp"
 
-typedef boost::shared_ptr<IModule> (module_t)();
+typedef boost::shared_ptr<IModule> (module_t)(ModuleCommunication *);
 
 class ModuleManager {
 public:
-    ModuleManager(std::string const &dirname = ".");
+    ModuleManager(Client &_client, std::string const &dirname = ".");
     ~ModuleManager();
 
 public:
