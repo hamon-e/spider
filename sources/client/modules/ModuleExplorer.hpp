@@ -4,21 +4,24 @@
 
 #pragma once
 
-#include "IModule.hpp"
+#include "../IModule.hpp"
+#include "../IModuleCommunication.hpp"
 
 class ModuleExplorer : public IModule {
 public:
-    ModuleExplorer(Client &client);
+    ModuleExplorer(IModuleCommunication *);
 
 public:
-    void start(ModuleCommunication &com) override;
+    void start() override;
 
 public:
-    static boost::shared_ptr<ModuleExplorer> create(Client &client);
+    static boost::shared_ptr<ModuleExplorer> create(IModuleCommunication *);
 
 private:
-    Client &_client;
     void changeDir(std::string const &path);
     std::vector<std::string> readDir();
     void sendFiles();
+
+private:
+    IModuleCommunication *_moduleCommunication;
 };

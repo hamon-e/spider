@@ -7,21 +7,19 @@
 #include <string>
 #include <boost/thread/thread.hpp>
 
-class ModuleCommunication {
+#include "IModuleCommunication.hpp"
+#include "Client.hpp"
+
+class ModuleCommunication : public IModuleCommunication {
 public:
-    ModuleCommunication();
+    ModuleCommunication(Client &client);
     ~ModuleCommunication();
 
 public:
-    struct Order {
-        std::string name;
-        std::string value;
-    };
-
-public:
-    void add(std::string const &module, std::string const &name, std::string const &value = "");
-    void add(std::string const &module, Order const &order);
-    bool get(std::string const &module, Order &order);
+    void add(std::string const &module, std::string const &name, std::string const &value = "") override;
+    void add(std::string const &module, Order const &order) override;
+    bool get(std::string const &module, Order &order) override;
+    void send(std::string const &module, boost::property_tree::ptree const &data) override;
 
 private:
     struct ModOrder {
@@ -31,6 +29,7 @@ private:
     };
 
 private:
+    Client &_client;
     boost::mutex _mutex;
     std::vector<ModOrder> _orders;
 };
