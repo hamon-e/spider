@@ -1,1 +1,0 @@
-/bin/c++    -rdynamic CMakeFiles/aggregate.dir/aggregate.o  -o aggregate  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 

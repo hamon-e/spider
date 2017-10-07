@@ -1,1 +1,0 @@
-/bin/c++    -rdynamic CMakeFiles/connect.dir/connect.o  -o connect  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 

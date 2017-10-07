@@ -1,1 +1,0 @@
-/bin/c++    -rdynamic CMakeFiles/view_or_value_variant.dir/view_or_value_variant.o  -o view_or_value_variant  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 

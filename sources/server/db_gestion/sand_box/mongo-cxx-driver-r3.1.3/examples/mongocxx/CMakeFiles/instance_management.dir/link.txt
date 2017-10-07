@@ -1,1 +1,0 @@
-/bin/c++    -rdynamic CMakeFiles/instance_management.dir/instance_management.o  -o instance_management  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 

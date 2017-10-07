@@ -1,1 +1,0 @@
-/bin/c++    -rdynamic CMakeFiles/document_validation.dir/document_validation.o  -o document_validation  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 

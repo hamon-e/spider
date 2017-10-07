@@ -1,1 +1,0 @@
-/bin/c++    -rdynamic CMakeFiles/index.dir/index.o  -o index  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 

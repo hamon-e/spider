@@ -1,1 +1,0 @@
-g++ main.o -o matchingengine /home/golitij/cpp_a1/sand_box/test_mgDBcXXX/mongo-cxx-driver-r3.1.3/build/src/mongocxx/libmongocxx.a /home/golitij/cpp_a1/sand_box/test_mgDBcXXX/mongo-cxx-driver-r3.1.3/build/src/bsoncxx/libbsoncxx.a

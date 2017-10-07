@@ -1,1 +1,0 @@
-/bin/c++    -rdynamic CMakeFiles/exception.dir/exception.o  -o exception  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lmongocxx 
