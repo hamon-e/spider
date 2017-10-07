@@ -21,7 +21,7 @@ void MongoDB::_generate_builder(ptree const &doc)
         if (!iter->second.empty())
         {
             _builder << iter->first << bsoncxx::builder::stream::open_document;
-            this->_generate_builder(iter->second);
+            _generate_builder(iter->second);
             _builder << bsoncxx::builder::stream::close_document;
         }
         else
@@ -29,7 +29,7 @@ void MongoDB::_generate_builder(ptree const &doc)
     }
 }
 
-void MongoDB::set_collection_name(std::string const & coll_name)
+void my_set_collection_name(std::string const & coll_name)
 {
     _collection = _db_access[coll_name];
 }
@@ -53,8 +53,8 @@ std::vector<ptree> MongoDB::find(ptree const &query)
 
     if (query.size() > 0)
     {
-        this->_generate_builder(query);
-        mongocxx::cursor cursor = collection.find(document{} << finalize);
+        _generate_builder(query);
+        mongocxx::cursor cursor = _collection.find(document{} << finalize);
         for(auto doc : cursor)
         {
             json_result = bsoncxx::to_json(doc);
@@ -74,7 +74,7 @@ ptree MongoDB::findOne(ptree const &query)
 
     if (query.size() > 0)
     {
-        this->_generate_builder(query);
+        _generate_builder(query);
         query_result = _collection.find_one(_builder << bsoncxx::builder::stream::finalize);
         if(query_result)
         {
@@ -86,24 +86,24 @@ ptree MongoDB::findOne(ptree const &query)
     return (ret_ptree);
 }
 
-void MongoDB::update(ptree const &query, ptree const &update)
+void MongoDB::remove(ptree const &query)
 {
-    ptree const &tree = update;
-    ptree const &update = query;
-
-    if (query.size() > 0 && update.size() > 0)
+    if (query.size() > 0)
     {
-        this->updatePTree(query, update);
-        this->remove(update);
-        this->insert(update);
+        _generate_builder(query);
+        _collection.delete_one(_builder << bsoncxx::builder::stream::finalize);
     }
 }
 
-void MongoDB::remove(ptree const &query)
+void MongoDB::update(ptree const &query, ptree const &update)
 {
+    ptree tree = update;
+    ptree query_bis = query;
+
     if (query.size() > 0 && update.size() > 0)
     {
-        this->_generate_builder(query);
-        collection.delete_one(_builder << bsoncxx::builder::stream::finalize);
+        updatePTree(query_bis, tree);
+        my_remove(update);
+        my_insert(tree);
     }
 }
