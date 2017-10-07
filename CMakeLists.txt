@@ -46,11 +46,15 @@ set(SOURCE_FILES
 ./sources/MapDB.cpp
 ./sources/MongoDB.cpp
 )
+        ./sources/LocalDB.cpp
+        ./sources/LocalDB.hpp
+        )
 
 add_executable(${EXE_SERVER_NAME} ${SOURCE_FILES})
 target_include_directories(${EXE_SERVER_NAME} PUBLIC
     ./sources
 )
+
 target_link_libraries(${EXE_SERVER_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${EXE_SERVER_NAME} ${LIBMONGOCXX_LIBRARIES})
 target_link_libraries(${EXE_SERVER_NAME} ${LIBBSONCXX_LIBRARIES})
@@ -61,6 +65,22 @@ target_link_libraries(${EXE_SERVER_NAME} ${LIBBSONCXX_LIBRARIES})
 
 set(EXE_CLIENT_NAME spider_client)
 
+#<<<<<<< HEAD
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+#find_package(Boost 1.36.0 COMPONENTS date_time filesystem system thread)
+#
+#if(Boost_FOUND)
+#
+#    include_directories(${Boost_INCLUDE_DIRS})
+#
+#    set(SOURCE_FILES sources/LocalDB.cpp sources/LocalDB.hpp sources/main.cpp)
+#
+#    add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
+#
+#    target_link_libraries(${EXE_CLIENT_NAME} ${Boost_LIBRARIES})
+#
+#endif()
+#=======
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread")
 
 set(SOURCE_FILES 
@@ -68,7 +88,8 @@ set(SOURCE_FILES
   ./sources/client/ModuleCommunication.cpp
   ./sources/ssl/Base64.cpp
   ./sources/ssl/CryptAES.cpp
-  ./sources/ssl/CryptRSA.cpp)
+  ./sources/ssl/CryptRSA.cpp
+        sources/LocalDB.cpp sources/LocalDB.hpp)
 if (WIN32)
   set (SOURCE_FILES
     ${SOURCE_FILES}
@@ -122,3 +143,4 @@ target_link_libraries(${EXPLORER_NAME} ${Boost_LIBRARIES})
 target_include_directories(${EXPLORER_NAME} PUBLIC
     ./sources/
 )
+#>>>>>>> origin
