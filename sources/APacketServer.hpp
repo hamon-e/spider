@@ -8,6 +8,7 @@
 class APacketServer : public AUdpServer {
 public:
     APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db = new MapDB());
+    ~APacketServer();
 
 public:
     void sendPacket(

@@ -13,6 +13,10 @@ APacketServer::APacketServer(boost::asio::io_service &ioService, int port, IData
       )
 {}
 
+APacketServer::~APacketServer() {
+    delete this->_db;
+}
+
 void APacketServer::sendPacket(std::string const &id,
                                std::string const &cookie,
                                std::string const &data,
