@@ -19,18 +19,16 @@ void Server::packetHandler(Packet &packet) {
 }
 
 void Server::send(std::string const &cookie,
-                  std::string const &type,
                   std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,
                   std::string const &id) {
-    this->sendPacket(id, cookie, type, data, clientEndpoint);
+    this->sendPacket(id, cookie, data, clientEndpoint);
 }
 
 void Server::send(std::string const &cookie,
-          std::string const &type,
-          std::string const &data,
-          boost::asio::ip::udp::endpoint &clientEndpoint) {
-    this->sendPacket(std::to_string(Server::id++), cookie, type, data, clientEndpoint);
+                  std::string const &data,
+                  boost::asio::ip::udp::endpoint &clientEndpoint) {
+    this->sendPacket(std::to_string(Server::id++), cookie, data, clientEndpoint);
 }
 
 // void Server::(boost::system::error_code ec,

@@ -13,7 +13,6 @@ public:
     void sendPacket(
         std::string const &id,
         std::string const &cookie,
-        std::string const &type,
         std::string const &data,
         boost::asio::ip::udp::endpoint &to
         );
