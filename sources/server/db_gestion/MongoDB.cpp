@@ -111,11 +111,13 @@ void MongoDB::update(std::string const &collection, ptree const &query, ptree co
 {
     boost::mutex::scoped_lock lock(this->_mutex);
     try {
-            //updatePTree(query_bis, tree);
-            //my_remove(update);
-            this->insert(collection, tree);
+            if (this->findOne(collection, query))
+            {
+                this->remove(query);
+                this->insert(update);
+            }
         }
-        catch (std::exception &ex)
+   catch (std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
         }
