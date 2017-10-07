@@ -5,6 +5,7 @@
 #pragma once
 
 #include <boost/thread/mutex.hpp>
+#include <boost/filesystem.hpp>
 
 #include "IDataBase.hpp"
 
@@ -20,5 +21,7 @@ public:
     virtual void insert(ptree const &doc);private:
 
 private:
+    void loop(boost::filesystem::directory_iterator &it,
+              std::function<bool(boost::filesystem::directory_iterator &)> fn);
     bool searchQuery(ptree &query, ptree const &tree);
 };

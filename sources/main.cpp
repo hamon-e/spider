@@ -16,18 +16,20 @@ int main()
     tree.put("checksum", 3);
     tree.put("id", 1);
     tree.put("data.key", "qeqqeweqwe");
-    tree.put("data.process", "skype");
+    tree.put("data.process", "teamspeak");
 
     pt::ptree tree2;
 
     tree2.put("timestamp", 2);
-    tree.put("checksum", 5);
+    tree2.put("checksum", 5);
     tree2.put("data.key", "qeqqeweqwe");
     tree2.put("data.process", "discord");
     tree2.put("id", 2);
 
     pt::ptree query;
-    query.put("timestamp", 1);
+    query.put("data.process", "discord");
+    query.put("data.key", "qeqqeweqwe");
+
 
     pt::ptree update;
     update.put("data.process", "teamspeak");
@@ -35,7 +37,7 @@ int main()
     LocalDB db;
 
     db.insert(tree);
-//    db.insert(tree2);
+    db.insert(tree2);
 
     std::vector<boost::property_tree::ptree> toto = db.find(query);
 
@@ -43,5 +45,13 @@ int main()
 
     db.update(query, update);
 
-    //   db.remove(query);
+    pt::ptree query2;
+    query2.put("data.process", "teamspeak");
+
+    toto = db.find(query2);
+
+    std::cout << toto.size() << std::endl;
+
+
+    db.remove(query2);
 }
