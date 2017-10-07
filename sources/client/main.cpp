@@ -5,13 +5,14 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Wed Oct 04 18:03:49 2017 Benoit Hamon
-// Last update Fri Oct 06 11:42:02 2017 Benoit Hamon
+// Last update Sat Oct 07 23:24:51 2017 Benoit Hamon
 //
 
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
 #include "Client.hpp"
+#include "ModuleCommunication.hpp"
 #include "ModuleManager.hpp"
 
 int main(int argc, char const *argv[]) {
@@ -21,12 +22,13 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
+
     Client client(ioService, argv[1], argv[2]);
-    client.send("Nicolas", "plain_text", "helloazeazeazeazeazeazeaz");
+    ModuleCommunication moduleCommunication(client);
     client.start();
 
-    boost::thread modules([&client]() {
-	ModuleManager mod(client);
+    boost::thread modules([&moduleCommunication]() {
+	ModuleManager mod(&moduleCommunication);
 	mod.run();
 	});
 
