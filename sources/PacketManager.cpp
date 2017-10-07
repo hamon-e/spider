@@ -1,4 +1,5 @@
 #include "PacketManager.hpp"
+#include "tools.hpp"
 
 std::string const PacketManager::partsColName = "parts";
 std::string const PacketManager::dataColName = "data";
@@ -10,13 +11,16 @@ PacketManager::PacketManager(IDataBase &db,
 {}
 
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
-    Packet packet(data);
-    if (!packet.checksum()) {
-        if (this->_errorHandler) {
-            this->_errorHandler(packet, PacketManager::Error::CHECKSUM);
+    try {
+        Packet packet(data);
+        if (!packet.checksum()) {
+            if (this->_errorHandler) {
+                this->_errorHandler(packet, PacketManager::Error::CHECKSUM);
+            }
+        } else {
+            this->complete(packet);
         }
-    } else {
-        this->complete(packet);
+    } catch (boost::property_tree::json_parser::json_parser_error &err) {
     }
     return *this;
 }

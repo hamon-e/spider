@@ -28,6 +28,7 @@ public:
 private:
     void complete(Packet &packet);
     void joinParts(std::vector<boost::property_tree::ptree> &packets);
+
 private:
     PacketHandler _handler;
     ErrorHandler _errorHandler;
