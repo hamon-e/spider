@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
     }
 
     Client client(ioService, argv[1], argv[2]);
-    client.send("Nicolas", "plain_text", "helloazeazeazeazeazeazeaz");
+    client.send("Nicolas", "helloazeazeazeazeazeazeaz");
     client.start();
 
     boost::thread modules([&client]() {
