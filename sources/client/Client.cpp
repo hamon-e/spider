@@ -1,9 +1,10 @@
+#include <LocalDB.hpp>
 #include "Client.hpp"
 
 std::size_t Client::id = 0;
 
 Client::Client(boost::asio::io_service &ioService, std::string const &host, std::string const &port)
-    : APacketServer(ioService, 0)
+    : APacketServer(ioService, 0, new LocalDB())
 {
     boost::asio::ip::udp::resolver resolver(ioService);
     this->_serverEndpoint = *resolver.resolve({boost::asio::ip::udp::v4(), host, port});

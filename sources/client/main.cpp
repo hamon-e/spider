@@ -10,9 +10,12 @@
 
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
+#include <LocalDB.hpp>
 
 #include "Client.hpp"
 #include "ModuleManager.hpp"
+
+namespace pt = boost::property_tree;
 
 int main(int argc, char const *argv[]) {
     boost::asio::io_service ioService;
