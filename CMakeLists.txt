@@ -12,9 +12,19 @@ else()
   pkg_search_module(OPENSSL REQUIRED openssl)
 endif()
 
+find_package(libmongocxx REQUIRED)
+find_package(libbsoncxx REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread chrono date_time filesystem system )
 
+include_directories(${LIBMONGOCXX_INCLUDE_DIR})
+include_directories(${LIBBSONCXX_INCLUDE_DIR})
+include_directories("/usr/local/include/mongocxx/v_noabi")
+include_directories("/usr/local/include/bsoncxx/v_noabi")
+include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/libbson-1.0")
+include_directories("/usr/local/lib")
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
 #############################################################################
@@ -34,14 +44,16 @@ set(SOURCE_FILES
 ./sources/Packet.cpp
 ./sources/json.cpp
 ./sources/MapDB.cpp
+./sources/MongoDB.cpp
 )
 
 add_executable(${EXE_SERVER_NAME} ${SOURCE_FILES})
 target_include_directories(${EXE_SERVER_NAME} PUBLIC
     ./sources
 )
-
 target_link_libraries(${EXE_SERVER_NAME} ${Boost_LIBRARIES})
+target_link_libraries(${EXE_SERVER_NAME} ${LIBMONGOCXX_LIBRARIES})
+target_link_libraries(${EXE_SERVER_NAME} ${LIBBSONCXX_LIBRARIES})
 
 #############################################################################
 ###################  Cmake CLIENT   #########################################
