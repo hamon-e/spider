@@ -9,8 +9,23 @@
 #include <iostream>
 
 #include "LocalDB.hpp"
+#include "Packet.hpp"
 
 using namespace boost::filesystem;
+
+std::string const LocalDB::dbDirectoryName = "DB";
+
+LocalDB::LocalDB()
+{
+    path dbDirectory(LocalDB::dbDirectoryName);
+    try {
+        if (!exists(dbDirectory)) {
+            create_directory(dbDirectory);
+        }
+    } catch (std::exception &) {
+
+    }
+}
 
 bool LocalDB::searchQuery(ptree &query, ptree const &tree) {
     BOOST_FOREACH(ptree::value_type &v, query.get_child("")) {
@@ -38,27 +53,48 @@ void LocalDB::loop(directory_iterator &it,
             }
         }
     }
-
 }
 
-void LocalDB::insert(ptree const &doc) {
+void LocalDB::insert(std::string const &collection, ptree const &doc) {
     boost::mutex::scoped_lock lock(this->_mutex);
 
+    std::string const collectionPath = LocalDB::dbDirectoryName + "/" + collection;
+    path targetDir(collectionPath);
     try {
-        std::string filename = doc.get<std::string>("checksum") + ".json";
-        boost::property_tree::write_json(filename, doc);
-    } catch (boost::property_tree::json_parser_error &error) {
+        if (!exists(targetDir)) {
+            create_directory(targetDir);
+        }
 
+        std::string filename = collectionPath
+                               + "/"
+                               + doc.get<std::string>(Packet::fields.at(Packet::Field::ID))
+                               + "_"
+                               + doc.get<std::string>(Packet::fields.at(Packet::Field::TIMESTAMP))
+                               + "_"
+                               + doc.get<std::string>(Packet::fields.at(Packet::Field::PART))
+                               + ".json";
+        std::cout << filename << std::endl;
+
+        boost::property_tree::write_json(filename, doc);
+    } catch (std::exception &exception) {
+        std::cout << "COMMENT CA NO SUCH NODE PART" << std::endl;
+        std::cout << exception.what() << std::endl;
     }
 }
 
-boost::property_tree::ptree LocalDB::findOne(ptree const &query) {
+boost::property_tree::ptree LocalDB::findOne(std::string const &collection, ptree const &query) {
+    boost::mutex::scoped_lock lock(this->_mutex);
+
     ptree result;
     bool found = false;
-    path targetDir(".");
+
+    std::string const collectionPath = LocalDB::dbDirectoryName + "/" + collection;
+    path targetDir(collectionPath);
+    if(!exists(targetDir)) {
+        create_directory(targetDir);
+    }
     directory_iterator it(targetDir);
 
-    boost::mutex::scoped_lock lock(this->_mutex);
     this->loop(it, [this, &result, &found, &query](directory_iterator &it) -> bool {
         try {
             boost::property_tree::read_json(it->path().string(), result);
@@ -66,7 +102,7 @@ boost::property_tree::ptree LocalDB::findOne(ptree const &query) {
                 found = true;
                 return false;
             }
-        } catch (boost::property_tree::json_parser_error &error) {
+        } catch (std::exception &) {
 
         }
         return true;
@@ -79,12 +115,18 @@ boost::property_tree::ptree LocalDB::findOne(ptree const &query) {
     }
 }
 
-std::vector<boost::property_tree::ptree> LocalDB::find(ptree const &query) {
+std::vector<boost::property_tree::ptree> LocalDB::find(std::string const &collection, ptree const &query) {
+    boost::mutex::scoped_lock lock(this->_mutex);
+
     std::vector<ptree> result;
-    path targetDir(".");
+
+    std::string const collectionPath = LocalDB::dbDirectoryName + "/" + collection;
+    path targetDir(collectionPath);
+    if(!exists(targetDir)) {
+        create_directory(targetDir);
+    }
     directory_iterator it(targetDir);
 
-    boost::mutex::scoped_lock lock(this->_mutex);
     this->loop(it, [this, &result, query](directory_iterator &it) -> bool {
         ptree tmp;
 
@@ -92,7 +134,7 @@ std::vector<boost::property_tree::ptree> LocalDB::find(ptree const &query) {
             boost::property_tree::read_json(it->path().string(), tmp);
             if (this->searchQuery(const_cast<ptree &>(query), tmp))
                 result.push_back(tmp);
-        } catch (boost::property_tree::json_parser_error &error) {
+        } catch (std::exception &) {
 
         }
         return true;
@@ -100,49 +142,52 @@ std::vector<boost::property_tree::ptree> LocalDB::find(ptree const &query) {
     return result;
 }
 
-void LocalDB::update(ptree const &query, ptree const &update) {
-    path targetDir(".");
+void LocalDB::update(std::string const &collection, ptree const &query, ptree const &update) {
+    boost::mutex::scoped_lock lock(this->_mutex);
+
+    std::string const collectionPath = LocalDB::dbDirectoryName + "/" + collection;
+    path targetDir(collectionPath);
+    if(!exists(targetDir)) {
+        create_directory(targetDir);
+    }
     directory_iterator it(targetDir);
 
-    boost::mutex::scoped_lock lock(this->_mutex);
     this->loop(it, [this, &query, &update](directory_iterator &it) -> bool {
         ptree tmp;
 
         try {
             boost::property_tree::read_json(it->path().string(), tmp);
             if (this->searchQuery(const_cast<ptree &>(query), tmp)) {
-                try {
                     boost::property_tree::write_json(it->path().string(), update);
-                } catch (boost::property_tree::json_parser_error &error) {
-
-                }
             }
-        } catch (boost::property_tree::json_parser_error &error) {
+        } catch (std::exception &) {
 
         }
         return true;
     });
 }
 
-void LocalDB::remove(ptree const &query) {
-    path targetDir(".");
+void LocalDB::remove(std::string const &collection, ptree const &query) {
+    boost::mutex::scoped_lock lock(this->_mutex);
+
+    std::string const collectionPath = LocalDB::dbDirectoryName + "/" + collection;
+    path targetDir(collectionPath);
+    if(!exists(targetDir)) {
+        create_directory(targetDir);
+    }
     directory_iterator it(targetDir);
 
-    boost::mutex::scoped_lock lock(this->_mutex);
     this->loop(it, [this, &query](directory_iterator &it) -> bool {
         ptree tmp;
 
         try {
             boost::property_tree::read_json(it->path().string(), tmp);
-        } catch (boost::property_tree::json_parser_error &error) {
 
-        }
-        if (this->searchQuery(const_cast<ptree &>(query), tmp)) {
-            try {
+            if (this->searchQuery(const_cast<ptree &>(query), tmp)) {
                 boost::filesystem::remove(it->path());
-            } catch (boost::filesystem::filesystem_error &error) {
-
             }
+        } catch (std::exception &) {
+
         }
         return true;
     });

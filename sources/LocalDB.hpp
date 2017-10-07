@@ -13,12 +13,20 @@ class LocalDB : public IDataBase {
 private:
     boost::mutex _mutex;
 
+    static std::string const dbDirectoryName;
+
 public:
-    virtual ptree findOne(ptree const &query);
-    virtual std::vector<ptree> find(ptree const &query);
-    virtual void update(ptree const &query, ptree const &update);
-    virtual void remove(ptree const &query);
-    virtual void insert(ptree const &doc);private:
+    LocalDB();
+    LocalDB(LocalDB const &other) = delete;
+    ~LocalDB() = delete;
+    LocalDB &operator=(LocalDB const &other) = delete;
+
+public:
+    virtual ptree findOne(std::string const &collection, ptree const &query);
+    virtual std::vector<ptree> find(std::string const &collection, ptree const &query);
+    virtual void update(std::string const &collection, ptree const &query, ptree const &update);
+    virtual void remove(std::string const &collection, ptree const &query);
+    virtual void insert(std::string const &collection, ptree const &doc);private:
 
 private:
     void loop(boost::filesystem::directory_iterator &it,
