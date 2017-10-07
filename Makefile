@@ -136,33 +136,6 @@ spider_serveur/fast:
 	$(MAKE) -f CMakeFiles/spider_serveur.dir/build.make CMakeFiles/spider_serveur.dir/build
 .PHONY : spider_serveur/fast
 
-sources/ADataBase.o: sources/ADataBase.cpp.o
-
-.PHONY : sources/ADataBase.o
-
-# target to build an object file
-sources/ADataBase.cpp.o:
-	$(MAKE) -f CMakeFiles/spider_client.dir/build.make CMakeFiles/spider_client.dir/sources/ADataBase.cpp.o
-.PHONY : sources/ADataBase.cpp.o
-
-sources/ADataBase.i: sources/ADataBase.cpp.i
-
-.PHONY : sources/ADataBase.i
-
-# target to preprocess a source file
-sources/ADataBase.cpp.i:
-	$(MAKE) -f CMakeFiles/spider_client.dir/build.make CMakeFiles/spider_client.dir/sources/ADataBase.cpp.i
-.PHONY : sources/ADataBase.cpp.i
-
-sources/ADataBase.s: sources/ADataBase.cpp.s
-
-.PHONY : sources/ADataBase.s
-
-# target to generate assembly for a file
-sources/ADataBase.cpp.s:
-	$(MAKE) -f CMakeFiles/spider_client.dir/build.make CMakeFiles/spider_client.dir/sources/ADataBase.cpp.s
-.PHONY : sources/ADataBase.cpp.s
-
 sources/LocalDB.o: sources/LocalDB.cpp.o
 
 .PHONY : sources/LocalDB.o
@@ -254,9 +227,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... spider_client"
 	@echo "... spider_serveur"
-	@echo "... sources/ADataBase.o"
-	@echo "... sources/ADataBase.i"
-	@echo "... sources/ADataBase.s"
 	@echo "... sources/LocalDB.o"
 	@echo "... sources/LocalDB.i"
 	@echo "... sources/LocalDB.s"

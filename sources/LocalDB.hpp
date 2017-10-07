@@ -4,13 +4,21 @@
 
 #pragma once
 
-#include "ADataBase.hpp"
+#include <boost/thread/mutex.hpp>
 
-class LocalDB : public ADataBase {
+#include "IDataBase.hpp"
+
+class LocalDB : public IDataBase {
+private:
+    boost::mutex _mutex;
+
 public:
     virtual ptree findOne(ptree const &query);
     virtual std::vector<ptree> find(ptree const &query);
     virtual void update(ptree const &query, ptree const &update);
     virtual void remove(ptree const &query);
     virtual void insert(ptree const &doc);private:
+
+private:
+    bool searchQuery(ptree &query, ptree const &tree);
 };

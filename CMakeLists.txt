@@ -23,7 +23,7 @@ if(Boost_FOUND)
 
     include_directories(${Boost_INCLUDE_DIRS})
 
-    set(SOURCE_FILES sources/LocalDB.cpp sources/LocalDB.hpp sources/main.cpp sources/ADataBase.cpp sources/ADataBase.hpp)
+    set(SOURCE_FILES sources/LocalDB.cpp sources/LocalDB.hpp sources/main.cpp)
 
     add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
 
