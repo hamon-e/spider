@@ -30,15 +30,17 @@ using ptree = boost::property_tree::ptree;
 class MongoDB : public IDataBase
 {
 private:
-    mongocxx::client *_mongodb_client;
-    mongocxx::database _db_access;
+    mongocxx::client *_mongodbClient;
+    mongocxx::database _dbAccess;
     mongocxx::collection _collection;
     bsoncxx::builder::stream::document _builder;
     boost::mutex _mutex;
 
 public:
-    MongoDB(int const &port = 27017, std::string const &db_name = "cpp_spider");
+    MongoDB(int const &port = 27017, std::string const &dbName = "cpp_spider");
     ~MongoDB();
+
+public:
     virtual void insert(std::string const &collection, ptree const &doc);
     virtual ptree findOne(std::string const &collection, ptree const &query);
     virtual std::vector<ptree> find(std::string const &collection, ptree const &query);
@@ -46,7 +48,7 @@ public:
     virtual void remove(std::string const &collection, ptree const &query);
 
 private:
-    void _generate_builder(ptree const &doc);
+    void generateBuilder(ptree const &doc);
 };
 
 
