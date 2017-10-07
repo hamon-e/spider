@@ -1,6 +1,7 @@
 #pragma once
 
 #include "APacketServer.hpp"
+#include "IModuleCommunication.hpp"
 
 class Client : public APacketServer {
 public:
@@ -19,9 +20,13 @@ private:
     static std::size_t id;
 
 private:
+    void addModuleCommunication(IModuleCommunication *moduleCommunication);
+
+private:
     virtual bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
     virtual void packetHandler(Packet &packet);
 
 private:
     boost::asio::ip::udp::endpoint _serverEndpoint;
+    IModuleCommunication *_moduleCommunication;
 };

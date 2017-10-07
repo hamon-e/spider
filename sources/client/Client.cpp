@@ -9,6 +9,10 @@ Client::Client(boost::asio::io_service &ioService, std::string const &host, std:
     this->_serverEndpoint = *resolver.resolve({boost::asio::ip::udp::v4(), host, port});
 }
 
+void Client::addModuleCommunication(IModuleCommunication *moduleCommunication) {
+  this->_moduleCommunication = moduleCommunication;
+}
+
 bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint) {
     if (this->_serverEndpoint != clientEndpoint) {
         return false;
@@ -17,6 +21,13 @@ bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost
 }
 
 void Client::packetHandler(Packet &packet) {
+  auto data = packet.get<Packet::Field::DATA, std::string>();
+  boost::property_tree::ptree ptree;
+
+  boost::property_tree::read_json(data, ptree);
+  this->_moduleCommunication->add(ptree.get<std::string>("module"),
+				  ptree.get<std::string>("name"),
+				  ptree.get<std::string>("value"));
 }
 
 void Client::send(std::string const &cookie,
