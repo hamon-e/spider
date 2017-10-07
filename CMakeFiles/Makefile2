@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/gusmin_m/CLionProjects/cpp_spider
 CMakeFiles/spider_client.dir/all:
 	$(MAKE) -f CMakeFiles/spider_client.dir/build.make CMakeFiles/spider_client.dir/depend
 	$(MAKE) -f CMakeFiles/spider_client.dir/build.make CMakeFiles/spider_client.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles --progress-num=1,2,3,4 "Built target spider_client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles --progress-num=1,2,3 "Built target spider_client"
 .PHONY : CMakeFiles/spider_client.dir/all
 
 # Include target in all.
@@ -76,7 +76,7 @@ all: CMakeFiles/spider_client.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/spider_client.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles 3
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/spider_client.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles 0
 .PHONY : CMakeFiles/spider_client.dir/rule
@@ -103,7 +103,7 @@ clean: CMakeFiles/spider_client.dir/clean
 CMakeFiles/spider_serveur.dir/all:
 	$(MAKE) -f CMakeFiles/spider_serveur.dir/build.make CMakeFiles/spider_serveur.dir/depend
 	$(MAKE) -f CMakeFiles/spider_serveur.dir/build.make CMakeFiles/spider_serveur.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles --progress-num=5,6 "Built target spider_serveur"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles --progress-num=4,5 "Built target spider_serveur"
 .PHONY : CMakeFiles/spider_serveur.dir/all
 
 # Include target in all.

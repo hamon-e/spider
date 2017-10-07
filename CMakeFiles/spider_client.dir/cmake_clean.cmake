@@ -1,7 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/spider_client.dir/sources/LocalDB.cpp.o"
   "CMakeFiles/spider_client.dir/sources/main.cpp.o"
-  "CMakeFiles/spider_client.dir/sources/ADataBase.cpp.o"
   "spider_client.pdb"
   "spider_client"
 )

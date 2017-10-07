@@ -6,16 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/gusmin_m/CLionProjects/cpp_spider/sources/ADataBase.cpp
-boost/foreach.hpp
--
-ADataBase.hpp
-/home/gusmin_m/CLionProjects/cpp_spider/sources/ADataBase.hpp
-
-/home/gusmin_m/CLionProjects/cpp_spider/sources/ADataBase.hpp
-IDataBase.hpp
-/home/gusmin_m/CLionProjects/cpp_spider/sources/IDataBase.hpp
-
 /home/gusmin_m/CLionProjects/cpp_spider/sources/IDataBase.hpp
 boost/property_tree/ptree.hpp
 -
@@ -37,8 +27,10 @@ LocalDB.hpp
 /home/gusmin_m/CLionProjects/cpp_spider/sources/LocalDB.hpp
 
 /home/gusmin_m/CLionProjects/cpp_spider/sources/LocalDB.hpp
-ADataBase.hpp
-/home/gusmin_m/CLionProjects/cpp_spider/sources/ADataBase.hpp
+boost/thread/mutex.hpp
+-
+IDataBase.hpp
+/home/gusmin_m/CLionProjects/cpp_spider/sources/IDataBase.hpp
 
 /home/gusmin_m/CLionProjects/cpp_spider/sources/main.cpp
 boost/property_tree/ptree.hpp

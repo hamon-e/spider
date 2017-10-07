@@ -4,7 +4,6 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/gusmin_m/CLionProjects/cpp_spider/sources/ADataBase.cpp" "/home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles/spider_client.dir/sources/ADataBase.cpp.o"
   "/home/gusmin_m/CLionProjects/cpp_spider/sources/LocalDB.cpp" "/home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles/spider_client.dir/sources/LocalDB.cpp.o"
   "/home/gusmin_m/CLionProjects/cpp_spider/sources/main.cpp" "/home/gusmin_m/CLionProjects/cpp_spider/CMakeFiles/spider_client.dir/sources/main.cpp.o"
   )
