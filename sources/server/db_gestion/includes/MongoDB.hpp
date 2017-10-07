@@ -16,6 +16,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <boost/thread/mutex.hpp>
 #include "IDataBase.hpp"
 #include "ADataBase.hpp"
 
@@ -26,12 +27,13 @@ using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::open_document;
 
-class MongoDB : public ADataBase
+class MongoDB : public IDataBase
 {
     mongocxx::client *_mongodb_client;
     mongocxx::database _db_access;
     mongocxx::collection _collection;
     bsoncxx::builder::stream::document _builder;
+    boost::mutex _mutex;
 
     void _generate_builder(ptree const &doc);
 public:
