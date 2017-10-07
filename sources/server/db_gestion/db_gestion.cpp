@@ -29,8 +29,6 @@ void MongoDB::_generate_builder(ptree const &doc)
     }
 }
 
-
-
 void MongoDB::insert(std::string const &collection, ptree const &doc)
 {
     if (doc.size() > 0)

@@ -37,8 +37,6 @@ class MongoDB : public ADataBase
 public:
     MongoDB(std::string const &client_name = "cpp_spider");
     ~MongoDB();
-    void set_collection_name(std::string const & coll_name = "JoneDoe");
-
     virtual void insert(std::string const &collection, ptree const &doc);
     virtual ptree findOne(std::string const &collection, ptree const &query);
     virtual std::vector<ptree> find(std::string const &collection, ptree const &query);
