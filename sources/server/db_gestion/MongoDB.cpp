@@ -4,7 +4,7 @@
 
 #include "MongoDB.hpp"
 
-MongoDB::MongoDB(std::string const &client_name)
+MongoDB::MongoDB(std::string const &db_name)
 {
     _mongodb_client = new mongocxx::client(mongocxx::uri{});
     _db_access = (*_mongodb_client)[client_name];
@@ -31,8 +31,7 @@ void MongoDB::_generate_builder(ptree const &doc)
 void MongoDB::insert(std::string const &collection, ptree const &doc)
 {
     boost::mutex::scoped_lock lock(this->_mutex);
-    if (doc.size() > 0) {
-        try {
+    try {
             this->_collection = _db_access[collection];
             this->_generate_builder(doc);
             auto _doc_contents = this->_builder << bsoncxx::builder::stream::finalize;
@@ -42,7 +41,6 @@ void MongoDB::insert(std::string const &collection, ptree const &doc)
         {
             std::cerr << ex.what() << std::endl;
         }
-    }
 }
 
 std::vector<ptree> MongoDB::find(std::string const &collection, ptree const &query)
@@ -53,15 +51,13 @@ std::vector<ptree> MongoDB::find(std::string const &collection, ptree const &que
     ptree   tmp_ptree;
     std::vector<ptree>   ret_ptree;
 
-    if (query.size() > 0) {
-        try {
+    try {
             this->_collection = _db_access[collection];
             this->_generate_builder(query);
             mongocxx::cursor cursor = this->_collection.find(document{} << finalize);
             for (auto doc : cursor) {
                 json_result = bsoncxx::to_json(doc);
-                boost::iostreams::stream <boost::iostreams::array_source> stream(json_result.c_str(),
-                                                                                 json_result.size());
+                boost::iostreams::stream <boost::iostreams::array_source> stream(json_result.c_str(), json_result.size());
                 boost::property_tree::read_json(stream, tmp_ptree);
                 ret_ptree.push_back(tmp_ptree);
             }
@@ -70,7 +66,6 @@ std::vector<ptree> MongoDB::find(std::string const &collection, ptree const &que
         {
             std::cerr << ex.what() << std::endl;
         }
-    }
     return (ret_ptree);
 }
 
@@ -81,15 +76,13 @@ ptree MongoDB::findOne(std::string const &collection, ptree const &query)
     std::string  json_result;
     ptree   ret_ptree;
 
-    if (query.size() > 0) {
-        try {
+     try {
             this->_collection = _db_access[collection];
             this->_generate_builder(query);
             query_result = this->_collection.find_one(this->_builder << bsoncxx::builder::stream::finalize);
             if (query_result) {
                 json_result = bsoncxx::to_json(*query_result);
-                boost::iostreams::stream <boost::iostreams::array_source> stream(json_result.c_str(),
-                                                                                 json_result.size());
+                boost::iostreams::stream <boost::iostreams::array_source> stream(json_result.c_str(), json_result.size());
                 boost::property_tree::read_json(stream, ret_ptree);
             }
         }
@@ -97,14 +90,12 @@ ptree MongoDB::findOne(std::string const &collection, ptree const &query)
         {
             std::cerr << ex.what() << std::endl;
         }
-    }
     return (ret_ptree);
 }
 
 void MongoDB::remove(std::string const &collection, ptree const &query)
 {
     boost::mutex::scoped_lock lock(this->_mutex);
-    if (query.size() > 0) {
         try {
             this->_collection = _db_access[collection];
             this->_generate_builder(query);
@@ -114,14 +105,12 @@ void MongoDB::remove(std::string const &collection, ptree const &query)
         {
             std::cerr << ex.what() << std::endl;
         }
-    }
 }
 
 void MongoDB::update(std::string const &collection, ptree const &query, ptree const &update)
 {
     boost::mutex::scoped_lock lock(this->_mutex);
-    if (query.size() > 0 && update.size() > 0) {
-        try {
+    try {
             //updatePTree(query_bis, tree);
             //my_remove(update);
             this->insert(collection, tree);
@@ -130,5 +119,4 @@ void MongoDB::update(std::string const &collection, ptree const &query, ptree co
         {
             std::cerr << ex.what() << std::endl;
         }
-    }
 }

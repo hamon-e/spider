@@ -37,7 +37,7 @@ class MongoDB : public IDataBase
 
     void _generate_builder(ptree const &doc);
 public:
-    MongoDB(std::string const &client_name = "cpp_spider");
+    MongoDB(std::string const &db_name = "cpp_spider");
     ~MongoDB();
     virtual void insert(std::string const &collection, ptree const &doc);
     virtual ptree findOne(std::string const &collection, ptree const &query);
