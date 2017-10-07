@@ -29,22 +29,20 @@ void MongoDB::_generate_builder(ptree const &doc)
     }
 }
 
-void my_set_collection_name(std::string const & coll_name)
-{
-    _collection = _db_access[coll_name];
-}
 
-void MongoDB::insert(ptree const &doc)
+
+void MongoDB::insert(std::string const &collection, ptree const &doc)
 {
     if (doc.size() > 0)
     {
+        _collection = _db_access[collection];
         _generate_builder(doc);
         auto _doc_contents = _builder << bsoncxx::builder::stream::finalize;
         _collection.insert_one(_doc_contents.view());
     }
 }
 
-std::vector<ptree> MongoDB::find(ptree const &query)
+std::vector<ptree> MongoDB::find(std::string const &collection, ptree const &query)
 {
     bsoncxx::stdx::optional<bsoncxx::document::value> query_result;
     std::string  json_result;
@@ -53,6 +51,7 @@ std::vector<ptree> MongoDB::find(ptree const &query)
 
     if (query.size() > 0)
     {
+        _collection = _db_access[collection];
         _generate_builder(query);
         mongocxx::cursor cursor = _collection.find(document{} << finalize);
         for(auto doc : cursor)
@@ -66,7 +65,7 @@ std::vector<ptree> MongoDB::find(ptree const &query)
     return (ret_ptree);
 }
 
-ptree MongoDB::findOne(ptree const &query)
+ptree MongoDB::findOne(std::string const &collection, ptree const &query)
 {
     bsoncxx::stdx::optional<bsoncxx::document::value> query_result;
     std::string  json_result;
@@ -74,6 +73,7 @@ ptree MongoDB::findOne(ptree const &query)
 
     if (query.size() > 0)
     {
+        _collection = _db_access[collection];
         _generate_builder(query);
         query_result = _collection.find_one(_builder << bsoncxx::builder::stream::finalize);
         if(query_result)
@@ -86,24 +86,25 @@ ptree MongoDB::findOne(ptree const &query)
     return (ret_ptree);
 }
 
-void MongoDB::remove(ptree const &query)
+void MongoDB::remove(std::string const &collection, ptree const &query)
 {
     if (query.size() > 0)
     {
+        _collection = _db_access[collection];
         _generate_builder(query);
         _collection.delete_one(_builder << bsoncxx::builder::stream::finalize);
     }
 }
 
-void MongoDB::update(ptree const &query, ptree const &update)
+void MongoDB::update(std::string const &collection, ptree const &query, ptree const &update)
 {
     ptree tree = update;
     ptree query_bis = query;
 
     if (query.size() > 0 && update.size() > 0)
     {
-        updatePTree(query_bis, tree);
-        my_remove(update);
-        my_insert(tree);
+        //updatePTree(query_bis, tree);
+        //my_remove(update);
+        this->insert(collection, tree);
     }
 }

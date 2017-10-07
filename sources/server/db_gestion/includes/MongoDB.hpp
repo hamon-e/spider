@@ -39,11 +39,11 @@ public:
     ~MongoDB();
     void set_collection_name(std::string const & coll_name = "JoneDoe");
 
-    virtual void insert(ptree const &doc);
-    virtual std::vector<ptree> find(ptree const &query);
-    virtual ptree findOne(ptree const &query);
-    virtual void update(ptree const &query, ptree const &update);
-    virtual void remove(ptree const &query);
+    virtual void insert(std::string const &collection, ptree const &doc);
+    virtual ptree findOne(std::string const &collection, ptree const &query);
+    virtual std::vector<ptree> find(std::string const &collection, ptree const &query);
+    virtual void update(std::string const &collection, ptree const &query, ptree const &update);
+    virtual void remove(std::string const &collection, ptree const &query);
 };
 
 
