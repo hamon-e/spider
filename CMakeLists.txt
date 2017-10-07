@@ -45,10 +45,9 @@ set(SOURCE_FILES
 ./sources/json.cpp
 ./sources/MapDB.cpp
 ./sources/MongoDB.cpp
+./sources/LocalDB.cpp
+./sources/LocalDB.hpp
 )
-        ./sources/LocalDB.cpp
-        ./sources/LocalDB.hpp
-        )
 
 add_executable(${EXE_SERVER_NAME} ${SOURCE_FILES})
 target_include_directories(${EXE_SERVER_NAME} PUBLIC
