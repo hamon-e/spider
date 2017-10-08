@@ -17,11 +17,13 @@ public:
         std::string const &data,
         boost::asio::ip::udp::endpoint const &to,
         std::string const &id,
+        std::size_t size = Packet::defaultSize,
         bool force = false,
         bool reserve = true);
     void sendPacket(
         std::string const &data,
         boost::asio::ip::udp::endpoint &to,
+        std::size_t size = Packet::defaultSize,
         bool force = false,
         bool reserve = true);
 

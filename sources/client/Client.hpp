@@ -12,8 +12,9 @@ public:
 public:
     void send(std::string const &data,
               std::string const &id,
+              std::size_t size = Packet::defaultSize,
               bool force = false);
-    void send(std::string const &data, bool force = false);
+    void send(std::string const &data, std::size_t size = Packet::defaultSize, bool force = false);
     void run();
 
 public:
