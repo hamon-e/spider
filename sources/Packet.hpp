@@ -13,7 +13,6 @@ public:
     enum class Field {
         ID,
         COOKIE,
-        TYPE,
         CHECKSUM,
         TIMESTAMP,
         PART,
@@ -34,8 +33,12 @@ public:
     Packet(std::string const &data);
 
 public:
-    void set(Packet::Field field, std::string const &value);
-    void set(Packet::Field field, std::string &&value);
+    template <typename T>
+    void set(Packet::Field field, T &&value) {
+        this->_ptree.put(Packet::fields.at(field), std::forward<T>(value));
+    }
+    void set(Packet::Field field, boost::property_tree::ptree const &ptree);
+    void set(Packet::Field field, boost::property_tree::ptree &&ptree);
 
     template<Field field, typename T>
     T get() const {

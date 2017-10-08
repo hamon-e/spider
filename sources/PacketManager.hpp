@@ -14,22 +14,26 @@ public:
 
     static std::string const partsColName;
     static std::string const dataColName;
+    static std::string const waitingColName;
 
 public:
     using PacketHandler = std::function<void(Packet &packet)>;
+    using SuccessHandler = std::function<void(Packet &packet, boost::asio::ip::udp::endpoint &from)>;
     using ErrorHandler = std::function<void(Packet &packet, PacketManager::Error)>;
 
 public:
-    PacketManager(IDataBase &db, PacketHandler handler, ErrorHandler = {});
+    PacketManager(IDataBase &db, PacketHandler handler, SuccessHandler = {}, ErrorHandler = {});
 
 public:
     PacketManager &in(std::string const &data, boost::asio::ip::udp::endpoint &from);
 
 private:
-    void complete(Packet &packet);
-    void joinParts(std::vector<boost::property_tree::ptree> &packets);
+    void complete(Packet &packet, boost::asio::ip::udp::endpoint &from);
+    bool joinParts(std::vector<boost::property_tree::ptree> &packets);
+
 private:
     PacketHandler _handler;
     ErrorHandler _errorHandler;
+    SuccessHandler _succesHandler;
     IDataBase &_db;
 };

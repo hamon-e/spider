@@ -10,14 +10,15 @@
 #include "ModuleManager.hpp"
 #include "Client.hpp"
 
-ModuleManager::ModuleManager(Client &client, std::string const &dirname) : _client(client), _dirname(dirname) {}
+ModuleManager::ModuleManager(Client &client, std::string const &dirname)
+  : _dirname(dirname), _moduleCommunication(client) {}
 
 ModuleManager::~ModuleManager() {}
 
 std::vector<std::string> ModuleManager::readDirectory() {
     boost::filesystem::path p(this->_dirname);
     std::vector<std::string> res;
-    std::regex regex(".+\\.dll");
+    std::regex regex(".+\\.so");
 
     if (is_directory(p)) {
         for (auto &entry : boost::make_iterator_range(boost::filesystem::directory_iterator(p), {})) {
@@ -36,9 +37,8 @@ void ModuleManager::runLibrary(std::string const &libraryName) {
     std::cout << libraryName << std::endl;
     try {
         creator = boost::dll::import_alias<module_t>(shared_library_path, "create_module");
-        boost::shared_ptr<IModule> plugin = creator(this->_client);
-        this->_threads.create_thread(boost::bind(&IModule::start, plugin.get(),
-						 boost::ref(this->_moduleCommunication)));
+        boost::shared_ptr<IModule> plugin = creator(&this->_moduleCommunication);
+        this->_threads.create_thread(boost::bind(&IModule::start, plugin.get()));
         this->_libraries.push_back({libraryName, plugin, creator});
     } catch (std::exception) {
         this->_libraries.push_back({libraryName, nullptr, creator});
@@ -60,6 +60,7 @@ void ModuleManager::runLibraries() {
 void ModuleManager::run() {
     while (true) {
         this->runLibraries();
+	this->_moduleCommunication.add("Explorer", "readdir");
         sleep(1);
     }
     this->_threads.join_all();

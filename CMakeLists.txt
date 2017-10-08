@@ -12,9 +12,19 @@ else()
   pkg_search_module(OPENSSL REQUIRED openssl)
 endif()
 
+find_package(libmongocxx REQUIRED)
+find_package(libbsoncxx REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread chrono date_time filesystem system )
 
+include_directories(${LIBMONGOCXX_INCLUDE_DIR})
+include_directories(${LIBBSONCXX_INCLUDE_DIR})
+include_directories("/usr/local/include/mongocxx/v_noabi")
+include_directories("/usr/local/include/bsoncxx/v_noabi")
+include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/libbson-1.0")
+include_directories("/usr/local/lib")
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
 #############################################################################
@@ -34,6 +44,11 @@ set(SOURCE_FILES
 ./sources/Packet.cpp
 ./sources/json.cpp
 ./sources/MapDB.cpp
+./sources/AIntervalService.cpp
+./sources/IntervalService.cpp
+./sources/MongoDB.cpp
+./sources/LocalDB.cpp
+./sources/LocalDB.hpp
 )
 
 add_executable(${EXE_SERVER_NAME} ${SOURCE_FILES})
@@ -42,6 +57,8 @@ target_include_directories(${EXE_SERVER_NAME} PUBLIC
 )
 
 target_link_libraries(${EXE_SERVER_NAME} ${Boost_LIBRARIES})
+target_link_libraries(${EXE_SERVER_NAME} ${LIBMONGOCXX_LIBRARIES})
+target_link_libraries(${EXE_SERVER_NAME} ${LIBBSONCXX_LIBRARIES})
 
 #############################################################################
 ###################  Cmake CLIENT   #########################################
@@ -49,19 +66,38 @@ target_link_libraries(${EXE_SERVER_NAME} ${Boost_LIBRARIES})
 
 set(EXE_CLIENT_NAME spider_client)
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+#find_package(Boost 1.36.0 COMPONENTS date_time filesystem system thread)
+#
+#if(Boost_FOUND)
+#
+#    include_directories(${Boost_INCLUDE_DIRS})
+#
+#    set(SOURCE_FILES sources/LocalDB.cpp sources/LocalDB.hpp sources/main.cpp)
+#
+#    add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
+#
+#    target_link_libraries(${EXE_CLIENT_NAME} ${Boost_LIBRARIES})
+#
+#endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread")
 
-set(SOURCE_FILES 
+set(SOURCE_FILES
   ./sources/client/ModuleManager.cpp
   ./sources/client/ModuleCommunication.cpp
   ./sources/ssl/Base64.cpp
   ./sources/ssl/CryptAES.cpp
-  ./sources/ssl/CryptRSA.cpp)
+  ./sources/ssl/CryptRSA.cpp
+  ./sources/LocalDB.cpp
+  ./sources/LocalDB.hpp
+)
+
 if (WIN32)
   set (SOURCE_FILES
     ${SOURCE_FILES}
     ./sources/ssl/applink.c)
 endif()
+
 set(SOURCE_FILES
   ${SOURCE_FILES}
   ./sources/client/main.cpp
@@ -73,6 +109,8 @@ set(SOURCE_FILES
   ./sources/Packet.cpp
   ./sources/json.cpp
   ./sources/MapDB.cpp
+  ./sources/AIntervalService.cpp
+  ./sources/IntervalService.cpp
 )
 
 add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
@@ -112,4 +150,18 @@ target_link_libraries(${HTTP_NAME} ${OPENSSL_LIBRARIES})
 
 target_include_directories(${HTTP_NAME} PUBLIC
     ./libs
+)
+
+#############  Cmake CLIENT MODULE : EXPLORER  ##############################
+#############################################################################
+
+set(EXPLORER_NAME module_explorer)
+
+set(SOURCE_FILES
+  ./sources/client/modules/ModuleExplorer.cpp)
+add_library(${EXPLORER_NAME} SHARED ${SOURCE_FILES})
+target_link_libraries(${EXPLORER_NAME} ${Boost_LIBRARIES})
+
+target_include_directories(${EXPLORER_NAME} PUBLIC
+    ./sources/
 )

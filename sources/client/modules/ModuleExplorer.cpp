@@ -6,16 +6,19 @@
 #include <boost/dll/alias.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "ModuleExplorer.hpp"
 
-ModuleExplorer::ModuleExplorer(Client &client) : _client(client) {}
+ModuleExplorer::ModuleExplorer(IModuleCommunication *moduleCommunication)
+  : _moduleCommunication(moduleCommunication) {}
 
-void ModuleExplorer::start(ModuleCommunication &com) {
-  ModuleCommunication::Order order;
+void ModuleExplorer::start() {
+  IModuleCommunication::Order order;
 
   while (true) {
-    if (com.get("Explorer", order)) {
+    if (this->_moduleCommunication->get("Explorer", order)) {
       if (order.name == "chdir")
 	this->changeDir(order.value);
       else if (order.name == "readdir")
@@ -24,9 +27,9 @@ void ModuleExplorer::start(ModuleCommunication &com) {
   }
 }
 
-boost::shared_ptr<ModuleExplorer> ModuleExplorer::create(Client &client) {
+boost::shared_ptr<ModuleExplorer> ModuleExplorer::create(IModuleCommunication *moduleCommunication) {
     return boost::shared_ptr<ModuleExplorer>(
-            new ModuleExplorer(client)
+            new ModuleExplorer(moduleCommunication)
     );
 }
 
@@ -46,25 +49,25 @@ std::vector<std::string> ModuleExplorer::readDir() {
   return res;
 }
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
 void ModuleExplorer::sendFiles() {
   auto files = this->readDir();
-  boost::property_tree::ptree ptree;
 
-  ptree.put("directory", boost::filesystem::current_path());
-
+  boost::property_tree::ptree data;
+  data.put("directory", boost::filesystem::current_path());
   boost::property_tree::ptree names;
   for (auto &elem : files) {
     boost::property_tree::ptree tmp;
     tmp.put("", elem);
     names.push_back(std::make_pair("", tmp));
   }
+  data.add_child("files", names);
 
-  ptree.add_child("files", names);
+  boost::property_tree::ptree ptree;
+  ptree.put("timestamp", std::to_string(std::time(nullptr)));
+  ptree.put("type", "Explorer");
+  ptree.add_child("data", data);
 
-  std::cout << ptree << std::endl;
+  this->_moduleCommunication->send(ptree);
 }
 
 BOOST_DLL_ALIAS(ModuleExplorer::create, create_module)

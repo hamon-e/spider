@@ -1,9 +1,8 @@
+#include <LocalDB.hpp>
 #include "Server.hpp"
 
-std::size_t Server::id = 0;
-
 Server::Server(boost::asio::io_service &ioService, int port)
-    : APacketServer(ioService, port)
+    : APacketServer(ioService, port, new LocalDB())
 {
 }
 
@@ -19,18 +18,16 @@ void Server::packetHandler(Packet &packet) {
 }
 
 void Server::send(std::string const &cookie,
-                  std::string const &type,
                   std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,
                   std::string const &id) {
-    this->sendPacket(id, cookie, type, data, clientEndpoint);
+    this->sendPacket(cookie, data, clientEndpoint, id);
 }
 
 void Server::send(std::string const &cookie,
-          std::string const &type,
-          std::string const &data,
-          boost::asio::ip::udp::endpoint &clientEndpoint) {
-    this->sendPacket(std::to_string(Server::id++), cookie, type, data, clientEndpoint);
+                  std::string const &data,
+                  boost::asio::ip::udp::endpoint &clientEndpoint) {
+    this->sendPacket(cookie, data, clientEndpoint);
 }
 
 // void Server::(boost::system::error_code ec,
