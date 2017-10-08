@@ -23,6 +23,16 @@ int main(int argc, char const *argv[]) {
 
     db.insert("parts", tree);
 */
+    MongoDB db;
+    pt::ptree tree;
+    tree.put("id.a", 1);
+    pt::ptree tree2;
+    tree2.put("id.a", 5);
+    db.insert("aze", tree);
+    db.update("aze", tree, tree2, true);
+    tree.put("id.a", 5);
+    db.update("aze", tree, tree2, true);
+    db.remove("aze", tree2);
 
     if (argc != 2) {
         std::cerr << "Usage : " << argv[0] << " port" << std::endl;
