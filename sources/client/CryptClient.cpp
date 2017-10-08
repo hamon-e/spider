@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Sun Oct 08 19:42:26 2017 Benoit Hamon
+// Last update Sun Oct 08 21:57:05 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
@@ -43,10 +43,13 @@ void CryptClient::addModuleCommunication(IModuleCommunication *moduleCommunicati
   this->_moduleCommunication = moduleCommunication;
 }
 
+#include <iostream>
 std::string CryptClient::encrypt(std::string const &message) {
   std::string res;
 
+  std::cout << message << std::endl;
   this->_current->encrypt(message, res);
+  std::cout << res << std::endl;
   return Base64::encrypt(res);
 }
 

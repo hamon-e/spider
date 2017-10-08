@@ -31,4 +31,5 @@ private:
     CryptClient _crypt;
     IModuleCommunication *_moduleCommunication;
     ModuleManager _moduleManager;
+    bool _isIgnited;
 };
