@@ -35,6 +35,7 @@ private:
 
     virtual void packetHandler(Packet &packet) = 0;
     virtual void encryptor(Packet &packet) = 0;
+    virtual void decryptor(Packet &packet) = 0;
     virtual bool isIgnited(boost::property_tree::ptree const &ptree, boost::asio::ip::udp::endpoint const &clientEndpoint) const = 0;
 
 protected:
