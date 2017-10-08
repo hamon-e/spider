@@ -146,29 +146,6 @@ int main() {
 
       SimpleWeb::CaseInsensitiveMultimap header;
 
-//    Uncomment the following line to enable Cache-Control
-//    header.emplace("Cache-Control", "max-age=86400");
-
-#ifdef HAVE_OPENSSL
-//    Uncomment the following lines to enable ETag
-//    {
-//      ifstream ifs(path.string(), ifstream::in | ios::binary);
-//      if(ifs) {
-//        auto hash = SimpleWeb::Crypto::to_hex_string(SimpleWeb::Crypto::md5(ifs));
-//        header.emplace("ETag", "\"" + hash + "\"");
-//        auto it = request->header.find("If-None-Match");
-//        if(it != request->header.end()) {
-//          if(!it->second.empty() && it->second.compare(1, hash.size(), hash) == 0) {
-//            response->write(SimpleWeb::StatusCode::redirection_not_modified, header);
-//            return;
-//          }
-//        }
-//      }
-//      else
-//        throw invalid_argument("could not read file");
-//    }
-#endif
-
       auto ifs = make_shared<ifstream>();
       ifs->open(path.string(), ifstream::in | ios::binary | ios::ate);
 
