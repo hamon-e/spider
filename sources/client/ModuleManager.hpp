@@ -15,7 +15,7 @@ typedef boost::shared_ptr<IModule> (module_t)(IModuleCommunication *);
 class ModuleManager {
 public:
     ModuleManager(IModuleCommunication *moduleCommunication = nullptr,
-		  std::string const &dirname = ".");
+		  std::string const &dirname = "./");
     ~ModuleManager();
 
 public:

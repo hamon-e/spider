@@ -8,6 +8,10 @@ Client::Client(boost::asio::io_service &ioService, std::string const &host, std:
     this->_serverEndpoint = *resolver.resolve({boost::asio::ip::udp::v4(), host, port});
 }
 
+void Client::run() {
+  this->_moduleManager.run();
+}
+
 void Client::addModuleCommunication(IModuleCommunication *moduleCommunication) {
   this->_moduleCommunication = moduleCommunication;
   this->_moduleManager.addModuleCommunication(moduleCommunication);

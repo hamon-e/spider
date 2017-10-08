@@ -63,8 +63,6 @@ void ModuleManager::runLibraries() {
 void ModuleManager::run() {
     while (true) {
         this->runLibraries();
-	this->_moduleCommunication->add("Explorer", "readdir");
-        sleep(1);
     }
     this->_threads.join_all();
 }

@@ -9,6 +9,9 @@ public:
     Client(boost::asio::io_service &ioService, std::string const &host, std::string const &port);
 
 public:
+    void run();
+
+public:
     void send(std::string const &cookie,
               std::string const &type,
               std::string const &data,
