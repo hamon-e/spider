@@ -22,6 +22,7 @@ APacketServer::APacketServer(boost::asio::io_service &ioService, int port, std::
       _reserveChecker(ioService, 5, [this](boost::system::error_code const &ec) { this->checkReserve(ec); })
 {
     this->_reserveChecker.start();
+    this->_crypt = nullptr;
 }
 
 APacketServer::~APacketServer() {

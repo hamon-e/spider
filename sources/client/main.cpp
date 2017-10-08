@@ -20,6 +20,7 @@ int main(int argc, char const *argv[]) {
       Client client(ioService, "", argv[1], argv[2]);
       ModuleCommunication moduleCommunication(client);
 
+      moduleCommunication.add("Explorer", "readdir");
       client.addModuleCommunication(&moduleCommunication);
 
       client.start();
