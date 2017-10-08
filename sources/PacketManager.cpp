@@ -11,16 +11,10 @@ PacketManager::PacketManager(IDataBase *db,
                              PacketManager::SuccessHandler successHandler,
                              PacketManager::ErrorHandler errorHandler)
     : _handler(handler), _decryptor(decryptor), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
-{
-    this->_crypt = nullptr;
-}
+{ }
 
 void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
-}
-
-void PacketManager::setCrypt(ICrypt *crypt) {
-    this->_crypt = crypt;
 }
 
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {

@@ -5,7 +5,6 @@
 #include "IDataBase.hpp"
 #include "MapDB.hpp"
 #include "IntervalService.hpp"
-#include "ICrypt.hpp"
 
 class APacketServer : public AUdpServer {
 public:
@@ -46,7 +45,6 @@ protected:
 
 protected:
     void setDB(IDataBase *db);
-    void setCrypt(ICrypt *db);
 
 private:
     void reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to);
@@ -61,5 +59,4 @@ protected:
     PacketManager _packetManager;
     boost::asio::ip::udp::resolver _resolver;
     IntervalService _reserveChecker;
-    ICrypt *_crypt;
 };

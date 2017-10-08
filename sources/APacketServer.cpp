@@ -22,7 +22,6 @@ APacketServer::APacketServer(boost::asio::io_service &ioService, int port, std::
       _reserveChecker(ioService, 5, [this](boost::system::error_code const &ec) { this->checkReserve(ec); })
 {
     this->_reserveChecker.start();
-    this->_crypt = nullptr;
 }
 
 APacketServer::~APacketServer() {
@@ -108,11 +107,6 @@ void APacketServer::setDB(IDataBase *db) {
     }
     this->_db = db;
     this->_packetManager.setDB(db);
-}
-
-void APacketServer::setCrypt(ICrypt *crypt) {
-    this->_crypt = crypt;
-    this->_packetManager.setCrypt(crypt);
 }
 
 void APacketServer::reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to) {

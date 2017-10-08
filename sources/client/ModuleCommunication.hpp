@@ -20,7 +20,7 @@ public:
     void add(std::string const &module, Order const &order) override;
     void add(boost::property_tree::ptree const &ptree) override;
     bool get(std::string const &module, Order &order) override;
-    void send(boost::property_tree::ptree const &data) override;
+    void send(boost::property_tree::ptree const &data, bool force = false) override;
 
 private:
     struct ModOrder {

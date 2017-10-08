@@ -14,18 +14,41 @@ bool Server::requestCheck(boost::system::error_code &,
 
 void Server::packetHandler(Packet &packet) {
     std::cout << "completed " << packet << std::endl;
-    this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
+    boost::property_tree::ptree ptree;
+    boost::property_tree::read_json(packet.get<Packet::Field::DATA>(), ptree);
+    if (ptree.get("type") == "PublicKey") {
+      this->send(this->_crypt.initClient(ptree));
+    } else {
+      this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
+    }
 }
 
-void Server::encryptor(Packet &) {
+void Server::encryptor(Packet &packet) {
+  if (packet.getPtree().get("data.type") == "AesKey")
+    packet.set<std::string>(Packet::Field::DATA,
+			    this->_crypt.encryptRSA(packet.get<Packet::Field::COOKIE, std::string>(),
+						    packet.get<Packet::Field::DATA, std::string>()));
+  else
+    packet.set<std::string>(Packet::Field::DATA,
+			    this->_crypt.encrypt(packet.get<Packet::Field::COOKIE, std::string>(),
+						 packet.get<Packet::Field::DATA, std::string>()));
 }
 
-void Server::decryptor(Packet &) {
+void Server::decryptor(Packet &packet) {
+  std::cout << packet.get<Packet::Field::COOKIE, std::string>().empty() << std::endl;
+  if (packet.get<Packet::Field::COOKIE, std::string>().empty())
+    packet.set<std::string>(Packet::Field::DATA,
+			    this->_crypt.decryptRSA(packet.get<Packet::Field::DATA, std::string>()));
+  else
+    packet.set<std::string>(Packet::Field::DATA,
+			    this->_crypt.decrypt(packet.get<Packet::Field::COOKIE, std::string>(),
+						 packet.get<Packet::Field::DATA, std::string>()));
 }
 
 bool Server::isIgnited(boost::property_tree::ptree const &, boost::asio::ip::udp::endpoint const &) const {
     return true;
 }
+
 
 void Server::send(std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,

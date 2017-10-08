@@ -43,7 +43,6 @@ void Client::packetHandler(Packet &packet) {
 }
 
 void Client::encryptor(Packet &packet) {
-  std::cout << this->_crypt.encrypt(packet.get<Packet::Field::DATA, std::string>()) << std::endl;
   packet.set<std::string>(Packet::Field::DATA,
 			  this->_crypt.encrypt(packet.get<Packet::Field::DATA, std::string>()));
 }
