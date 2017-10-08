@@ -11,8 +11,9 @@ public:
 
 public:
     void send(std::string const &data,
-              std::string const &id);
-    void send(std::string const &data);
+              std::string const &id,
+              bool force = false);
+    void send(std::string const &data, bool force = false);
     void run();
 
 public:
@@ -21,6 +22,8 @@ public:
 private:
     virtual bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
     virtual void packetHandler(Packet &packet);
+    virtual void encryptor(Packet &packet);
+    virtual bool isIgnited(boost::property_tree::ptree const &packet, boost::asio::ip::udp::endpoint const &clientEndpoint) const;
 
 private:
     boost::asio::ip::udp::endpoint _serverEndpoint;

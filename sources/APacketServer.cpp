@@ -15,6 +15,7 @@ APacketServer::APacketServer(boost::asio::io_service &ioService, int port, std::
       _packetManager(
         this->_db,
         [this](Packet &packet) { this->packetHandler(packet); },
+        [this](Packet &packet) { this->encryptor(packet); },
         [this](Packet &packet, boost::asio::ip::udp::endpoint &from) { return this->sendSuccess(packet, from); }
       ),
       _resolver(ioService),
@@ -32,6 +33,7 @@ APacketServer::~APacketServer() {
 void APacketServer::sendPacket(std::string const &data,
                                boost::asio::ip::udp::endpoint const &to,
                                std::string const &id,
+                               bool force,
                                bool reserve) {
     Packet packet;
 
@@ -41,6 +43,9 @@ void APacketServer::sendPacket(std::string const &data,
     std::vector<Packet> packets = packet.split();
     if (reserve) {
         this->reservePackets(packets, to);
+    }
+    if (!force && this->isIgnited(packet.getPtree(), to)) {
+        return ;
     }
     try {
         for (auto &part : packets) {
@@ -53,6 +58,7 @@ void APacketServer::sendPacket(std::string const &data,
 
 void APacketServer::sendPacket(std::string const &data,
                                boost::asio::ip::udp::endpoint &to,
+                               bool force,
                                bool reserve) {
     this->sendPacket(data, to, std::to_string(APacketServer::id++), reserve);
 }
@@ -115,7 +121,7 @@ void APacketServer::reservePackets(std::vector<Packet> const &packets, boost::as
     }
 }
 
-void APacketServer::checkReserve(boost::system::error_code const &ec) {
+void APacketServer::checkReserve(boost::system::error_code const &) {
     auto packets = this->_db->find(PacketManager::waitingColName, {});
     if (!packets.size()) {
         return ;
@@ -123,12 +129,13 @@ void APacketServer::checkReserve(boost::system::error_code const &ec) {
     for (auto &part : packets) {
         std::string host = part.get("host", "");
         std::string port = part.get("port", "");
-        std::string msg(std::move(json::stringify(part.get_child("packet"))));
+        boost::asio::ip::udp::endpoint endpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
         try {
-            this->_socket.send_to(
-                boost::asio::buffer(msg, msg.length()),
-                *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port})
-            );
+            if (!this->isIgnited(part.get_child("packet"), endpoint)) {
+                continue ;
+            }
+            std::string msg(std::move(json::stringify(part.get_child("packet"))));
+                this->_socket.send_to(boost::asio::buffer(msg, msg.length()), endpoint);
         } catch (std::exception &err) {
         }
     }

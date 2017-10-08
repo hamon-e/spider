@@ -39,11 +39,20 @@ void Client::packetHandler(Packet &packet) {
     this->_crypt.init(ptree.get_child("key"));
 }
 
+void Client::encryptor(Packet &packet) {
+
+}
+
+bool Client::isIgnited(boost::property_tree::ptree const &packet, boost::asio::ip::udp::endpoint const &clientEndpoint) const {
+    return true;
+}
+
 void Client::send(std::string const &data,
-                  std::string const &id) {
+                  std::string const &id,
+                  bool force) {
     this->sendPacket(data, this->_serverEndpoint, id);
 }
 
-void Client::send(std::string const &data) {
+void Client::send(std::string const &data, bool force) {
     this->sendPacket(data, this->_serverEndpoint);
 }

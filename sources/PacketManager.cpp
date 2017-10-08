@@ -7,9 +7,11 @@ std::string const PacketManager::waitingColName = "waiting";
 
 PacketManager::PacketManager(IDataBase *db,
                              PacketManager::PacketHandler handler,
+                             PacketManager::PacketHandler encryptor,
                              PacketManager::SuccessHandler successHandler,
                              PacketManager::ErrorHandler errorHandler)
-  : _handler(handler), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db) {
+    : _handler(handler), _encryptor(encryptor), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
+{
     this->_crypt = nullptr;
 }
 
@@ -59,9 +61,10 @@ void PacketManager::complete(boost::property_tree::ptree const &query, boost::as
 
  bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
-    if (this->_crypt)
-      packet.set(Packet::Field::DATA,
-		 this->_crypt->encrypt(packet.get<Packet::Field::DATA, std::string>()));
+    this->_encryptor(packet);
+    // if (this->_crypt)
+    //   packet.set(Packet::Field::DATA,
+	// 	 this->_crypt->encrypt(packet.get<Packet::Field::DATA, std::string>()));
 
     boost::property_tree::ptree query;
     try {
