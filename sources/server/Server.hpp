@@ -8,9 +8,11 @@ public:
     void send(std::string const &data,
               boost::asio::ip::udp::endpoint &clientEndpoint,
               std::string const &id,
+              std::size_t size = Packet::defaultSize,
               bool force = false);
     void send(std::string const &data,
               boost::asio::ip::udp::endpoint &clientEndpoint,
+              std::size_t size = Packet::defaultSize,
               bool force = false);
 
 private:

@@ -30,12 +30,14 @@ bool Server::isIgnited(boost::property_tree::ptree const &, boost::asio::ip::udp
 void Server::send(std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,
                   std::string const &id,
+                  std::size_t size,
                   bool force) {
-    this->sendPacket(data, clientEndpoint, id, force);
+    this->sendPacket(data, clientEndpoint, id, size, force);
 }
 
 void Server::send(std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,
+                  std::size_t size,
                   bool force) {
-    this->sendPacket(data, clientEndpoint, force);
+    this->sendPacket(data, clientEndpoint, size, force);
 }

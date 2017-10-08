@@ -60,10 +60,11 @@ bool Client::isIgnited(boost::property_tree::ptree const &packet,
 
 void Client::send(std::string const &data,
                   std::string const &id,
+                  std::size_t size,
                   bool force) {
-    this->sendPacket(data, this->_serverEndpoint, id);
+    this->sendPacket(data, this->_serverEndpoint, id, size, force);
 }
 
-void Client::send(std::string const &data, bool force) {
-    this->sendPacket(data, this->_serverEndpoint);
+void Client::send(std::string const &data, std::size_t size, bool force) {
+    this->sendPacket(data, this->_serverEndpoint, size, force);
 }

@@ -33,6 +33,7 @@ APacketServer::~APacketServer() {
 void APacketServer::sendPacket(std::string const &data,
                                boost::asio::ip::udp::endpoint const &to,
                                std::string const &id,
+                               std::size_t size,
                                bool force,
                                bool reserve) {
     Packet packet;
@@ -41,7 +42,7 @@ void APacketServer::sendPacket(std::string const &data,
     packet.set(Packet::Field::COOKIE, this->_cookie);
     packet.set(Packet::Field::DATA, data);
     this->encryptor(packet);
-    std::vector<Packet> packets = packet.split();
+    std::vector<Packet> packets = packet.split(size);
     if (reserve) {
         this->reservePackets(packets, to);
     }
@@ -59,9 +60,10 @@ void APacketServer::sendPacket(std::string const &data,
 
 void APacketServer::sendPacket(std::string const &data,
                                boost::asio::ip::udp::endpoint &to,
+                               std::size_t size,
                                bool force,
                                bool reserve) {
-    this->sendPacket(data, to, std::to_string(APacketServer::id++), reserve);
+    this->sendPacket(data, to, std::to_string(APacketServer::id++), size, reserve);
 }
 
 void APacketServer::requestHandler(boost::system::error_code ec,
