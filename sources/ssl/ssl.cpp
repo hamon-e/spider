@@ -1,11 +1,11 @@
 //
-// ssl.cpp for cpp_spider in sources/client
+// ssl.cpp for cpp_spider in sources/ssl
 //
 // Made by Benoit Hamon
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 01 17:14:07 2017 Benoit Hamon
-// Last update Mon Oct 02 22:29:31 2017 Benoit Hamon
+// Last update Sun Oct 08 17:45:42 2017 Benoit Hamon
 //
 //
 
@@ -26,17 +26,17 @@ int main(int argc, char *argv[]) {
     test.decrypt(encrypt, decrypt);
     std::cout << decrypt << std::endl;
     std::string key;
-    test.getKey(ICrypt::RSA_PUB, key);
+    test.getKey(ICryptAlgo::RSA_PUB, key);
     std::cout << key << std::endl;
-    test.getKey(ICrypt::RSA_PRIV, key);
+    test.getKey(ICryptAlgo::RSA_PRIV, key);
     std::cout << key << std::endl;
-    test.saveKeyInFile(ICrypt::RSA_PUB, "filename");
-    test.saveKeyInFile(ICrypt::RSA_PRIV, "filename1");
+    test.saveKeyInFile(ICryptAlgo::RSA_PUB, "filename");
+    test.saveKeyInFile(ICryptAlgo::RSA_PRIV, "filename1");
 
 
 
-    test.setKeyFromFile(ICrypt::RSA_PUB, "filename");
-    test.setKeyFromFile(ICrypt::RSA_PRIV, "filename1");
+    test.setKeyFromFile(ICryptAlgo::RSA_PUB, "filename");
+    test.setKeyFromFile(ICryptAlgo::RSA_PRIV, "filename1");
 //  std::string lol("BONJOUR123");
     // std::string encrypt;
 //  std::string decrypt;
@@ -47,9 +47,9 @@ int main(int argc, char *argv[]) {
     test.decrypt(encrypt, decrypt);
     std::cout << decrypt << std::endl;
 //  std::string key;
-    test.getKey(ICrypt::RSA_PUB, key);
+    test.getKey(ICryptAlgo::RSA_PUB, key);
     std::cout << key << std::endl;
-    test.getKey(ICrypt::RSA_PRIV, key);
+    test.getKey(ICryptAlgo::RSA_PRIV, key);
     std::cout << key << std::endl;
     return 0;
 }
