@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.6)
 project(cpp_spider)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 if (WIN32)
   set(BOOST_ROOT "C:/local/boost_1_65_1")
   link_directories("${BOOST_ROOT}/lib64-msvc-14.1")
 
+  find_package(OPENSSL)
+elseif(APPLE)
   find_package(OPENSSL)
 else()
   find_package(PkgConfig)
