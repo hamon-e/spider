@@ -18,7 +18,7 @@ private:
 public:
     LocalDB();
     LocalDB(LocalDB const &other) = delete;
-    ~LocalDB() = delete;
+    virtual ~LocalDB() = default;
     LocalDB &operator=(LocalDB const &other) = delete;
 
 public:
@@ -29,7 +29,7 @@ public:
     virtual void insert(std::string const &collection, ptree const &doc);private:
 
 private:
-    void loop(boost::filesystem::directory_iterator &it,
-              std::function<bool(boost::filesystem::directory_iterator &)> fn);
-    bool searchQuery(ptree &query, ptree const &tree);
+    void foreachJsonFile(boost::filesystem::directory_iterator &it,
+                         std::function<bool(boost::filesystem::directory_iterator &)> fn) const;
+    bool searchQuery(ptree const &query, ptree const &tree) const;
 };
