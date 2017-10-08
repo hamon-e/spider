@@ -1,7 +1,3 @@
-//
-// Created by golitij on 03/10/17.
-//
-
 #ifndef CPP_SPIDER_MongoDB_HPP
 #define CPP_SPIDER_MongoDB_HPP
 
@@ -18,6 +14,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/thread/mutex.hpp>
 #include "IDataBase.hpp"
+#include "LocalDB.hpp"
 
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
@@ -32,8 +29,8 @@ class MongoDB : public IDataBase
 private:
     mongocxx::client *_mongodbClient;
     mongocxx::database _dbAccess;
-    mongocxx::collection _collection;
-    bsoncxx::builder::stream::document _builder;
+    // mongocxx::collection _collection;
+    // bsoncxx::builder::stream::document _builder;
     boost::mutex _mutex;
 
 public:
@@ -44,11 +41,12 @@ public:
     virtual void insert(std::string const &collection, ptree const &doc);
     virtual ptree findOne(std::string const &collection, ptree const &query);
     virtual std::vector<ptree> find(std::string const &collection, ptree const &query);
-    virtual void update(std::string const &collection, ptree const &query, ptree const &update);
+    virtual void update(std::string const &collection, ptree const &query, ptree const &update, bool upsert = false);
     virtual void remove(std::string const &collection, ptree const &query);
 
 private:
-    void generateBuilder(ptree const &doc);
+    bsoncxx::builder::stream::document generateBson(ptree const &doc);
+    void generateBson(ptree const &doc, bsoncxx::builder::stream::document &bson);
 };
 
 

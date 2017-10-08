@@ -22,7 +22,10 @@ public:
     using ErrorHandler = std::function<void(Packet &packet, PacketManager::Error)>;
 
 public:
-    PacketManager(IDataBase &db, PacketHandler handler, SuccessHandler = {}, ErrorHandler = {});
+    PacketManager(IDataBase *db, PacketHandler handler, SuccessHandler = {}, ErrorHandler = {});
+
+public:
+    void setDB(IDataBase *db);
 
 public:
     PacketManager &in(std::string const &data, boost::asio::ip::udp::endpoint &from);
@@ -35,5 +38,5 @@ private:
     PacketHandler _handler;
     ErrorHandler _errorHandler;
     SuccessHandler _succesHandler;
-    IDataBase &_db;
+    IDataBase *_db;
 };

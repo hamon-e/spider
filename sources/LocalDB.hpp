@@ -18,13 +18,13 @@ private:
 public:
     LocalDB();
     LocalDB(LocalDB const &other) = delete;
-    ~LocalDB() = delete;
+    ~LocalDB() = default;
     LocalDB &operator=(LocalDB const &other) = delete;
 
 public:
     virtual ptree findOne(std::string const &collection, ptree const &query);
     virtual std::vector<ptree> find(std::string const &collection, ptree const &query);
-    virtual void update(std::string const &collection, ptree const &query, ptree const &update);
+    virtual void update(std::string const &collection, ptree const &query, ptree const &update, bool upsert = false);
     virtual void remove(std::string const &collection, ptree const &query);
     virtual void insert(std::string const &collection, ptree const &doc);private:
 

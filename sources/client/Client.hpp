@@ -4,14 +4,12 @@
 
 class Client : public APacketServer {
 public:
-    Client(boost::asio::io_service &ioService, std::string const &host, std::string const &port);
+    Client(boost::asio::io_service &ioService, std::string const &cookie, std::string const &host, std::string const &port);
 
 public:
-    void send(std::string const &cookie,
-              std::string const &data,
+    void send(std::string const &data,
               std::string const &id);
-    void send(std::string const &cookie,
-              std::string const &data);
+    void send(std::string const &data);
 
 private:
     virtual bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
