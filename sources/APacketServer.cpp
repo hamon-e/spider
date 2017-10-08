@@ -6,7 +6,6 @@
 #include "MapDB.hpp"
 #include "json.hpp"
 
-std::string const APacketServer::waitingColName = "waiting";
 std::size_t APacketServer::id = 0;
 
 APacketServer::APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db)
@@ -38,7 +37,8 @@ void APacketServer::sendPacket(std::string const &cookie,
     try {
         for (auto part : packets) {
             std::string msg(std::move(part.stringify()));
-            std::cout << "sent : " << this->_socket.send_to(boost::asio::buffer(msg, msg.length()), to) << std::endl;
+            this->_socket.send_to(boost::asio::buffer(msg, msg.length()), to);
+            std::cout << "sent : " << part << std::endl;
         }
     } catch (boost::system::system_error const &ec) {
     }
@@ -72,19 +72,6 @@ void APacketServer::sendSuccess(Packet &packet, boost::asio::ip::udp::endpoint &
 
 void APacketServer::reservePackets(std::vector<Packet> const &packets) {
     for (auto part : packets) {
-        this->_db->insert(APacketServer::waitingColName, part.getPtree());
+        this->_db->insert(PacketManager::waitingColName, part.getPtree());
     }
-}
-
-void APacketServer::unreservePackets(std::string const &id) {
-    boost::property_tree::ptree ptree;
-    ptree.put(Packet::fields.at(Packet::Field::ID), id);
-    this->_db->remove(APacketServer::waitingColName, ptree);
-}
-
-void APacketServer::unreservePackets(std::string const &id, std::size_t part) {
-    boost::property_tree::ptree ptree;
-    ptree.put(Packet::fields.at(Packet::Field::ID), id);
-    ptree.put(Packet::fields.at(Packet::Field::PART), part);
-    this->_db->remove(APacketServer::waitingColName, ptree);
 }

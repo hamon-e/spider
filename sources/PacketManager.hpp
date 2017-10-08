@@ -14,6 +14,7 @@ public:
 
     static std::string const partsColName;
     static std::string const dataColName;
+    static std::string const waitingColName;
 
 public:
     using PacketHandler = std::function<void(Packet &packet)>;

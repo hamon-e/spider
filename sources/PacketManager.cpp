@@ -3,6 +3,7 @@
 
 std::string const PacketManager::partsColName = "parts";
 std::string const PacketManager::dataColName = "data";
+std::string const PacketManager::waitingColName = "waiting";
 
 PacketManager::PacketManager(IDataBase &db,
                              PacketManager::PacketHandler handler,
@@ -31,7 +32,6 @@ void PacketManager::complete(Packet &part, boost::asio::ip::udp::endpoint &from)
     query.put(Packet::fields.at(Packet::Field::ID), part.get<Packet::Field::ID, std::string>());
     std::vector<boost::property_tree::ptree> packets = this->_db.find(PacketManager::partsColName, query);
     if ((packets.size() + 1) == part.get<Packet::Field::TOTALPART, std::size_t>(0)) {
-        std::cout << "ok" << std::endl;
         packets.push_back(std::move(part.getPtree()));
         if (!this->joinParts(packets)) {
             tools::call(this->_succesHandler, part, from);
@@ -41,7 +41,6 @@ void PacketManager::complete(Packet &part, boost::asio::ip::udp::endpoint &from)
         } catch (std::exception &) {
         }
     } else {
-        std::cout << "nok" << std::endl;
         tools::call(this->_succesHandler, part, from);
     }
     this->_db.insert(PacketManager::partsColName, part.getPtree());
@@ -49,8 +48,15 @@ void PacketManager::complete(Packet &part, boost::asio::ip::udp::endpoint &from)
 
  bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
+    boost::property_tree::ptree query;
     if (packet.getPtree().get("data.type", "") == "success") {
-        std::cout << "success" << std::endl;
+        query.put(Packet::fields.at(Packet::Field::ID), packet.getPtree().get("data.id", ""));
+        query.put(Packet::fields.at(Packet::Field::PART), packet.getPtree().get("data.part", ""));
+        try {
+            this->_db.remove(PacketManager::waitingColName, query);
+        } catch (std::exception &) {
+            std::cout << "error" << std::endl;
+        }
         return true;
     }
     this->_handler(packet);

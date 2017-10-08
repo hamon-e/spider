@@ -7,9 +7,6 @@
 
 class APacketServer : public AUdpServer {
 public:
-    static std::string const waitingColName;
-
-public:
     APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db = new MapDB());
 
 public:
@@ -40,8 +37,6 @@ private:
 
 private:
     void reservePackets(std::vector<Packet> const &packets);
-    void unreservePackets(std::string const &id);
-    void unreservePackets(std::string const &id, std::size_t part);
 
 protected:
     static std::size_t id;
