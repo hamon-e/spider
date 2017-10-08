@@ -13,7 +13,6 @@ bool Server::requestCheck(boost::system::error_code &,
 }
 
 void Server::packetHandler(Packet &packet) {
-    std::cout << "completed " << packet << std::endl;
     this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
 }
 
