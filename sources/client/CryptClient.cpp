@@ -5,11 +5,11 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Sun Oct 08 19:37:43 2017 Benoit Hamon
+// Last update Sun Oct 08 19:42:26 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
-#include "Base64.hpp"
+#include "ssl/Base64.hpp"
 #include "CryptClient.hpp"
 
 void CryptClient::init() {

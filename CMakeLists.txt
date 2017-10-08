@@ -90,6 +90,8 @@ set(SOURCE_FILES
   ./sources/ssl/Base64.cpp
   ./sources/ssl/CryptAES.cpp
   ./sources/ssl/CryptRSA.cpp
+  ./sources/client/CryptClient.cpp
+  ./sources/ssl/CryptRSA.cpp
   ./sources/LocalDB.cpp
   ./sources/LocalDB.hpp
 )
