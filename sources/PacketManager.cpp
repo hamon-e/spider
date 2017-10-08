@@ -15,6 +15,11 @@ PacketManager::PacketManager(IDataBase *db,
 void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
 }
+
+void PacketManager::setCrypt(ICrypt *crypt) {
+    this->_crypt = crypt;
+}
+
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
         Packet packet(data);
@@ -53,6 +58,10 @@ void PacketManager::complete(boost::property_tree::ptree const &query, boost::as
 
  bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
+    if (this->_crypt)
+      packet.set(Packet::Field::DATA,
+		 this->_crypt->encrypt(packet.get<Packet::Field::DATA, std::string>()));
+
     boost::property_tree::ptree query;
     try {
         auto ptree = packet.getPtree();

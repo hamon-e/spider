@@ -36,7 +36,7 @@ void APacketServer::sendPacket(std::string const &data,
 
     packet.set(Packet::Field::ID, id);
     packet.set(Packet::Field::COOKIE, this->_cookie);
-    packet.set(Packet::Field::DATA, data);
+    packet.set(Packet::Field::DATA, this->_crypt ? this->_crypt->encrypt(data) : data);
     std::vector<Packet> packets = packet.split();
     if (reserve) {
         this->reservePackets(packets, to);
@@ -96,6 +96,11 @@ void APacketServer::setDB(IDataBase *db) {
     }
     this->_db = db;
     this->_packetManager.setDB(db);
+}
+
+void APacketServer::setCrypt(ICrypt *crypt) {
+    this->_crypt = crypt;
+    this->_packetManager.setCrypt(crypt);
 }
 
 void APacketServer::reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to) {

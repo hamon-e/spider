@@ -1,6 +1,7 @@
 #pragma once
 
 #include "APacketServer.hpp"
+#include "CryptClient.hpp"
 
 class Client : public APacketServer {
 public:
@@ -17,4 +18,5 @@ private:
 
 private:
     boost::asio::ip::udp::endpoint _serverEndpoint;
+    CryptClient _crypt;
 };

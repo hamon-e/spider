@@ -23,6 +23,7 @@ void Client::send(std::string const &data,
                   std::string const &id) {
     this->sendPacket(data, this->_serverEndpoint, id);
 }
+
 void Client::send(std::string const &data) {
     this->sendPacket(data, this->_serverEndpoint);
 }

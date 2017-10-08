@@ -5,6 +5,7 @@
 
 #include "Packet.hpp"
 #include "IDataBase.hpp"
+#include "ICrypt.hpp"
 
 class PacketManager {
 public:
@@ -26,6 +27,7 @@ public:
 
 public:
     void setDB(IDataBase *db);
+    void setCrypt(ICrypt *crypt);
 
 public:
     PacketManager &in(std::string const &data, boost::asio::ip::udp::endpoint &from);
@@ -39,4 +41,5 @@ private:
     ErrorHandler _errorHandler;
     SuccessHandler _succesHandler;
     IDataBase *_db;
+    ICrypt *_crypt;
 };
