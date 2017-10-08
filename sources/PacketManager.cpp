@@ -34,15 +34,11 @@ PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::
 }
 
 void PacketManager::complete(boost::property_tree::ptree const &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
-    // boost::property_tree::ptree query;
-    // query.put(Packet::fields.at(Packet::Field::ID), part.get<Packet::Field::ID, std::string>());
-
     std::vector<boost::property_tree::ptree> packets = this->_db->find(PacketManager::partsColName, query);
     if (!packets.size()) {
         return ;
     }
     if (packets.size() == static_cast<std::size_t>(packets[0].get(Packet::fields.at(Packet::Field::TOTALPART), 0))) {
-        // packets.push_back(std::move(part.getPtree()));
         if (!this->joinParts(packets)) {
             tools::call(this->_succesHandler, part, from);
         }
@@ -53,9 +49,6 @@ void PacketManager::complete(boost::property_tree::ptree const &query, boost::as
     } else {
         tools::call(this->_succesHandler, part, from);
     }
-
-//     query.put(Packet::fields.at(Packet::Field::PART), part.get<Packet::Field::PART, std::string>());
-//     this->_db->update(PacketManager::partsColName, part.getPtree(), part.getPtree(), true);
 }
 
  bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
