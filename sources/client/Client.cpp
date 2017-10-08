@@ -16,6 +16,7 @@ void Client::addModuleCommunication(IModuleCommunication *moduleCommunication) {
   this->_moduleCommunication = moduleCommunication;
   this->_moduleManager.addModuleCommunication(moduleCommunication);
   this->_crypt.addModuleCommunication(moduleCommunication);
+  this->_crypt.init();
 }
 
 bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint) {
