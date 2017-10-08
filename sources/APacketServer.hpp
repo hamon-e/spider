@@ -8,18 +8,16 @@
 
 class APacketServer : public AUdpServer {
 public:
-    APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db = new MapDB());
+    APacketServer(boost::asio::io_service &ioService, int port, std::string const &cookie, IDataBase *db = nullptr);
     ~APacketServer();
 
 public:
     void sendPacket(
-        std::string const &cookie,
         std::string const &data,
         boost::asio::ip::udp::endpoint const &to,
         std::string const &id,
         bool reserve = true);
         void sendPacket(
-            std::string const &cookie,
             std::string const &data,
             boost::asio::ip::udp::endpoint &to,
             bool reserve = true);
@@ -38,6 +36,9 @@ protected:
     void saveClient(std::string const &cookie, boost::asio::ip::udp::endpoint const &from);
     void sendSuccess(Packet &packet, boost::asio::ip::udp::endpoint &from);
 
+protected:
+    void setDB(IDataBase *db);
+
 private:
     void reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to);
     void checkReserve(boost::system::error_code const &ec);
@@ -47,6 +48,7 @@ protected:
 
 protected:
     IDataBase *_db;
+    std::string _cookie;
     PacketManager _packetManager;
     boost::asio::ip::udp::resolver _resolver;
     IntervalService _reserveChecker;

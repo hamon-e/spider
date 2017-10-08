@@ -24,7 +24,7 @@ public:
 public:
     virtual ptree findOne(std::string const &collection, ptree const &query);
     virtual std::vector<ptree> find(std::string const &collection, ptree const &query);
-    virtual void update(std::string const &collection, ptree const &query, ptree const &update);
+    virtual void update(std::string const &collection, ptree const &query, ptree const &update, bool upsert = false);
     virtual void remove(std::string const &collection, ptree const &query);
     virtual void insert(std::string const &collection, ptree const &doc);private:
 

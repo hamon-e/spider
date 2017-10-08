@@ -46,17 +46,20 @@ std::vector<IDataBase::ptree> MapDB::find(std::string const &collection, IDataBa
     return res;
 }
 
-void MapDB::update(std::string const &collection, IDataBase::ptree const &query, IDataBase::ptree const &update) {
+void MapDB::update(std::string const &collection, IDataBase::ptree const &query, IDataBase::ptree const &update, bool upsert) {
+    bool found = false;
     auto node = this->_db.find(collection);
     if (node != this->_db.end()) {
         for (auto &doc : node->second) {
             if (MapDB::cmpQuery(doc, query)) {
                 doc = update;
-                return ;
+                found = true;
             }
         }
     }
-    throw std::out_of_range("update");
+    if (upsert && !found) {
+        this->insert(collection, update);
+    }
 }
 
 void MapDB::remove(std::string const &collection, IDataBase::ptree const &query) {
