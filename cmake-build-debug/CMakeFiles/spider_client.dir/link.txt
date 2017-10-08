@@ -1,1 +1,0 @@
-/usr/bin/c++   -std=c++14 -Wall -std=c++14 -Wall -g   CMakeFiles/spider_client.dir/sources/DataBase.cpp.o CMakeFiles/spider_client.dir/sources/main.cpp.o  -o spider_client /usr/lib64/libboost_date_time-mt.so /usr/lib64/libboost_filesystem-mt.so /usr/lib64/libboost_system-mt.so /usr/lib64/libboost_thread-mt.so /usr/lib64/libboost_chrono-mt.so /usr/lib64/libboost_atomic-mt.so 

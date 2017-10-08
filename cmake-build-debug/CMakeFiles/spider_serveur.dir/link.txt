@@ -1,1 +1,0 @@
-/usr/bin/c++   -std=c++14 -Wall -std=c++14 -Wall -g   CMakeFiles/spider_serveur.dir/sources/server/main.cpp.o  -o spider_serveur 
