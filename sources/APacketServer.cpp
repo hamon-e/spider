@@ -32,6 +32,7 @@ void APacketServer::sendPacket(std::string const &data,
                                boost::asio::ip::udp::endpoint const &to,
                                std::string const &id,
                                bool reserve) {
+    boost::mutex::scoped_lock lock(this->_mutex);
     Packet packet;
 
     packet.set(Packet::Field::ID, id);

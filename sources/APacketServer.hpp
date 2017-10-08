@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/thread/mutex.hpp>
+
 #include "AUdpServer.hpp"
 #include "PacketManager.hpp"
 #include "IDataBase.hpp"
@@ -52,4 +54,5 @@ protected:
     PacketManager _packetManager;
     boost::asio::ip::udp::resolver _resolver;
     IntervalService _reserveChecker;
+    boost::mutex _mutex;
 };
