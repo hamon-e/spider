@@ -7,15 +7,23 @@
 
 class APacketServer : public AUdpServer {
 public:
+    static std::string const waitingColName;
+
+public:
     APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db = new MapDB());
 
 public:
     void sendPacket(
-        std::string const &id,
         std::string const &cookie,
         std::string const &data,
-        boost::asio::ip::udp::endpoint &to
-        );
+        boost::asio::ip::udp::endpoint &to,
+        std::string const &id,
+        bool reserve = true);
+        void sendPacket(
+            std::string const &cookie,
+            std::string const &data,
+            boost::asio::ip::udp::endpoint &to,
+            bool reserve = true);
 
 private:
     void requestHandler(boost::system::error_code ec,
@@ -27,8 +35,20 @@ private:
                               boost::asio::ip::udp::endpoint &clientEndpoint) = 0;
     virtual void packetHandler(Packet &packet) = 0;
 
+private:
+    void sendSuccess(Packet &packet, boost::asio::ip::udp::endpoint &from);
+
+private:
+    void reservePackets(std::vector<Packet> const &packets);
+    void unreservePackets(std::string const &id);
+    void unreservePackets(std::string const &id, std::size_t part);
+
+protected:
+    static std::size_t id;
 
 protected:
     IDataBase *_db;
     PacketManager _packetManager;
+    boost::asio::ip::udp::resolver _resolver;
+    bool _network;
 };

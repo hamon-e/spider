@@ -12,21 +12,26 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    try {
+    // try {
         Client client(ioService, argv[1], argv[2]);
-        client.send("Nicolas", "helloazeazeazeazeazeazeaz");
+        client.send("Nicolas", "{ \"aze\": \"helloazeazeazeazeazeazeaz\" }");
         client.start();
-
-        boost::thread modules([&client]() {
-    	ModuleManager mod(client);
-    	mod.run();
-    	});
+        boost::thread([&client]() {
+            std::string s;
+            while (getline(std::cin, s)) {
+                client.send("aze", "{\"aze\": \"" + s + "\" }");
+            }
+        });
+        // boost::thread modules([&client]() {
+    	// ModuleManager mod(client);
+    	// mod.run();
+    	// });
 
         ioService.run();
-        modules.join();
-    } catch(std::exception &err) {
-        std::cout << err.what() << std::endl;
-        return 1;
-    }
+        // modules.join();
+    // } catch(std::exception &err) {
+    //     std::cout << err.what() << std::endl;
+    //     return 1;
+    // }
     return 0;
 }
