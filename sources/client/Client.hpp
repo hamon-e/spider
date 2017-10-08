@@ -2,6 +2,8 @@
 
 #include "APacketServer.hpp"
 #include "CryptClient.hpp"
+#include "IModuleCommunication.hpp"
+#include "ModuleManager.hpp"
 
 class Client : public APacketServer {
 public:
@@ -11,6 +13,10 @@ public:
     void send(std::string const &data,
               std::string const &id);
     void send(std::string const &data);
+    void run();
+
+public:
+    void addModuleCommunication(IModuleCommunication *moduleCommunication);
 
 private:
     virtual bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
@@ -19,4 +25,6 @@ private:
 private:
     boost::asio::ip::udp::endpoint _serverEndpoint;
     CryptClient _crypt;
+    IModuleCommunication *_moduleCommunication;
+    ModuleManager _moduleManager;
 };

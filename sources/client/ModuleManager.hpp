@@ -8,18 +8,20 @@
 #include <boost/thread/thread.hpp>
 
 #include "IModule.hpp"
-#include "ModuleCommunication.hpp"
-#include "Client.hpp"
+#include "IModuleCommunication.hpp"
 
-typedef boost::shared_ptr<IModule> (module_t)(ModuleCommunication *);
+typedef boost::shared_ptr<IModule> (module_t)(IModuleCommunication *);
 
 class ModuleManager {
 public:
-    ModuleManager(Client &_client, std::string const &dirname = ".");
+    ModuleManager(IModuleCommunication *moduleCommunication = nullptr,
+		  std::string const &dirname = "./");
     ~ModuleManager();
 
 public:
     void run();
+    void addModuleCommunication(IModuleCommunication *moduleCommunication);
+    void addLibrary(boost::property_tree::ptree const &ptree);
 
 private:
     struct Library {
@@ -37,5 +39,5 @@ private:
     std::string _dirname;
     std::vector<Library> _libraries;
     boost::thread_group _threads;
-    ModuleCommunication _moduleCommunication;
+    IModuleCommunication *_moduleCommunication;
 };

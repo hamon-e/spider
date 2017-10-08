@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:52:53 2017 Benoit Hamon
-// Last update Sun Oct 08 18:15:15 2017 Benoit Hamon
+// Last update Sun Oct 08 19:37:10 2017 Benoit Hamon
 //
 
 #pragma once
@@ -17,15 +17,13 @@
 
 class CryptClient : public ICrypt {
   public:
-    CryptClient(IModuleCommunication *moduleCommunication);
-
-  public:
     std::string encrypt(std::string const &message) override;
     std::string decrypt(std::string const &encryptedMessage) override;
 
   public:
     void init();
     void init(boost::property_tree::ptree const &ptree);
+    void addModuleCommunication(IModuleCommunication *moduleCommunication);
 
   private:
     IModuleCommunication *_moduleCommunication;

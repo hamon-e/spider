@@ -5,15 +5,12 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Sun Oct 08 18:24:23 2017 Benoit Hamon
+// Last update Sun Oct 08 19:37:43 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
 #include "Base64.hpp"
 #include "CryptClient.hpp"
-
-CryptClient::CryptClient(IModuleCommunication *moduleCommunication)
-  : _moduleCommunication(moduleCommunication) {}
 
 void CryptClient::init() {
   if (!boost::filesystem::exists("aesiv.key") || !boost::filesystem::exists("aeskey.key")) {
@@ -40,6 +37,10 @@ void CryptClient::init(boost::property_tree::ptree const &ptree) {
   this->_aes.setKey(ICryptAlgo::KeyType::AES_IV,
 		    Base64::decrypt(ptree.get<std::string>("AES_IV")));
   this->_current = &this->_aes;
+}
+
+void CryptClient::addModuleCommunication(IModuleCommunication *moduleCommunication) {
+  this->_moduleCommunication = moduleCommunication;
 }
 
 std::string CryptClient::encrypt(std::string const &message) {

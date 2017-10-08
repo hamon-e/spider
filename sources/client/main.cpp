@@ -4,6 +4,7 @@
 #include <LocalDB.hpp>
 
 #include "Client.hpp"
+#include "ModuleCommunication.hpp"
 #include "ModuleManager.hpp"
 
 namespace pt = boost::property_tree;
@@ -16,25 +17,21 @@ int main(int argc, char const *argv[]) {
     }
 
     try {
-        Client client(ioService, "Nicolas", argv[1], argv[2]);
-        client.send("{ \"aze\": \"helloazeazeazeazeazeazeaz\" }");
-        client.start();
-        // boost::thread([&client]() {
-        //     std::string s;
-        //     while (getline(std::cin, s)) {
-        //         client.send("{\"aze\": \"" + s + "\" }");
-        //     }
-        // });
-        // boost::thread modules([&client]() {
-    	// ModuleManager mod(client);
-    	// mod.run();
-    	// });
+      Client client(ioService, "", argv[1], argv[2]);
+      ModuleCommunication moduleCommunication(client);
 
-        ioService.run();
-        // modules.join();
-    } catch(std::exception &err) {
-        std::cout << err.what() << std::endl;
-        return 1;
+      client.addModuleCommunication(&moduleCommunication);
+
+      client.start();
+      boost::thread modules([&client]() {
+			    client.run();
+			    });
+
+      ioService.run();
+      modules.join();
+    } catch (std::exception &err) {
+      std::cout << err.what() << std::endl;
+      return 1;
     }
     return 0;
 }
