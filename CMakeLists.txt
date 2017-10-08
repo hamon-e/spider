@@ -142,11 +142,15 @@ set(HTTP_NAME http_server)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 
-set(SOURCE_FILES ./sources/server/HttpsRestApi.cpp)
+set(SOURCE_FILES
+  ./sources/server/HttpsRestApi.cpp
+  ./sources/MongoDB.cpp)
 
 add_executable(${HTTP_NAME} ${SOURCE_FILES})
 target_link_libraries(${HTTP_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${HTTP_NAME} ${OPENSSL_LIBRARIES})
+target_link_libraries(${HTTP_NAME} ${LIBMONGOCXX_LIBRARIES})
+target_link_libraries(${HTTP_NAME} ${LIBBSONCXX_LIBRARIES})
 target_include_directories(${HTTP_NAME} PUBLIC
     ./libs
     ./sources

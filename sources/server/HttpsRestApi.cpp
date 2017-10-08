@@ -5,7 +5,7 @@
 // Login   <nicolas.goudal@epitech.eu>
 //
 // Started on  Sun Oct 08 18:38:49 2017 Nicolas Goudal
-// Last update Sun Oct 08 20:06:31 2017 Nicolas Goudal
+// Last update Sun Oct 08 20:41:42 2017 Benoit Hamon
 //
 
 #include "SimpleWebServer/client_https.hpp"
@@ -48,11 +48,11 @@ int g_user_id = 0;
 
 int main() {
   HttpsServer server("server.crt", "server.key");
-  server.config.port = 443;
+  server.config.port = 1234;
 
   MongoDB db;
 
-  server.resource["^/signup$"]["POST"] = [](shared_ptr<HttpsServer::Response> response, shared_ptr<HttpsServer::Request> request) {
+  server.resource["^/signup$"]["POST"] = [&db](shared_ptr<HttpsServer::Response> response, shared_ptr<HttpsServer::Request> request) {
     try {
       ptree iptree;
       read_json(request->content, iptree);
@@ -79,15 +79,19 @@ int main() {
       optree.put("status", "ok");
       optree.put("id", g_user_id);
       std::string json;
-      write_json(json, optree);
-      response->write(json);
+
+      std::stringstream ss;
+      write_json(ss, optree);
+
+      std::cout << ss.str() << std::endl;
+      response->write(ss);
     }
     catch (const exception &e) {
       response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
     }
   };
 
-  server.resource["^/login$"]["POST"] = [](shared_ptr<HttpsServer::Response> response, shared_ptr<HttpsServer::Request> request) {
+  server.resource["^/login$"]["POST"] = [&db](shared_ptr<HttpsServer::Response> response, shared_ptr<HttpsServer::Request> request) {
     try {
       ptree iptree;
       read_json(request->content, iptree);
