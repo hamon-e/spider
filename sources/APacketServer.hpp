@@ -17,21 +17,25 @@ public:
         std::string const &data,
         boost::asio::ip::udp::endpoint const &to,
         std::string const &id,
+        bool force = false,
         bool reserve = true);
-        void sendPacket(
-            std::string const &data,
-            boost::asio::ip::udp::endpoint &to,
-            bool reserve = true);
+    void sendPacket(
+        std::string const &data,
+        boost::asio::ip::udp::endpoint &to,
+        bool force = false,
+        bool reserve = true);
 
 private:
     void requestHandler(boost::system::error_code ec,
                         std::string req,
                         boost::asio::ip::udp::endpoint clientEndpoint);
-
     virtual bool requestCheck(boost::system::error_code &ec,
                               std::string &req,
                               boost::asio::ip::udp::endpoint &clientEndpoint) = 0;
+
     virtual void packetHandler(Packet &packet) = 0;
+    virtual void encryptor(Packet &packet) = 0;
+    virtual bool isIgnited(boost::property_tree::ptree const &ptree, boost::asio::ip::udp::endpoint const &clientEndpoint) const = 0;
 
 protected:
     void saveClient(std::string const &cookie, boost::asio::ip::udp::endpoint const &from);

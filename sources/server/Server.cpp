@@ -17,13 +17,23 @@ void Server::packetHandler(Packet &packet) {
     this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
 }
 
-void Server::send(std::string const &data,
-                  boost::asio::ip::udp::endpoint &clientEndpoint,
-                  std::string const &id) {
-    this->sendPacket(data, clientEndpoint, id);
+void Server::encryptor(Packet &packet) {
+
+}
+
+bool Server::isIgnited(boost::property_tree::ptree const &, boost::asio::ip::udp::endpoint const &) const {
+    return true;
 }
 
 void Server::send(std::string const &data,
-                  boost::asio::ip::udp::endpoint &clientEndpoint) {
-    this->sendPacket(data, clientEndpoint);
+                  boost::asio::ip::udp::endpoint &clientEndpoint,
+                  std::string const &id,
+                  bool force) {
+    this->sendPacket(data, clientEndpoint, id, force);
+}
+
+void Server::send(std::string const &data,
+                  boost::asio::ip::udp::endpoint &clientEndpoint,
+                  bool force) {
+    this->sendPacket(data, clientEndpoint, force);
 }
