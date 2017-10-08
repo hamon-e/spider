@@ -16,13 +16,13 @@ int main(int argc, char const *argv[]) {
     }
 
     try {
-        Client client(ioService, argv[1], argv[2]);
-        client.send("Nicolas", "{ \"aze\": \"helloazeazeazeazeazeazeaz\" }");
+        Client client(ioService, "Nicolas", argv[1], argv[2]);
+        client.send("{ \"aze\": \"helloazeazeazeazeazeazeaz\" }");
         client.start();
         // boost::thread([&client]() {
         //     std::string s;
         //     while (getline(std::cin, s)) {
-        //         client.send("aze", "{\"aze\": \"" + s + "\" }");
+        //         client.send("{\"aze\": \"" + s + "\" }");
         //     }
         // });
         boost::thread modules([&client]() {
