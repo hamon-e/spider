@@ -26,6 +26,7 @@ void PacketManager::setCrypt(ICrypt *crypt) {
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
         Packet packet(data);
+        this->_decryptor(packet);
         if (!packet.checksum()) {
             tools::call(this->_errorHandler, packet, PacketManager::Error::CHECKSUM);
         } else {
@@ -61,10 +62,6 @@ void PacketManager::complete(boost::property_tree::ptree const &query, boost::as
 
  bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
-    this->_decryptor(packet);
-    // if (this->_crypt)
-    //   packet.set(Packet::Field::DATA,
-	// 	 this->_crypt->encrypt(packet.get<Packet::Field::DATA, std::string>()));
 
     boost::property_tree::ptree query;
     try {

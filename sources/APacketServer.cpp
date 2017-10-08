@@ -41,8 +41,10 @@ void APacketServer::sendPacket(std::string const &data,
     packet.set(Packet::Field::ID, id);
     packet.set(Packet::Field::COOKIE, this->_cookie);
     packet.set(Packet::Field::DATA, data);
-    this->encryptor(packet);
     std::vector<Packet> packets = packet.split(size);
+    for (auto &part : packets) {
+        this->encryptor(part);
+    }
     if (reserve) {
         this->reservePackets(packets, to);
     }
