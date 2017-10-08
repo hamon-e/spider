@@ -11,12 +11,13 @@ void MapDB::insert(std::string const &collection, IDataBase::ptree const &doc) {
 }
 
 bool MapDB::cmpQuery(IDataBase::ptree const &doc, IDataBase::ptree const &query) {
+
     for (auto field : query) {
-        if (doc.get_child(field.first) == field.second) {
-            return true;
+        if (doc.get_child(field.first) != field.second) {
+            return false;
         }
     }
-    return false;
+    return true;
 }
 
 
@@ -29,7 +30,7 @@ IDataBase::ptree MapDB::findOne(std::string const &collection, IDataBase::ptree 
             }
         }
     }
-    throw std::out_of_range("");
+    throw std::out_of_range("findOne");
 }
 
 std::vector<IDataBase::ptree> MapDB::find(std::string const &collection, IDataBase::ptree const &query) {
@@ -55,7 +56,7 @@ void MapDB::update(std::string const &collection, IDataBase::ptree const &query,
             }
         }
     }
-    throw std::out_of_range("");
+    throw std::out_of_range("update");
 }
 
 void MapDB::remove(std::string const &collection, IDataBase::ptree const &query) {
@@ -69,5 +70,5 @@ void MapDB::remove(std::string const &collection, IDataBase::ptree const &query)
             }
         }
     }
-    throw std::out_of_range("");
+    // throw std::out_of_range("remove");
 }

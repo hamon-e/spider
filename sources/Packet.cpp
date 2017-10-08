@@ -1,7 +1,9 @@
 #include <sstream>
 #include <boost/property_tree/json_parser.hpp>
 #include <ctime>
+
 #include "Packet.hpp"
+#include "json.hpp"
 
 std::unordered_map<Packet::Field, std::string, EnumClassHash> const Packet::fields = {
     { Packet::Field::ID, "id" },
@@ -13,11 +15,9 @@ std::unordered_map<Packet::Field, std::string, EnumClassHash> const Packet::fiel
     { Packet::Field::DATA, "data" },
 };
 
-Packet::Packet(std::string const &data) {
-    std::stringstream ss;
-    ss << data;
-    boost::property_tree::json_parser::read_json(ss, this->_ptree);
-}
+Packet::Packet(std::string const &data)
+    : _ptree(json::parse(data))
+{}
 
 Packet::Packet(boost::property_tree::ptree const &ptree)
     : _ptree(ptree)
@@ -25,14 +25,6 @@ Packet::Packet(boost::property_tree::ptree const &ptree)
 
 std::string Packet::stringify(bool pretty) const {
     return json::stringify(this->_ptree, pretty);
-}
-
-void Packet::set(Packet::Field field, std::string &&value) {
-    this->_ptree.put(Packet::fields.at(field), std::move(value));
-}
-
-void Packet::set(Packet::Field field, std::string const &value) {
-    this->_ptree.put(Packet::fields.at(field), value);
 }
 
 boost::property_tree::ptree const Packet::getPtree() const {
@@ -45,6 +37,14 @@ Packet::PartPair Packet::getPartPair() const {
     part.first = this->_ptree.get(Packet::fields.at(Packet::Field::PART), 0);
     part.second = this->_ptree.get(Packet::fields.at(Packet::Field::TOTALPART), 0);
     return part;
+}
+
+void Packet::set(Packet::Field field, boost::property_tree::ptree const &ptree) {
+   this->_ptree.put_child(Packet::fields.at(field), ptree);
+}
+
+void Packet::set(Packet::Field field, boost::property_tree::ptree &&ptree) {
+   this->_ptree.put_child(Packet::fields.at(field), std::move(ptree));
 }
 
 std::vector<Packet> Packet::split(size_t size) const {
@@ -79,7 +79,7 @@ Packet Packet::join(std::vector<boost::property_tree::ptree> &packets) {
         data += (*it).get(Packet::fields.at(Packet::Field::DATA), "");
     }
 
-    packet.set(Packet::Field::DATA, std::move(data));
+    packet.set(Packet::Field::DATA, std::move(json::parse(data)));
     packet.set(Packet::Field::PART, "1");
     packet.set(Packet::Field::TOTALPART, "1");
     return packet;

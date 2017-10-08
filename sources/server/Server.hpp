@@ -14,9 +14,6 @@ public:
               boost::asio::ip::udp::endpoint &clientEndpoint);
 
 private:
-    static std::size_t id;
-
-private:
     bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
     void packetHandler(Packet &packet);
 };

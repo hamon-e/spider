@@ -1,7 +1,5 @@
 #include "Server.hpp"
 
-std::size_t Server::id = 0;
-
 Server::Server(boost::asio::io_service &ioService, int port)
     : APacketServer(ioService, port)
 {
@@ -22,13 +20,13 @@ void Server::send(std::string const &cookie,
                   std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,
                   std::string const &id) {
-    this->sendPacket(id, cookie, data, clientEndpoint);
+    this->sendPacket(cookie, data, clientEndpoint, id);
 }
 
 void Server::send(std::string const &cookie,
                   std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint) {
-    this->sendPacket(std::to_string(Server::id++), cookie, data, clientEndpoint);
+    this->sendPacket(cookie, data, clientEndpoint);
 }
 
 // void Server::(boost::system::error_code ec,

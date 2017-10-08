@@ -1,10 +1,10 @@
 #include <functional>
 
-namespace tool {
+namespace tools {
     template<typename T, typename ...Args>
-    T call(std::function<T(Args...)> fn, Args...args) {
+    T call(std::function<T(Args...)> fn, Args&&...args) {
         if (fn) {
-            fn(args...);
+            fn(std::forward<Args>(args)...);
         }
     }
 }
