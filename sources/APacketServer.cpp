@@ -15,7 +15,7 @@ APacketServer::APacketServer(boost::asio::io_service &ioService, int port, std::
       _packetManager(
         this->_db,
         [this](Packet &packet) { this->packetHandler(packet); },
-        [this](Packet &packet) { this->encryptor(packet); },
+        [this](Packet &packet) { this->decryptor(packet); },
         [this](Packet &packet, boost::asio::ip::udp::endpoint &from) { return this->sendSuccess(packet, from); }
       ),
       _resolver(ioService),
@@ -39,12 +39,13 @@ void APacketServer::sendPacket(std::string const &data,
 
     packet.set(Packet::Field::ID, id);
     packet.set(Packet::Field::COOKIE, this->_cookie);
-    packet.set(Packet::Field::DATA, this->_crypt ? this->_crypt->encrypt(data) : data);
+    packet.set(Packet::Field::DATA, data);
+    this->encryptor(packet);
     std::vector<Packet> packets = packet.split();
     if (reserve) {
         this->reservePackets(packets, to);
     }
-    if (!force && this->isIgnited(packet.getPtree(), to)) {
+    if (!force && !this->isIgnited(packet.getPtree(), to)) {
         return ;
     }
     try {

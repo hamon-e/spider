@@ -38,8 +38,10 @@ void Client::packetHandler(Packet &packet) {
     this->_crypt.init(ptree.get_child("key"));
 }
 
-void Client::encryptor(Packet &packet) {
+void Client::encryptor(Packet &) {
+}
 
+void Client::decryptor(Packet &) {
 }
 
 bool Client::isIgnited(boost::property_tree::ptree const &packet, boost::asio::ip::udp::endpoint const &clientEndpoint) const {

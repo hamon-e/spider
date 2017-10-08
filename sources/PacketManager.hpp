@@ -23,7 +23,7 @@ public:
     using ErrorHandler = std::function<void(Packet &packet, PacketManager::Error)>;
 
 public:
-    PacketManager(IDataBase *db, PacketHandler handler, PacketHandler encryptor, SuccessHandler = {}, ErrorHandler = {});
+    PacketManager(IDataBase *db, PacketHandler handler, PacketHandler decryptor, SuccessHandler = {}, ErrorHandler = {});
 
 public:
     void setDB(IDataBase *db);
@@ -38,7 +38,7 @@ private:
 
 private:
     PacketHandler _handler;
-    PacketHandler _encryptor;
+    PacketHandler _decryptor;
     ErrorHandler _errorHandler;
     SuccessHandler _succesHandler;
     IDataBase *_db;

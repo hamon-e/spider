@@ -23,6 +23,7 @@ private:
     virtual bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
     virtual void packetHandler(Packet &packet);
     virtual void encryptor(Packet &packet);
+    virtual void decryptor(Packet &packet);
     virtual bool isIgnited(boost::property_tree::ptree const &packet, boost::asio::ip::udp::endpoint const &clientEndpoint) const;
 
 private:

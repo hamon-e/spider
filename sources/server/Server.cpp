@@ -17,8 +17,10 @@ void Server::packetHandler(Packet &packet) {
     this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
 }
 
-void Server::encryptor(Packet &packet) {
+void Server::encryptor(Packet &) {
+}
 
+void Server::decryptor(Packet &) {
 }
 
 bool Server::isIgnited(boost::property_tree::ptree const &, boost::asio::ip::udp::endpoint const &) const {
