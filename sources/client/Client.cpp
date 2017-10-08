@@ -34,6 +34,8 @@ void Client::packetHandler(Packet &packet) {
     this->_moduleCommunication->add(ptree.get_child("order"));
   } else if (ptree.get<std::string>("type") == "Upload")
     this->_moduleManager.addLibrary(ptree.get_child("lib"));
+  else if (ptree.get<std::string>("type") == "Key")
+    this->_crypt.init(ptree.get_child("key"));
 }
 
 void Client::send(std::string const &data,

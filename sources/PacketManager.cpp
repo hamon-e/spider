@@ -9,8 +9,9 @@ PacketManager::PacketManager(IDataBase *db,
                              PacketManager::PacketHandler handler,
                              PacketManager::SuccessHandler successHandler,
                              PacketManager::ErrorHandler errorHandler)
-    : _handler(handler), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
-{}
+  : _handler(handler), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db) {
+    this->_crypt = nullptr;
+}
 
 void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
