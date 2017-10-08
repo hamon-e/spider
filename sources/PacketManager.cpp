@@ -11,13 +11,11 @@ PacketManager::PacketManager(IDataBase &db,
                              PacketManager::ErrorHandler errorHandler)
     : _handler(handler), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
 {}
-#include <iostream>
 
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
         Packet packet(data);
         if (!packet.checksum()) {
-            std::cout << "err" << std::endl;
             tools::call(this->_errorHandler, packet, PacketManager::Error::CHECKSUM);
         } else {
             this->complete(packet, from);
@@ -49,15 +47,18 @@ void PacketManager::complete(Packet &part, boost::asio::ip::udp::endpoint &from)
  bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
     boost::property_tree::ptree query;
-    if (packet.getPtree().get("data.type", "") == "success") {
-        query.put(Packet::fields.at(Packet::Field::ID), packet.getPtree().get("data.id", ""));
-        query.put(Packet::fields.at(Packet::Field::PART), packet.getPtree().get("data.part", ""));
-        try {
-            this->_db.remove(PacketManager::waitingColName, query);
-        } catch (std::exception &) {
-            std::cout << "error" << std::endl;
+    try {
+        auto ptree = packet.getPtree();
+        query.put(Packet::fields.at(Packet::Field::ID), ptree.get("data.id", ""));
+        if (ptree.get("data.type", "") == "success") {
+            query.put(Packet::fields.at(Packet::Field::PART), ptree.get("data.part", ""));
+            try {
+                this->_db.remove(PacketManager::waitingColName, query);
+            } catch (std::exception &err) {
+            }
+            return true;
         }
-        return true;
+    } catch (std::exception &) {
     }
     this->_handler(packet);
     return false;

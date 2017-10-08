@@ -6,6 +6,7 @@
 class AUdpServer {
 public:
     AUdpServer(boost::asio::io_service &io_service, int port);
+    ~AUdpServer() = default;
 
 public:
     bool start();
