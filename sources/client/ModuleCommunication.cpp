@@ -44,6 +44,6 @@ void ModuleCommunication::send(boost::property_tree::ptree const &data) {
   std::stringstream ss;
   boost::property_tree::json_parser::write_json(ss, data);
 
-  this->_client.send("Cookie", ss.str());
+  this->_client.send(ss.str());
   std::cout << ss.str() << std::endl;
 }
