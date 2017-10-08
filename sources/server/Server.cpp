@@ -1,7 +1,8 @@
+#include <LocalDB.hpp>
 #include "Server.hpp"
 
 Server::Server(boost::asio::io_service &ioService, int port)
-    : APacketServer(ioService, port)
+    : APacketServer(ioService, port, new LocalDB())
 {
 }
 

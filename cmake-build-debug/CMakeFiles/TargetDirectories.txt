@@ -1,0 +1,4 @@
+/home/gusmin_m/CLionProjects/cpp_spider/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/gusmin_m/CLionProjects/cpp_spider/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/gusmin_m/CLionProjects/cpp_spider/cmake-build-debug/CMakeFiles/spider_client.dir
+/home/gusmin_m/CLionProjects/cpp_spider/cmake-build-debug/CMakeFiles/spider_serveur.dir

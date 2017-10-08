@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <boost/property_tree/ptree.hpp>
+#include <vector>
 
 class IDataBase {
 public:
