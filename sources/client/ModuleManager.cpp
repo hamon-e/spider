@@ -3,11 +3,14 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <regex>
+#include <exception>
 #include <boost/dll/import.hpp>
 #include <boost/range/iterator_range.hpp>
 
 #include "ModuleManager.hpp"
+#include "ssl/Base64.hpp"
 
 ModuleManager::ModuleManager(IModuleCommunication *moduleCommunication,
 			     std::string const &dirname)
@@ -64,4 +67,18 @@ void ModuleManager::run() {
         sleep(1);
     }
     this->_threads.join_all();
+}
+
+void ModuleManager::addModuleCommunication(IModuleCommunication *moduleCommunication) {
+  this->_moduleCommunication = moduleCommunication;
+}
+
+void ModuleManager::addLibrary(boost::property_tree::ptree const &ptree) {
+  try {
+    std::ofstream file(this->_dirname
+		       + ptree.get<std::string>("filename"));
+
+    file << Base64::decrypt(ptree.get<std::string>("data"));
+    file.close();
+  } catch (std::exception) {}
 }

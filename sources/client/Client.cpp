@@ -3,14 +3,14 @@
 std::size_t Client::id = 0;
 
 Client::Client(boost::asio::io_service &ioService, std::string const &host, std::string const &port)
-    : APacketServer(ioService, 0)
-{
+    : APacketServer(ioService, 0) {
     boost::asio::ip::udp::resolver resolver(ioService);
     this->_serverEndpoint = *resolver.resolve({boost::asio::ip::udp::v4(), host, port});
 }
 
 void Client::addModuleCommunication(IModuleCommunication *moduleCommunication) {
   this->_moduleCommunication = moduleCommunication;
+  this->_moduleManager.addModuleCommunication(moduleCommunication);
 }
 
 bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint) {
@@ -25,9 +25,10 @@ void Client::packetHandler(Packet &packet) {
   boost::property_tree::ptree ptree;
 
   boost::property_tree::read_json(data, ptree);
-  this->_moduleCommunication->add(ptree.get<std::string>("module"),
-				  ptree.get<std::string>("name"),
-				  ptree.get<std::string>("value"));
+  if (ptree.get<std::string>("type") == "Order") {
+    this->_moduleCommunication->add(ptree.get_child("order"));
+  } else if (ptree.get<std::string>("type") == "Upload")
+    this->_moduleManager.addLibrary(ptree.get_child("lib"));
 }
 
 void Client::send(std::string const &cookie,
@@ -36,6 +37,7 @@ void Client::send(std::string const &cookie,
                   std::string const &id) {
     this->sendPacket(id, cookie, type, data, this->_serverEndpoint);
 }
+
 void Client::send(std::string const &cookie,
                   std::string const &type,
                   std::string const &data) {

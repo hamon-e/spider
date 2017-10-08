@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Wed Oct 04 18:03:49 2017 Benoit Hamon
-// Last update Sat Oct 07 23:24:51 2017 Benoit Hamon
+// Last update Sun Oct 08 15:25:40 2017 Benoit Hamon
 //
 
 #include <boost/thread.hpp>
@@ -25,10 +25,12 @@ int main(int argc, char const *argv[]) {
 
     Client client(ioService, argv[1], argv[2]);
     ModuleCommunication moduleCommunication(client);
-    client.start();
+//    ModuleManager mod(&moduleCommunication);
 
-    boost::thread modules([&moduleCommunication]() {
-	ModuleManager mod(&moduleCommunication);
+    client.addModules(&moduleCommunication);
+
+    client.start();
+    boost::thread modules([&mod]() {
 	mod.run();
 	});
 

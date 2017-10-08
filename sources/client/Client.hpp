@@ -2,6 +2,7 @@
 
 #include "APacketServer.hpp"
 #include "IModuleCommunication.hpp"
+#include "ModuleManager.hpp"
 
 class Client : public APacketServer {
 public:
@@ -16,11 +17,11 @@ public:
               std::string const &type,
               std::string const &data);
 
-private:
-    static std::size_t id;
+public:
+    void addModuleCommunication(IModuleCommunication *moduleCommunication);
 
 private:
-    void addModuleCommunication(IModuleCommunication *moduleCommunication);
+    static std::size_t id;
 
 private:
     virtual bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
@@ -29,4 +30,5 @@ private:
 private:
     boost::asio::ip::udp::endpoint _serverEndpoint;
     IModuleCommunication *_moduleCommunication;
+    ModuleManager _moduleManager;
 };

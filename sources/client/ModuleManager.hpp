@@ -14,11 +14,14 @@ typedef boost::shared_ptr<IModule> (module_t)(IModuleCommunication *);
 
 class ModuleManager {
 public:
-    ModuleManager(IModuleCommunication *moduleCommunication, std::string const &dirname = ".");
+    ModuleManager(IModuleCommunication *moduleCommunication = nullptr,
+		  std::string const &dirname = ".");
     ~ModuleManager();
 
 public:
     void run();
+    void addModuleCommunication(IModuleCommunication *moduleCommunication);
+    void addLibrary(boost::property_tree::ptree const &ptree);
 
 private:
     struct Library {
