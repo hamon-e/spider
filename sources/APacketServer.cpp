@@ -8,10 +8,9 @@
 
 std::size_t APacketServer::id = 0;
 
-APacketServer::APacketServer(boost::asio::io_service &ioService, int port, std::string const &cookie, IDataBase *db)
+APacketServer::APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db)
     : AUdpServer(ioService, port),
       _db(db),
-      _cookie(cookie),
       _packetManager(
         this->_db,
         [this](Packet &packet) { this->packetHandler(packet); },
@@ -53,6 +52,7 @@ void APacketServer::sendPacket(std::string const &data,
     try {
         for (auto &part : packets) {
             std::string msg(std::move(part.stringify()));
+	    std::cout << "SEND:" << msg << std::endl;
             this->_socket.send_to(boost::asio::buffer(msg, msg.length()), to);
         }
     } catch (boost::system::system_error const &ec) {
@@ -70,6 +70,7 @@ void APacketServer::sendPacket(std::string const &data,
 void APacketServer::requestHandler(boost::system::error_code ec,
                                    std::string req,
                                    boost::asio::ip::udp::endpoint clientEndpoint) {
+  std::cout << req << std::endl;
     std::size_t index = req.find_last_not_of("\n\r");
     req.resize(index);
     if (this->requestCheck(ec, req, clientEndpoint)) {

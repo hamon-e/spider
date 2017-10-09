@@ -8,10 +8,11 @@
 
 class APacketServer : public AUdpServer {
 public:
-    APacketServer(boost::asio::io_service &ioService, int port, std::string const &cookie, IDataBase *db = nullptr);
+    APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db = nullptr);
     ~APacketServer();
 
 public:
+    void setCookie(std::string const &cookie);
     void sendPacket(
         std::string const &data,
         boost::asio::ip::udp::endpoint const &to,

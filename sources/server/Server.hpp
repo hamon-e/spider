@@ -1,5 +1,5 @@
 #include "APacketServer.hpp"
-#include "ServerCrypt.hpp"
+#include "CryptServer.hpp"
 
 class Server : public APacketServer {
 public:
@@ -28,5 +28,5 @@ private:
     virtual bool isIgnited(boost::property_tree::ptree const &packet, boost::asio::ip::udp::endpoint const &clientEndpoint) const;
 
 private:
-    ServerCrypt _crypt;
+    CryptServer _crypt;
 };

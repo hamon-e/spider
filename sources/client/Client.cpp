@@ -1,8 +1,8 @@
 #include <LocalDB.hpp>
 #include "Client.hpp"
 
-Client::Client(boost::asio::io_service &ioService, std::string const &cookie, std::string const &host, std::string const &port)
-    : APacketServer(ioService, 0, cookie, new LocalDB())
+Client::Client(boost::asio::io_service &ioService, std::string const &host, std::string const &port)
+    : APacketServer(ioService, 0, new LocalDB())
 {
     this->_serverEndpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
     this->saveClient("SERVER", this->_serverEndpoint);
@@ -36,8 +36,9 @@ void Client::packetHandler(Packet &packet) {
     this->_moduleCommunication->add(ptree.get_child("order"));
   } else if (ptree.get<std::string>("type") == "Upload")
     this->_moduleManager.addLibrary(ptree.get_child("lib"));
-  else if (ptree.get<std::string>("type") == "Key") {
+  else if (ptree.get<std::string>("type") == "AesKey") {
     this->_crypt.init(ptree.get_child("key"));
+    this->_cookie =
     this->_isIgnited = true;
   }
 }

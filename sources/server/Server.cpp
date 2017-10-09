@@ -3,7 +3,7 @@
 #include "Server.hpp"
 
 Server::Server(boost::asio::io_service &ioService, int port)
-    : APacketServer(ioService, port, "SERVER", new MongoDB())
+    : APacketServer(ioService, port, new MongoDB())
 {}
 
 bool Server::requestCheck(boost::system::error_code &,
@@ -15,16 +15,18 @@ bool Server::requestCheck(boost::system::error_code &,
 void Server::packetHandler(Packet &packet) {
     std::cout << "completed " << packet << std::endl;
     boost::property_tree::ptree ptree;
-    boost::property_tree::read_json(packet.get<Packet::Field::DATA>(), ptree);
-    if (ptree.get("type") == "PublicKey") {
-      this->send(this->_crypt.initClient(ptree));
+    boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
+    if (ptree.get<std::string>("type") == "PublicKey") {
+      //this->send(this->_crypt.initClient(ptree));
     } else {
       this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
     }
 }
 
 void Server::encryptor(Packet &packet) {
-  if (packet.getPtree().get("data.type") == "AesKey")
+  boost::property_tree::ptree ptree;
+    boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
+  if (ptree.get<std::string>("type") == "AesKey")
     packet.set<std::string>(Packet::Field::DATA,
 			    this->_crypt.encryptRSA(packet.get<Packet::Field::COOKIE, std::string>(),
 						    packet.get<Packet::Field::DATA, std::string>()));

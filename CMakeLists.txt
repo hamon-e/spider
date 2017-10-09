@@ -49,6 +49,10 @@ set(SOURCE_FILES
 ./sources/MongoDB.cpp
 ./sources/LocalDB.cpp
 ./sources/LocalDB.hpp
+./sources/ssl/Base64.cpp
+./sources/ssl/CryptAES.cpp
+./sources/ssl/CryptRSA.cpp
+./sources/server/CryptServer.cpp
 )
 
 add_executable(${EXE_SERVER_NAME} ${SOURCE_FILES})
@@ -59,6 +63,7 @@ target_include_directories(${EXE_SERVER_NAME} PUBLIC
 target_link_libraries(${EXE_SERVER_NAME} ${Boost_LIBRARIES})
 target_link_libraries(${EXE_SERVER_NAME} ${LIBMONGOCXX_LIBRARIES})
 target_link_libraries(${EXE_SERVER_NAME} ${LIBBSONCXX_LIBRARIES})
+target_link_libraries(${EXE_SERVER_NAME} ${OPENSSL_LIBRARIES})
 
 #############################################################################
 ###################  Cmake CLIENT   #########################################

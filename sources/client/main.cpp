@@ -17,7 +17,7 @@ int main(int argc, char const *argv[]) {
     }
 
     try {
-      Client client(ioService, "", argv[1], argv[2]);
+      Client client(ioService, argv[1], argv[2]);
       ModuleCommunication moduleCommunication(client);
 
       moduleCommunication.add("Explorer", "readdir");

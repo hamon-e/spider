@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Sun Oct 08 22:32:11 2017 Benoit Hamon
+// Last update Mon Oct 09 02:07:50 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
@@ -48,6 +48,7 @@ std::string CryptClient::encrypt(std::string const &message) {
   std::string res;
 
   this->_current->encrypt(message, res);
+  std::cout << Base64::encrypt(res) << std::endl;
   return Base64::encrypt(res);
 }
 

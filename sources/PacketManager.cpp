@@ -17,9 +17,11 @@ void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
 }
 
+#include <iostream>
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
         Packet packet(data);
+	std::cout << data << std::endl;
         this->_decryptor(packet);
         if (!packet.checksum()) {
             tools::call(this->_errorHandler, packet, PacketManager::Error::CHECKSUM);

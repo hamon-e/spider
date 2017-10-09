@@ -7,7 +7,7 @@
 
 class Client : public APacketServer {
 public:
-    Client(boost::asio::io_service &ioService, std::string const &cookie, std::string const &host, std::string const &port);
+    Client(boost::asio::io_service &ioService, std::string const &host, std::string const &port);
 
 public:
     void send(std::string const &data,
