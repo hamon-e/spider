@@ -63,13 +63,11 @@ bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets)
 
     boost::property_tree::ptree query;
     try {
-      boost::property_tree::ptree ptree;
-	boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
+      boost::property_tree::ptree ptree = packet.getPtree();
 
-        if (ptree.get("type", "") == "success") {
-            query.put("packet.id", ptree.get("id", ""));
-            query.put("packet.part", ptree.get("part", ""));
-	    std::cout << "REMOVE" << ptree.get("id", "") << ptree.get("part", "") << std::endl;
+        if (ptree.get("data.type", "") == "success") {
+            query.put("packet.id", ptree.get("data.id", ""));
+            query.put("packet.part", ptree.get("data.part", ""));
             try {
                 this->_db->remove(PacketManager::waitingColName, query);
             } catch (std::exception &err) {
