@@ -31,7 +31,7 @@ public:
     PacketManager &in(std::string const &data, boost::asio::ip::udp::endpoint &from);
 
 private:
-    void complete(boost::property_tree::ptree const &query, boost::asio::ip::udp::endpoint &from, Packet &packet);
+    void complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &packet);
     bool joinParts(std::vector<boost::property_tree::ptree> &packets);
 
 private:

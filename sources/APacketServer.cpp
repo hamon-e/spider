@@ -36,6 +36,9 @@ void APacketServer::sendPacket(std::string const &data,
                                bool reserve) {
     Packet packet;
 
+    std::cout << "SEND" << std::endl;
+    std::cout << data  << std::endl;
+    std::cout << "reserve " << reserve << std::endl;
     packet.set(Packet::Field::ID, id);
     packet.set(Packet::Field::COOKIE, this->_cookie);
     packet.set(Packet::Field::DATA, data);
@@ -107,7 +110,7 @@ void APacketServer::sendSuccess(Packet &packet, boost::asio::ip::udp::endpoint &
     ptree.put("type", "success");
     ptree.put(Packet::fields.at(Packet::Field::ID), packet.getPtree().get(Packet::fields.at(Packet::Field::ID), ""));
     ptree.put(Packet::fields.at(Packet::Field::PART), packet.getPtree().get(Packet::fields.at(Packet::Field::PART), ""));
-    this->sendPacket(json::stringify(ptree), from);
+    this->sendPacket(json::stringify(ptree), from, Packet::defaultSize, false, false);
 }
 
 void APacketServer::setDB(IDataBase *db) {

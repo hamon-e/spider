@@ -16,6 +16,7 @@ PacketManager::PacketManager(IDataBase *db,
 void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
 }
+#include <iostream>
 
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
@@ -36,12 +37,8 @@ PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::
     return *this;
 }
 
-#include <iostream>
-
-void PacketManager::complete(boost::property_tree::ptree const &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
-  std::cout << "Query:" << std::endl;
-  std::cout << query << std::endl;
-  std::cout << "END" << std::endl;
+void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
+    query.erase(Packet::fields.at(Packet::Field::PART));
     std::vector<boost::property_tree::ptree> packets = this->_db->find(PacketManager::partsColName, query);
     if (!packets.size()) {
         return ;
@@ -62,15 +59,13 @@ void PacketManager::complete(boost::property_tree::ptree const &query, boost::as
 }
 
 bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
-   std::cout << "TEST" << std::endl;
     Packet packet = Packet::join(packets);
 
-    std::cout << "TEST" << std::endl;
     boost::property_tree::ptree query;
     try {
       boost::property_tree::ptree ptree;
 	boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
-	std::cout << packet << std::endl;
+
         if (ptree.get("type", "") == "success") {
             query.put("packet.id", ptree.get("id", ""));
             query.put("packet.part", ptree.get("part", ""));
