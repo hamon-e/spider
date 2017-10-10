@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Tue Oct 10 19:59:24 2017 Benoit Hamon
+// Last update Wed Oct 11 01:21:49 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
@@ -26,7 +26,7 @@ void CryptClient::init() {
     ptree.add("type", "PublicKey");
     std::string key; this->_rsaClient.getKey(ICryptAlgo::KeyType::RSA_PUB, key);
     ptree.add("key", Base64::encrypt(key));
-    this->_moduleCommunication->send(ptree, true);
+    this->_moduleCommunication->send(ptree);
   } else {
     this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_KEY, "aeskey.key");
     this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_IV, "aesiv.key");
@@ -59,20 +59,22 @@ void CryptClient::encrypt(Packet &packet) {
   }
 }
 
+std::string CryptClient::encryptMethod(Packet &packet) {
+  return this->_currentType;
+}
+
 void CryptClient::decrypt(Packet &packet) {
   std::string data = packet.get<Packet::Field::DATA, std::string>();
-  std::string crypt = packet.get<Packet::Field::DATA, std::string>();
+  std::string crypt = packet.get<Packet::Field::CRYPT, std::string>();
   std::string res;
 
   if (!data.empty()) {
     if (crypt == "AES")
       this->_aes.decrypt(Base64::decrypt(data), res);
-    else if (crypt == "RSA")
+    else if (crypt == "RSA") {
       this->_rsaClient.decrypt(Base64::decrypt(data), res);
-    else
+    } else
       res = data;
-    std::cout << "Received" << std::endl;
-    std::cout << res << std::endl;
 
     packet.set(Packet::Field::DATA, res);
   }

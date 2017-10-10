@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:52:53 2017 Benoit Hamon
-// Last update Tue Oct 10 18:28:40 2017 Benoit Hamon
+// Last update Wed Oct 11 01:01:18 2017 Benoit Hamon
 //
 
 #pragma once
@@ -18,6 +18,7 @@
 class CryptClient {
   public:
     void encrypt(Packet &packet);
+    std::string encryptMethod(Packet &packet);
     void decrypt(Packet &packet);
 
   public:

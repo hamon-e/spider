@@ -8,26 +8,18 @@ public:
 public:
     void send(std::string const &data,
               boost::asio::ip::udp::endpoint &clientEndpoint,
-              std::string const &id,
-              std::size_t size = Packet::defaultSize,
-              bool force = false);
+              std::string const &id);
     void send(std::string const &data,
-              boost::asio::ip::udp::endpoint &clientEndpoint,
-              std::size_t size = Packet::defaultSize,
-              bool force = false);
-    void send(std::string const &data,
-	      std::string const &cookie,
-              std::size_t size = Packet::defaultSize,
-              bool force = false);
+              boost::asio::ip::udp::endpoint &clientEndpoint);
     void send(std::string const &data,
 	      std::string const &cookie);
 
 private:
     bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
     void packetHandler(Packet &packet);
-    virtual void encryptor(Packet &packet);
+    virtual void encryptor(Packet &packet, boost::asio::ip::udp::endpoint const &to);
+    virtual std::string encryptorMethod(Packet &packet, boost::asio::ip::udp::endpoint const &to);
     virtual void decryptor(Packet &packet);
-    virtual bool isIgnited(boost::property_tree::ptree const &packet, boost::asio::ip::udp::endpoint const &clientEndpoint) const;
 
 private:
     CryptServer _crypt;

@@ -16,7 +16,6 @@ PacketManager::PacketManager(IDataBase *db,
 void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
 }
-#include <iostream>
 
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
@@ -27,6 +26,9 @@ PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::
         } else {
             boost::property_tree::ptree query;
             query.put(Packet::fields.at(Packet::Field::ID), packet.get<Packet::Field::ID, std::string>());
+	    std::string cookie = packet.get<Packet::Field::COOKIE, std::string>();
+	    if (cookie.empty())
+	      packet.set(Packet::Field::COOKIE, from.address().to_string() + ":" + std::to_string(from.port()));
             query.put(Packet::fields.at(Packet::Field::COOKIE), packet.get<Packet::Field::COOKIE, std::string>());
             query.put(Packet::fields.at(Packet::Field::PART), packet.get<Packet::Field::PART, std::string>());
             this->_db->update(PacketManager::partsColName, query, packet.getPtree(), true);
@@ -44,13 +46,12 @@ void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip
         return ;
     }
 
-    std::cout << packets.size() << std::endl;
     if (packets.size() == static_cast<std::size_t>(packets[0].get(Packet::fields.at(Packet::Field::TOTALPART), 0))) {
         if (!this->joinParts(packets)) {
             tools::call(this->_succesHandler, part, from);
         }
         try {
-            this->_db->remove(PacketManager::partsColName, query);
+	    this->_db->remove(PacketManager::partsColName, query);
         } catch (std::exception &) {
         }
     } else {
@@ -76,6 +77,11 @@ bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets)
         }
     } catch (std::exception &) {
     }
+    try {
+
     this->_handler(packet);
+    } catch (std::exception &) {
+
+    }
     return false;
 }

@@ -17,14 +17,10 @@ public:
         std::string const &data,
         boost::asio::ip::udp::endpoint const &to,
         std::string const &id,
-        std::size_t size = Packet::defaultSize,
-        bool force = false,
         bool reserve = true);
     void sendPacket(
         std::string const &data,
         boost::asio::ip::udp::endpoint &to,
-        std::size_t size = Packet::defaultSize,
-        bool force = false,
         bool reserve = true);
 
 private:
@@ -36,9 +32,9 @@ private:
                               boost::asio::ip::udp::endpoint &clientEndpoint) = 0;
 
     virtual void packetHandler(Packet &packet) = 0;
-    virtual void encryptor(Packet &packet) = 0;
+    virtual void encryptor(Packet &packet, boost::asio::ip::udp::endpoint const &to) = 0;
+    virtual std::string encryptorMethod(Packet &packet, boost::asio::ip::udp::endpoint const &to) = 0;
     virtual void decryptor(Packet &packet) = 0;
-    virtual bool isIgnited(boost::property_tree::ptree const &ptree, boost::asio::ip::udp::endpoint const &clientEndpoint) const = 0;
 
 protected:
     void saveClient(std::string const &cookie, boost::asio::ip::udp::endpoint const &from);
@@ -50,7 +46,6 @@ protected:
 private:
     void reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to);
     void checkReserve(boost::system::error_code const &ec);
-    std::string genCookie(Packet &packet);
 
 protected:
     static std::size_t id;

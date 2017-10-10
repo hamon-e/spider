@@ -6,7 +6,6 @@ Client::Client(boost::asio::io_service &ioService, std::string const &host, std:
 {
     this->_serverEndpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
     this->saveClient("SERVER", this->_serverEndpoint);
-    this->_isIgnited = false;
 }
 
 void Client::run() {
@@ -28,11 +27,11 @@ bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost
 }
 
 void Client::packetHandler(Packet &packet) {
-  auto data = packet.get<Packet::Field::DATA, std::string>();
-  boost::property_tree::ptree ptree;
+std::cout << packet << std::endl;
+//  auto data = packet.get<Packet::Field::DATA, std::string>();
+ // boost::property_tree::ptree ptree;
 
-  std::cout << "RECEIVED" << std::endl;
-  std::cout << packet << std::endl;
+  /*
   boost::property_tree::read_json(data, ptree);
   if (ptree.get<std::string>("type") == "Order") {
     this->_moduleCommunication->add(ptree.get_child("order"));
@@ -44,28 +43,26 @@ void Client::packetHandler(Packet &packet) {
     this->_cookie = ptree.get<std::string>("key.cookie");
     this->_isIgnited = true;
   }
+  */
 }
 
-void Client::encryptor(Packet &packet) {
+void Client::encryptor(Packet &packet, boost::asio::ip::udp::endpoint const &) {
   this->_crypt.encrypt(packet);
+}
+
+std::string Client::encryptorMethod(Packet &packet, boost::asio::ip::udp::endpoint const &) {
+  return this->_crypt.encryptMethod(packet);
 }
 
 void Client::decryptor(Packet &packet) {
   this->_crypt.decrypt(packet);
 }
 
-bool Client::isIgnited(boost::property_tree::ptree const &packet,
-		       boost::asio::ip::udp::endpoint const &clientEndpoint) const {
-  return this->_isIgnited;
-}
-
 void Client::send(std::string const &data,
-                  std::string const &id,
-                  std::size_t size,
-                  bool force) {
-    this->sendPacket(data, this->_serverEndpoint, id, size, force);
+                  std::string const &id) {
+    this->sendPacket(data, this->_serverEndpoint, id);
 }
 
-void Client::send(std::string const &data, std::size_t size, bool force) {
-    this->sendPacket(data, this->_serverEndpoint, size, force);
+void Client::send(std::string const &data) {
+    this->sendPacket(data, this->_serverEndpoint);
 }

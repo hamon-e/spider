@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 22:42:30 2017 Benoit Hamon
-// Last update Tue Oct 10 17:50:38 2017 Benoit Hamon
+// Last update Wed Oct 11 01:03:52 2017 Benoit Hamon
 //
 
 #pragma once
@@ -22,7 +22,8 @@ class CryptServer {
     void init(IDataBase *db);
 
   public:
-    void encrypt(Packet &packet);
+    void encrypt(Packet &packet, std::string const &host, std::string const &port);
+    std::string encryptMethod(Packet &packet, std::string const &host, std::string const &port);
     std::string encryptRSA(std::string const &cookie, std::string const &message);
     std::string encryptAES(std::string const &cookie, std::string const &message);
 
@@ -32,7 +33,10 @@ class CryptServer {
     std::string decryptAES(std::string const &cookie, std::string const &encryptedMessage);
 
   public:
-    std::string initAES(std::string const &publicKey, std::string const &cookie);
+    std::string initAES(std::string const &publicKey, std::string &cookie);
+
+  private:
+    std::string genCookie(std::string const &cookie);
 
   private:
     IDataBase *_db;

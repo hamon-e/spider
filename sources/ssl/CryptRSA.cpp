@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:14:55 2017 Benoit Hamon
-// Last update Mon Oct 09 12:45:04 2017 Benoit Hamon
+// Last update Wed Oct 11 00:22:31 2017 Benoit Hamon
 //
 
 #include "CryptRSA.hpp"
@@ -26,7 +26,11 @@ bool CryptRSA::setKey(KeyType type, std::string const &key) {
   if (!bio)
     return false;
 
-  EVP_PKEY *tmp = PEM_read_bio_PUBKEY(bio, NULL, NULL, NULL);
+  EVP_PKEY *tmp;
+  if (type == RSA_PUB)
+    tmp = PEM_read_bio_PUBKEY(bio, NULL, NULL, NULL);
+  else
+    tmp = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL);
   if (!tmp)
     return false;
 

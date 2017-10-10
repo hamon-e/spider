@@ -40,13 +40,10 @@ bool ModuleCommunication::get(std::string const &module, Order &order) {
   return false;
 }
 
-void ModuleCommunication::send(boost::property_tree::ptree const &data, bool force) {
+void ModuleCommunication::send(boost::property_tree::ptree const &data) {
   std::stringstream ss;
   boost::property_tree::json_parser::write_json(ss, data);
 
-  if (force)
-    this->_client.send(ss.str(), 50, force);
-  else
-    this->_client.send(ss.str());
+  this->_client.send(ss.str());
   std::cout << ss.str() << std::endl;
 }

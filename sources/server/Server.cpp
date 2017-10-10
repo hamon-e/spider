@@ -16,35 +16,37 @@ bool Server::requestCheck(boost::system::error_code &,
 }
 
 void Server::packetHandler(Packet &packet) {
-    std::cout << "completed " << packet << std::endl;
-    boost::property_tree::ptree ptree;
-    boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
-    if (ptree.get<std::string>("type") == "PublicKey") {
-      this->_crypt.initAES(Base64::decrypt(ptree.get<std::string>("key")), packet.get<Packet::Field::COOKIE, std::string>());
+  std::cout << packet << std::endl;
+    boost::property_tree::ptree ptree = packet.getPtree();
+    if (ptree.get<std::string>("data.type") == "PublicKey") {
+      std::string cookie = ptree.get("cookie", "");
+      this->send(this->_crypt.initAES(Base64::decrypt(ptree.get("data.key", "")), cookie),
+		 cookie);
     } else {
-      this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
+      this->_db->update(PacketManager::dataColName, ptree, ptree, true);
     }
 }
 
-void Server::encryptor(Packet &packet) {
-  this->_crypt.encrypt(packet);
+void Server::encryptor(Packet &packet, boost::asio::ip::udp::endpoint const &to) {
+  this->_crypt.encrypt(packet, to.address().to_string(), std::to_string(to.port()));
+}
+
+std::string Server::encryptorMethod(Packet &packet, boost::asio::ip::udp::endpoint const &to) {
+  return this->_crypt.encryptMethod(packet, to.address().to_string(), std::to_string(to.port()));
 }
 
 void Server::decryptor(Packet &packet) {
   this->_crypt.decrypt(packet);
 }
 
-bool Server::isIgnited(boost::property_tree::ptree const &, boost::asio::ip::udp::endpoint const &) const {
-    return true;
-}
-
 void Server::send(std::string const &data,
 		  std::string const &cookie) {
     boost::property_tree::ptree ptree;
+    ptree.put("cookie", cookie);
     auto client = this->_db->findOne("client", ptree);
 
-    std::string host = ptree.get<std::string>("host");
-    std::string port = ptree.get<std::string>("port");
+    std::string host = client.get<std::string>("host");
+    std::string port = client.get<std::string>("port");
 
     boost::asio::ip::udp::endpoint endpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
 
@@ -53,15 +55,11 @@ void Server::send(std::string const &data,
 
 void Server::send(std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,
-                  std::string const &id,
-                  std::size_t size,
-                  bool force) {
-    this->sendPacket(data, clientEndpoint, id, size, force);
+                  std::string const &id) {
+    this->sendPacket(data, clientEndpoint, id);
 }
 
 void Server::send(std::string const &data,
-                  boost::asio::ip::udp::endpoint &clientEndpoint,
-                  std::size_t size,
-                  bool force) {
-    this->sendPacket(data, clientEndpoint, size, force);
+                  boost::asio::ip::udp::endpoint &clientEndpoint) {
+    this->sendPacket(data, clientEndpoint);
 }

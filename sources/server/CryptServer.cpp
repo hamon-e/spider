@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 22:42:24 2017 Benoit Hamon
-// Last update Tue Oct 10 19:58:43 2017 Benoit Hamon
+// Last update Wed Oct 11 01:25:26 2017 Benoit Hamon
 //
 
 #include "ssl/ICryptAlgo.hpp"
@@ -41,8 +41,6 @@ std::string CryptServer::encryptAES(std::string const &cookie, std::string const
 
   query.put("cookie", cookie);
   ptree = this->_db->findOne("keys", query);
-  ptree.put("sent", "1");
-  this->_db->update("keys", query, ptree);
   aes.setKey(ICryptAlgo::KeyType::AES_KEY, ptree.get<std::string>("AES_KEY"));
   aes.setKey(ICryptAlgo::KeyType::AES_IV, ptree.get<std::string>("AES_IV"));
 
@@ -52,14 +50,18 @@ std::string CryptServer::encryptAES(std::string const &cookie, std::string const
   return Base64::encrypt(encryptedMessage);
 }
 
-void CryptServer::encrypt(Packet &packet) {
+void CryptServer::encrypt(Packet &packet, std::string const &host, std::string const &port) {
   std::string data = packet.get<Packet::Field::DATA, std::string>();
+  std::string cookie;
+
+  boost::property_tree::ptree query;
+  query.put("host", host);
+  query.put("port", port);
+  query = this->_db->findOne("client", query);
+
+  cookie = query.get("cookie", "");
 
   if (!data.empty()) {
-    std::cout << "SEND" << std::endl;
-    std::cout << data << std::endl;
-    std::string cookie = packet.get<Packet::Field::COOKIE, std::string>();
-
     std::string crypt;
     boost::property_tree::ptree query;
     boost::property_tree::ptree ptree;
@@ -79,7 +81,31 @@ void CryptServer::encrypt(Packet &packet) {
     else
       message = data;
     packet.set(Packet::Field::DATA, message);
+    packet.set(Packet::Field::CRYPT, crypt);
   }
+}
+
+std::string CryptServer::encryptMethod(Packet &packet, std::string const &host, std::string const &port) {
+  std::string crypt;
+
+  std::string cookie;
+  boost::property_tree::ptree query;
+  query.put("host", host);
+  query.put("port", port);
+  query = this->_db->findOne("client", query);
+  cookie = query.get("cookie", "");
+
+  boost::property_tree::ptree ptree;
+  boost::property_tree::ptree query2;
+  query2.put("cookie", cookie);
+  try {
+    ptree = this->_db->findOne("keys", query2);
+    crypt = ptree.get<std::string>("sent") == "0" ? "RSA" : "AES";
+  } catch (std::exception &) {
+    crypt = "NONE";
+  }
+
+  return crypt;
 }
 
 std::string CryptServer::decryptAES(std::string const &cookie, std::string const &encryptedMessage) {
@@ -89,6 +115,9 @@ std::string CryptServer::decryptAES(std::string const &cookie, std::string const
 
   query.put("cookie", cookie);
   ptree = this->_db->findOne("keys", query);
+  ptree.put("sent", "1");
+  this->_db->update("keys", query, ptree);
+
   aes.setKey(ICryptAlgo::KeyType::AES_KEY, ptree.get<std::string>("AES_KEY"));
   aes.setKey(ICryptAlgo::KeyType::AES_IV, ptree.get<std::string>("AES_IV"));
 
@@ -116,15 +145,31 @@ void CryptServer::decrypt(Packet &packet) {
       message = this->decryptRSA(data);
     else if (crypt == "AES")
       message = this->decryptAES(cookie, data);
+
     packet.set(Packet::Field::DATA, message);
   }
 }
 
-std::string CryptServer::initAES(std::string const &publicKey, std::string const &cookie) {
+std::string CryptServer::genCookie(std::string const &cookie) {
+  boost::property_tree::ptree query;
+  boost::property_tree::ptree ptree;
+  std::string nCookie = "012345";
+
+  query.put("cookie", cookie);
+  ptree = this->_db->findOne("client", query);
+  this->_db->remove("client", query);
+  ptree.put("cookie", nCookie);
+  this->_db->insert("client", ptree);
+  return nCookie;
+}
+
+std::string CryptServer::initAES(std::string const &publicKey, std::string &cookie) {
   CryptAES aes;
   boost::property_tree::ptree ptree;
   std::string key;
   std::string keyiv;
+
+  cookie = this->genCookie(cookie);
 
   aes.genKey();
 
@@ -133,7 +178,7 @@ std::string CryptServer::initAES(std::string const &publicKey, std::string const
   ptree.put("pubkey", publicKey);
 
   aes.getKey(ICryptAlgo::KeyType::AES_KEY, key);
-  ptree.put("AES_IV", Base64::encrypt(key));
+  ptree.put("AES_KEY", Base64::encrypt(key));
 
   aes.getKey(ICryptAlgo::KeyType::AES_IV, keyiv);
   ptree.put("AES_IV", Base64::encrypt(keyiv));
@@ -150,5 +195,5 @@ std::string CryptServer::initAES(std::string const &publicKey, std::string const
 
   send.add_child("key", child);
 
-  return Base64::encrypt(json::stringify(send));
+  return json::stringify(send);
 }

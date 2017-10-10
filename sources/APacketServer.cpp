@@ -31,26 +31,23 @@ APacketServer::~APacketServer() {
 void APacketServer::sendPacket(std::string const &data,
                                boost::asio::ip::udp::endpoint const &to,
                                std::string const &id,
-                               std::size_t size,
-                               bool force,
                                bool reserve) {
     Packet packet;
+    std::size_t size;
 
-    std::cout << "SEND" << std::endl;
-    std::cout << data  << std::endl;
-    std::cout << "reserve " << reserve << std::endl;
     packet.set(Packet::Field::ID, id);
     packet.set(Packet::Field::COOKIE, this->_cookie);
     packet.set(Packet::Field::DATA, data);
+    if (this->encryptorMethod(packet, to) == "RSA")
+      size = 150;
+    else
+      size = Packet::defaultSize;
     std::vector<Packet> packets = packet.split(size);
     for (auto &part : packets) {
-        this->encryptor(part);
+        this->encryptor(part, to);
     }
     if (reserve) {
         this->reservePackets(packets, to);
-    }
-    if (!force && !this->isIgnited(packet.getPtree(), to)) {
-        return ;
     }
     try {
         for (auto &part : packets) {
@@ -63,10 +60,8 @@ void APacketServer::sendPacket(std::string const &data,
 
 void APacketServer::sendPacket(std::string const &data,
                                boost::asio::ip::udp::endpoint &to,
-                               std::size_t size,
-                               bool force,
                                bool reserve) {
-    this->sendPacket(data, to, std::to_string(APacketServer::id++), size, force, reserve);
+    this->sendPacket(data, to, std::to_string(APacketServer::id++), reserve);
 }
 
 void APacketServer::requestHandler(boost::system::error_code ec,
@@ -95,22 +90,14 @@ void APacketServer::saveClient(std::string const &cookie, boost::asio::ip::udp::
     }
 }
 
-std::string APacketServer::genCookie(Packet &packet) {
-  return std::string("012345");
-}
-
 void APacketServer::sendSuccess(Packet &packet, boost::asio::ip::udp::endpoint &from) {
     std::string cookie = packet.getPtree().get(Packet::fields.at(Packet::Field::COOKIE), "");
-    if (cookie.empty()) {
-      cookie = this->genCookie(packet);
-      packet.set(Packet::Field::COOKIE, cookie);
-    }
     this->saveClient(cookie, from);
     boost::property_tree::ptree ptree;
     ptree.put("type", "success");
     ptree.put(Packet::fields.at(Packet::Field::ID), packet.getPtree().get(Packet::fields.at(Packet::Field::ID), ""));
     ptree.put(Packet::fields.at(Packet::Field::PART), packet.getPtree().get(Packet::fields.at(Packet::Field::PART), ""));
-    this->sendPacket(json::stringify(ptree), from, Packet::defaultSize, false, false);
+    this->sendPacket(json::stringify(ptree), from, false);
 }
 
 void APacketServer::setDB(IDataBase *db) {
@@ -146,9 +133,6 @@ void APacketServer::checkReserve(boost::system::error_code const &) {
         std::string port = part.get("port", "");
         boost::asio::ip::udp::endpoint endpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
         try {
-            if (!this->isIgnited(part.get_child("packet"), endpoint)) {
-                continue ;
-            }
             std::string msg(std::move(json::stringify(part.get_child("packet"))));
                 this->_socket.send_to(boost::asio::buffer(msg, msg.length()), endpoint);
         } catch (std::exception &err) {
