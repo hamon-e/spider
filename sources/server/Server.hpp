@@ -19,6 +19,8 @@ public:
 	      std::string const &cookie,
               std::size_t size = Packet::defaultSize,
               bool force = false);
+    void send(std::string const &data,
+	      std::string const &cookie);
 
 private:
     bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);

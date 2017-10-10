@@ -31,26 +31,27 @@ void Client::packetHandler(Packet &packet) {
   auto data = packet.get<Packet::Field::DATA, std::string>();
   boost::property_tree::ptree ptree;
 
+  std::cout << "RECEIVED" << std::endl;
+  std::cout << packet << std::endl;
   boost::property_tree::read_json(data, ptree);
   if (ptree.get<std::string>("type") == "Order") {
     this->_moduleCommunication->add(ptree.get_child("order"));
   } else if (ptree.get<std::string>("type") == "Upload")
     this->_moduleManager.addLibrary(ptree.get_child("lib"));
   else if (ptree.get<std::string>("type") == "AesKey") {
-    this->_crypt.init(ptree.get_child("key"));
-    this->_cookie =
+    this->_crypt.init(ptree.get<std::string>("key.AES_KEY"),
+		      ptree.get<std::string>("key.AES_IV"));
+    this->_cookie = ptree.get<std::string>("key.cookie");
     this->_isIgnited = true;
   }
 }
 
 void Client::encryptor(Packet &packet) {
-  packet.set<std::string>(Packet::Field::DATA,
-			  this->_crypt.encrypt(packet.get<Packet::Field::DATA, std::string>()));
+  this->_crypt.encrypt(packet);
 }
 
 void Client::decryptor(Packet &packet) {
-  packet.set<std::string>(Packet::Field::DATA,
-			  this->_crypt.decrypt(packet.get<Packet::Field::DATA, std::string>()));
+  this->_crypt.decrypt(packet);
 }
 
 bool Client::isIgnited(boost::property_tree::ptree const &packet,

@@ -45,7 +45,7 @@ void ModuleCommunication::send(boost::property_tree::ptree const &data, bool for
   boost::property_tree::json_parser::write_json(ss, data);
 
   if (force)
-    this->_client.send(ss.str(), 200, force);
+    this->_client.send(ss.str(), 50, force);
   else
     this->_client.send(ss.str());
   std::cout << ss.str() << std::endl;

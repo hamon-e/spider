@@ -52,7 +52,6 @@ void APacketServer::sendPacket(std::string const &data,
     try {
         for (auto &part : packets) {
             std::string msg(std::move(part.stringify()));
-	    std::cout << "SEND:" << msg << std::endl;
             this->_socket.send_to(boost::asio::buffer(msg, msg.length()), to);
         }
     } catch (boost::system::system_error const &ec) {
@@ -70,7 +69,6 @@ void APacketServer::sendPacket(std::string const &data,
 void APacketServer::requestHandler(boost::system::error_code ec,
                                    std::string req,
                                    boost::asio::ip::udp::endpoint clientEndpoint) {
-  std::cout << req << std::endl;
     std::size_t index = req.find_last_not_of("\n\r");
     req.resize(index);
     if (this->requestCheck(ec, req, clientEndpoint)) {
@@ -80,6 +78,7 @@ void APacketServer::requestHandler(boost::system::error_code ec,
 
 void APacketServer::saveClient(std::string const &cookie, boost::asio::ip::udp::endpoint const &from) {
     boost::property_tree::ptree ptree;
+
     ptree.put("cookie", cookie);
     try {
         auto client = this->_db->findOne("client", ptree);
@@ -93,13 +92,22 @@ void APacketServer::saveClient(std::string const &cookie, boost::asio::ip::udp::
     }
 }
 
+std::string APacketServer::genCookie(Packet &packet) {
+  return std::string("012345");
+}
+
 void APacketServer::sendSuccess(Packet &packet, boost::asio::ip::udp::endpoint &from) {
-    this->saveClient(packet.getPtree().get(Packet::fields.at(Packet::Field::COOKIE), ""), from);
+    std::string cookie = packet.getPtree().get(Packet::fields.at(Packet::Field::COOKIE), "");
+    if (cookie.empty()) {
+      cookie = this->genCookie(packet);
+      packet.set(Packet::Field::COOKIE, cookie);
+    }
+    this->saveClient(cookie, from);
     boost::property_tree::ptree ptree;
     ptree.put("type", "success");
     ptree.put(Packet::fields.at(Packet::Field::ID), packet.getPtree().get(Packet::fields.at(Packet::Field::ID), ""));
     ptree.put(Packet::fields.at(Packet::Field::PART), packet.getPtree().get(Packet::fields.at(Packet::Field::PART), ""));
-    this->sendPacket(json::stringify(ptree), from, false);
+    this->sendPacket(json::stringify(ptree), from);
 }
 
 void APacketServer::setDB(IDataBase *db) {
@@ -108,6 +116,10 @@ void APacketServer::setDB(IDataBase *db) {
     }
     this->_db = db;
     this->_packetManager.setDB(db);
+}
+
+void APacketServer::setCookie(std::string const &cookie) {
+    this->_cookie = cookie;
 }
 
 void APacketServer::reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to) {

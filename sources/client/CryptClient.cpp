@@ -5,12 +5,14 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Mon Oct 09 02:07:50 2017 Benoit Hamon
+// Last update Tue Oct 10 19:59:24 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
 #include "ssl/Base64.hpp"
 #include "CryptClient.hpp"
+
+#include <iostream>
 
 void CryptClient::init() {
   if (!boost::filesystem::exists("aesiv.key") || !boost::filesystem::exists("aeskey.key")) {
@@ -18,43 +20,60 @@ void CryptClient::init() {
     this->_rsaServer.setKeyFromFile(ICryptAlgo::KeyType::RSA_PUB, "serverPubKey.key");
 
     this->_current = &this->_rsaServer;
+    this->_currentType = "RSA";
 
     boost::property_tree::ptree ptree;
     ptree.add("type", "PublicKey");
     std::string key; this->_rsaClient.getKey(ICryptAlgo::KeyType::RSA_PUB, key);
     ptree.add("key", Base64::encrypt(key));
-    this->_moduleCommunication->send(ptree);
+    this->_moduleCommunication->send(ptree, true);
   } else {
     this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_KEY, "aeskey.key");
     this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_IV, "aesiv.key");
     this->_current = &this->_aes;
+    this->_currentType = "AES";
   }
 }
 
-void CryptClient::init(boost::property_tree::ptree const &ptree) {
-  this->_aes.setKey(ICryptAlgo::KeyType::AES_KEY,
-		    Base64::decrypt(ptree.get<std::string>("AES_KEY")));
-  this->_aes.setKey(ICryptAlgo::KeyType::AES_IV,
-		    Base64::decrypt(ptree.get<std::string>("AES_IV")));
+void CryptClient::init(std::string const &aes_key, std::string const &aes_iv) {
+  this->_aes.setKey(ICryptAlgo::KeyType::AES_KEY, Base64::decrypt(aes_key));
+  this->_aes.setKey(ICryptAlgo::KeyType::AES_IV, Base64::decrypt(aes_iv));
   this->_current = &this->_aes;
+  this->_currentType = "AES";
 }
 
 void CryptClient::addModuleCommunication(IModuleCommunication *moduleCommunication) {
   this->_moduleCommunication = moduleCommunication;
 }
 
-#include <iostream>
-std::string CryptClient::encrypt(std::string const &message) {
-  std::string res;
+void CryptClient::encrypt(Packet &packet) {
+  std::string data = packet.get<Packet::Field::DATA, std::string>();
 
-  this->_current->encrypt(message, res);
-  std::cout << Base64::encrypt(res) << std::endl;
-  return Base64::encrypt(res);
+  if (!data.empty()) {
+    std::string res;
+
+    this->_current->encrypt(data, res);
+
+    packet.set(Packet::Field::DATA, Base64::encrypt(res));
+    packet.set(Packet::Field::CRYPT, this->_currentType);
+  }
 }
 
-std::string CryptClient::decrypt(std::string const &encryptedMessage) {
+void CryptClient::decrypt(Packet &packet) {
+  std::string data = packet.get<Packet::Field::DATA, std::string>();
+  std::string crypt = packet.get<Packet::Field::DATA, std::string>();
   std::string res;
 
-  this->_current->decrypt(Base64::decrypt(encryptedMessage), res);
-  return res;
+  if (!data.empty()) {
+    if (crypt == "AES")
+      this->_aes.decrypt(Base64::decrypt(data), res);
+    else if (crypt == "RSA")
+      this->_rsaClient.decrypt(Base64::decrypt(data), res);
+    else
+      res = data;
+    std::cout << "Received" << std::endl;
+    std::cout << res << std::endl;
+
+    packet.set(Packet::Field::DATA, res);
+  }
 }

@@ -5,13 +5,14 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:14:55 2017 Benoit Hamon
-// Last update Sun Oct 08 22:17:23 2017 Benoit Hamon
+// Last update Mon Oct 09 12:45:04 2017 Benoit Hamon
 //
 
 #include "CryptRSA.hpp"
 
 CryptRSA::CryptRSA() {
-
+  this->_publicKey = nullptr;
+  this->_privateKey = nullptr;
 }
 
 CryptRSA::~CryptRSA() {
@@ -54,6 +55,8 @@ bool CryptRSA::getKey(KeyType type, std::string &key) {
   return true;
 }
 
+#include <string.h>
+#include <iostream>
 bool CryptRSA::encrypt(std::string const &message, std::string &encryptedMessage) {
   unsigned char *tmp = (unsigned char *)malloc(RSA_size(this->_publicKey));
   int encryptMessageLength = 0;

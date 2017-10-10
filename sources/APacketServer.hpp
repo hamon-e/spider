@@ -50,6 +50,7 @@ protected:
 private:
     void reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to);
     void checkReserve(boost::system::error_code const &ec);
+    std::string genCookie(Packet &packet);
 
 protected:
     static std::size_t id;

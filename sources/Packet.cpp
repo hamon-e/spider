@@ -7,6 +7,7 @@
 
 std::unordered_map<Packet::Field, std::string, EnumClassHash> const Packet::fields = {
     { Packet::Field::ID, "id" },
+    { Packet::Field::CRYPT, "crypt" },
     { Packet::Field::COOKIE, "cookie" },
     { Packet::Field::CHECKSUM, "checksum" },
     { Packet::Field::TIMESTAMP, "timestamp" },
@@ -47,6 +48,7 @@ void Packet::set(Packet::Field field, boost::property_tree::ptree &&ptree) {
    this->_ptree.put_child(Packet::fields.at(field), std::move(ptree));
 }
 
+#include <iostream>
 std::vector<Packet> Packet::split(size_t size) const {
     std::string data = this->_ptree.get(Packet::fields.at(Packet::Field::DATA), "");
     size_t nbPacket = ((data.size() - 1) / size) + 1;

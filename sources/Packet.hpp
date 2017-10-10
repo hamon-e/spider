@@ -12,7 +12,8 @@ class Packet {
 public:
     enum class Field {
         ID,
-        COOKIE,
+        CRYPT,
+	COOKIE,
         CHECKSUM,
         TIMESTAMP,
         PART,

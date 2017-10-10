@@ -10,29 +10,7 @@
 namespace pt = boost::property_tree;
 
 int main(int argc, char const *argv[]) {
-/*
     MongoDB db;
-    pt::ptree tree;
-
-    tree.put("id", 1);
-    tree.put("timestamp", 239);
-    tree.put("part", 2);
-    tree.put("checksum", 6);
-    tree.put("data.key", "oiergoerihgerio");
-    tree.put("data.process", "discord");
-
-    db.insert("parts", tree);
-*/
-    MongoDB db;
-    pt::ptree tree;
-    tree.put("id.a", 1);
-    pt::ptree tree2;
-    tree2.put("id.a", 5);
-    db.insert("aze", tree);
-    db.update("aze", tree, tree2, true);
-    tree.put("id.a", 5);
-    db.update("aze", tree, tree2, true);
-    db.remove("aze", tree2);
 
     if (argc != 2) {
         std::cerr << "Usage : " << argv[0] << " port" << std::endl;

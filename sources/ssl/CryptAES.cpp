@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:14:40 2017 Benoit Hamon
-// Last update Sun Oct 08 17:44:33 2017 Benoit Hamon
+// Last update Tue Oct 10 18:35:15 2017 Benoit Hamon
 //
 
 #include <stdexcept>
@@ -17,6 +17,9 @@
 CryptAES::CryptAES() {
   this->_aesEncryptContext = EVP_CIPHER_CTX_new();
   this->_aesDecryptContext = EVP_CIPHER_CTX_new();
+
+  this->_aesKey = nullptr;
+  this->_aesIv = nullptr;
 
   if (!this->_aesEncryptContext || !this->_aesDecryptContext)
     throw std::runtime_error("Could Not Initialize SSL");

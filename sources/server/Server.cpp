@@ -1,10 +1,13 @@
 #include "LocalDB.hpp"
 #include "MongoDB.hpp"
 #include "Server.hpp"
+#include "ssl/Base64.hpp"
 
 Server::Server(boost::asio::io_service &ioService, int port)
-    : APacketServer(ioService, port, new MongoDB())
-{}
+  : APacketServer(ioService, port, new MongoDB()) {
+    this->_crypt.init(this->_db);
+    this->setCookie("SERVER");
+}
 
 bool Server::requestCheck(boost::system::error_code &,
                             std::string &,
@@ -17,40 +20,36 @@ void Server::packetHandler(Packet &packet) {
     boost::property_tree::ptree ptree;
     boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
     if (ptree.get<std::string>("type") == "PublicKey") {
-      //this->send(this->_crypt.initClient(ptree));
+      this->_crypt.initAES(Base64::decrypt(ptree.get<std::string>("key")), packet.get<Packet::Field::COOKIE, std::string>());
     } else {
       this->_db->update(PacketManager::dataColName, packet.getPtree(), packet.getPtree(), true);
     }
 }
 
 void Server::encryptor(Packet &packet) {
-  boost::property_tree::ptree ptree;
-    boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
-  if (ptree.get<std::string>("type") == "AesKey")
-    packet.set<std::string>(Packet::Field::DATA,
-			    this->_crypt.encryptRSA(packet.get<Packet::Field::COOKIE, std::string>(),
-						    packet.get<Packet::Field::DATA, std::string>()));
-  else
-    packet.set<std::string>(Packet::Field::DATA,
-			    this->_crypt.encrypt(packet.get<Packet::Field::COOKIE, std::string>(),
-						 packet.get<Packet::Field::DATA, std::string>()));
+  this->_crypt.encrypt(packet);
 }
 
 void Server::decryptor(Packet &packet) {
-  std::cout << packet.get<Packet::Field::COOKIE, std::string>().empty() << std::endl;
-  if (packet.get<Packet::Field::COOKIE, std::string>().empty())
-    packet.set<std::string>(Packet::Field::DATA,
-			    this->_crypt.decryptRSA(packet.get<Packet::Field::DATA, std::string>()));
-  else
-    packet.set<std::string>(Packet::Field::DATA,
-			    this->_crypt.decrypt(packet.get<Packet::Field::COOKIE, std::string>(),
-						 packet.get<Packet::Field::DATA, std::string>()));
+  this->_crypt.decrypt(packet);
 }
 
 bool Server::isIgnited(boost::property_tree::ptree const &, boost::asio::ip::udp::endpoint const &) const {
     return true;
 }
 
+void Server::send(std::string const &data,
+		  std::string const &cookie) {
+    boost::property_tree::ptree ptree;
+    auto client = this->_db->findOne("client", ptree);
+
+    std::string host = ptree.get<std::string>("host");
+    std::string port = ptree.get<std::string>("port");
+
+    boost::asio::ip::udp::endpoint endpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
+
+    this->send(data, endpoint);
+}
 
 void Server::send(std::string const &data,
                   boost::asio::ip::udp::endpoint &clientEndpoint,

@@ -17,11 +17,9 @@ void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
 }
 
-#include <iostream>
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
         Packet packet(data);
-	std::cout << data << std::endl;
         this->_decryptor(packet);
         if (!packet.checksum()) {
             tools::call(this->_errorHandler, packet, PacketManager::Error::CHECKSUM);
@@ -38,11 +36,18 @@ PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::
     return *this;
 }
 
+#include <iostream>
+
 void PacketManager::complete(boost::property_tree::ptree const &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
+  std::cout << "Query:" << std::endl;
+  std::cout << query << std::endl;
+  std::cout << "END" << std::endl;
     std::vector<boost::property_tree::ptree> packets = this->_db->find(PacketManager::partsColName, query);
     if (!packets.size()) {
         return ;
     }
+
+    std::cout << packets.size() << std::endl;
     if (packets.size() == static_cast<std::size_t>(packets[0].get(Packet::fields.at(Packet::Field::TOTALPART), 0))) {
         if (!this->joinParts(packets)) {
             tools::call(this->_succesHandler, part, from);
@@ -56,15 +61,20 @@ void PacketManager::complete(boost::property_tree::ptree const &query, boost::as
     }
 }
 
- bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
+bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
+   std::cout << "TEST" << std::endl;
     Packet packet = Packet::join(packets);
 
+    std::cout << "TEST" << std::endl;
     boost::property_tree::ptree query;
     try {
-        auto ptree = packet.getPtree();
-        if (ptree.get("data.type", "") == "success") {
-            query.put("packet.id", ptree.get("data.id", ""));
-            query.put("packet.part", ptree.get("data.part", ""));
+      boost::property_tree::ptree ptree;
+	boost::property_tree::read_json(packet.get<Packet::Field::DATA, std::string>(), ptree);
+	std::cout << packet << std::endl;
+        if (ptree.get("type", "") == "success") {
+            query.put("packet.id", ptree.get("id", ""));
+            query.put("packet.part", ptree.get("part", ""));
+	    std::cout << "REMOVE" << ptree.get("id", "") << ptree.get("part", "") << std::endl;
             try {
                 this->_db->remove(PacketManager::waitingColName, query);
             } catch (std::exception &err) {
