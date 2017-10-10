@@ -66,7 +66,7 @@ void APacketServer::sendPacket(std::string const &data,
                                std::size_t size,
                                bool force,
                                bool reserve) {
-    this->sendPacket(data, to, std::to_string(APacketServer::id++), size, reserve);
+    this->sendPacket(data, to, std::to_string(APacketServer::id++), size, force, reserve);
 }
 
 void APacketServer::requestHandler(boost::system::error_code ec,
