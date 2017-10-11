@@ -32,7 +32,7 @@ public:
 
 private:
     void complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &packet);
-    bool joinParts(std::vector<boost::property_tree::ptree> &packets);
+    bool joinParts(std::vector<boost::property_tree::ptree> &packets, boost::asio::ip::udp::endpoint const &from);
 
 private:
     PacketHandler _handler;

@@ -47,7 +47,7 @@ void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip
     }
 
     if (packets.size() == static_cast<std::size_t>(packets[0].get(Packet::fields.at(Packet::Field::TOTALPART), 0))) {
-        if (!this->joinParts(packets)) {
+        if (!this->joinParts(packets, from)) {
             tools::call(this->_succesHandler, part, from);
         }
         try {
@@ -58,8 +58,8 @@ void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip
         tools::call(this->_succesHandler, part, from);
     }
 }
-
-bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
+#include <iostream>
+bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets, boost::asio::ip::udp::endpoint const &from) {
     Packet packet = Packet::join(packets);
 
     boost::property_tree::ptree query;
@@ -67,8 +67,10 @@ bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets)
       boost::property_tree::ptree ptree = packet.getPtree();
 
         if (ptree.get("data.type", "") == "success") {
-            query.put("packet.id", ptree.get("data.id", ""));
-            query.put("packet.part", ptree.get("data.part", ""));
+            query.put(boost::property_tree::ptree::path_type("packet.id", '/'), ptree.get("data.id", ""));
+            query.put(boost::property_tree::ptree::path_type("packet.part", '/'), ptree.get("data.part", ""));
+            query.put("host", from.address().to_string());
+            query.put("port", from.port());
             try {
                 this->_db->remove(PacketManager::waitingColName, query);
             } catch (std::exception &err) {
@@ -78,10 +80,8 @@ bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets)
     } catch (std::exception &) {
     }
     try {
-
-    this->_handler(packet);
+        this->_handler(packet);
     } catch (std::exception &) {
-
     }
     return false;
 }
