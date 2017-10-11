@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 22:42:24 2017 Benoit Hamon
-// Last update Wed Oct 11 11:45:17 2017 Benoit Hamon
+// Last update Wed Oct 11 23:51:19 2017 Benoit Hamon
 //
 
 #include "ssl/ICryptAlgo.hpp"
@@ -161,9 +161,8 @@ std::string CryptServer::genCookie(std::string const &cookie) {
 
   query.put("cookie", cookie);
   ptree = this->_db->findOne("client", query);
-  this->_db->remove("client", query);
   ptree.put("cookie", nCookie);
-  this->_db->insert("client", ptree);
+  this->_db->update("client", query, ptree);
   return nCookie;
 }
 

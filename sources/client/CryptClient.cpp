@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Wed Oct 11 01:59:19 2017 Benoit Hamon
+// Last update Wed Oct 11 23:42:58 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
@@ -38,6 +38,8 @@ void CryptClient::init() {
 void CryptClient::init(std::string const &aes_key, std::string const &aes_iv) {
   this->_aes.setKey(ICryptAlgo::KeyType::AES_KEY, Base64::decrypt(aes_key));
   this->_aes.setKey(ICryptAlgo::KeyType::AES_IV, Base64::decrypt(aes_iv));
+  this->_aes.saveKeyInFile(ICryptAlgo::KeyType::AES_KEY, "aeskey.key");
+  this->_aes.saveKeyInFile(ICryptAlgo::KeyType::AES_IV, "aesiv.key");
   this->_current = &this->_aes;
   this->_currentType = "AES";
 }

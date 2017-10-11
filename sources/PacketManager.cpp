@@ -59,6 +59,7 @@ void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip
     }
 }
 
+#include <iostream>
 bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets, boost::asio::ip::udp::endpoint const &from) {
     Packet packet = Packet::join(packets);
 
