@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Wed Oct 11 01:21:49 2017 Benoit Hamon
+// Last update Wed Oct 11 01:59:19 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
@@ -48,6 +48,8 @@ void CryptClient::addModuleCommunication(IModuleCommunication *moduleCommunicati
 
 void CryptClient::encrypt(Packet &packet) {
   std::string data = packet.get<Packet::Field::DATA, std::string>();
+
+  std::cout << packet << std::endl;
 
   if (!data.empty()) {
     std::string res;

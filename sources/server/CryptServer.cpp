@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 22:42:24 2017 Benoit Hamon
-// Last update Wed Oct 11 01:25:26 2017 Benoit Hamon
+// Last update Wed Oct 11 11:45:17 2017 Benoit Hamon
 //
 
 #include "ssl/ICryptAlgo.hpp"
@@ -118,8 +118,9 @@ std::string CryptServer::decryptAES(std::string const &cookie, std::string const
   ptree.put("sent", "1");
   this->_db->update("keys", query, ptree);
 
-  aes.setKey(ICryptAlgo::KeyType::AES_KEY, ptree.get<std::string>("AES_KEY"));
-  aes.setKey(ICryptAlgo::KeyType::AES_IV, ptree.get<std::string>("AES_IV"));
+  aes.setKey(ICryptAlgo::KeyType::AES_KEY, Base64::decrypt(ptree.get<std::string>("AES_KEY")));
+  aes.setKey(ICryptAlgo::KeyType::AES_IV, Base64::decrypt(ptree.get<std::string>("AES_IV")));
+
 
   std::string message;
   aes.decrypt(Base64::decrypt(encryptedMessage), message);
@@ -147,6 +148,9 @@ void CryptServer::decrypt(Packet &packet) {
       message = this->decryptAES(cookie, data);
 
     packet.set(Packet::Field::DATA, message);
+    std::cout << "RECEIV" << std::endl;
+    std::cout << packet << std::endl;
+    std::cout << std::endl;
   }
 }
 
