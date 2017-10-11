@@ -28,22 +28,18 @@ bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost
 
 void Client::packetHandler(Packet &packet) {
 std::cout << packet << std::endl;
-//  auto data = packet.get<Packet::Field::DATA, std::string>();
- // boost::property_tree::ptree ptree;
+  auto data = packet.get<Packet::Field::DATA, std::string>();
+  boost::property_tree::ptree ptree = packet.getPtree();
 
-  /*
-  boost::property_tree::read_json(data, ptree);
-  if (ptree.get<std::string>("type") == "Order") {
-    this->_moduleCommunication->add(ptree.get_child("order"));
-  } else if (ptree.get<std::string>("type") == "Upload")
-    this->_moduleManager.addLibrary(ptree.get_child("lib"));
-  else if (ptree.get<std::string>("type") == "AesKey") {
-    this->_crypt.init(ptree.get<std::string>("key.AES_KEY"),
-		      ptree.get<std::string>("key.AES_IV"));
-    this->_cookie = ptree.get<std::string>("key.cookie");
-    this->_isIgnited = true;
+  if (ptree.get<std::string>("data.type") == "Order") {
+    this->_moduleCommunication->add(ptree.get_child("data.order"));
+  } else if (ptree.get<std::string>("data.type") == "Upload")
+    this->_moduleManager.addLibrary(ptree.get_child("data.lib"));
+  else if (ptree.get<std::string>("data.type") == "AesKey") {
+    this->_crypt.init(ptree.get<std::string>("data.key.AES_KEY"),
+		      ptree.get<std::string>("data.key.AES_IV"));
+    this->_cookie = ptree.get<std::string>("data.key.cookie");
   }
-  */
 }
 
 void Client::encryptor(Packet &packet, boost::asio::ip::udp::endpoint const &) {

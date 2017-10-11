@@ -59,6 +59,7 @@ void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip
     }
 }
 
+#include <iostream>
 bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
     Packet packet = Packet::join(packets);
 
@@ -67,11 +68,14 @@ bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets)
       boost::property_tree::ptree ptree = packet.getPtree();
 
         if (ptree.get("data.type", "") == "success") {
+	  std::cout << ptree.get("data.id", "") << " : " << ptree.get("data.part", "") << std::endl;
             query.put("packet.id", ptree.get("data.id", ""));
             query.put("packet.part", ptree.get("data.part", ""));
+	    std::cout << query << std::endl;
             try {
                 this->_db->remove(PacketManager::waitingColName, query);
             } catch (std::exception &err) {
+	      std::cout << err.what() << std::endl;
             }
             return true;
         }
