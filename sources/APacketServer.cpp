@@ -81,11 +81,11 @@ void APacketServer::saveClient(std::string const &cookie, boost::asio::ip::udp::
     try {
         auto client = this->_db->findOne("client", ptree);
         client.put("host", from.address().to_string());
-        client.put("port", from.port());
+        client.put("port", std::to_string(from.port()));
         this->_db->update("client", ptree, client);
     } catch (std::exception &err) {
         ptree.put("host", from.address().to_string());
-        ptree.put("port", from.port());
+        ptree.put("port", std::to_string(from.port()));
         this->_db->insert("client", ptree);
     }
 }
@@ -116,7 +116,7 @@ void APacketServer::reservePackets(std::vector<Packet> const &packets, boost::as
     for (auto part : packets) {
         boost::property_tree::ptree ptree;
         ptree.put("host", to.address().to_string());
-        ptree.put("port", to.port());
+        ptree.put("port", std::to_string(to.port()));
         ptree.put_child("packet", part.getPtree());
         this->_db->update(PacketManager::waitingColName, ptree, ptree, true);
         auto vec = this->_db->find(PacketManager::waitingColName, {});
