@@ -5,16 +5,16 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:14:04 2017 Benoit Hamon
-// Last update Thu Oct 05 22:06:50 2017 Benoit Hamon
+// Last update Sun Oct 08 17:44:27 2017 Benoit Hamon
 //
 
 #pragma once
 
-#include "ICrypt.hpp"
+#include "ICryptAlgo.hpp"
 
 #define AES_KEYLEN 256
 
-class CryptAES : public ICrypt {
+class CryptAES : public ICryptAlgo {
   public:
     CryptAES();
     ~CryptAES();

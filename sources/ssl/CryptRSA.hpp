@@ -5,16 +5,16 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Mon Oct 02 16:13:38 2017 Benoit Hamon
-// Last update Thu Oct 05 22:04:51 2017 Benoit Hamon
+// Last update Sun Oct 08 17:44:50 2017 Benoit Hamon
 //
 
 #pragma once
 
-#include "ICrypt.hpp"
+#include "ICryptAlgo.hpp"
 
 #define RSA_KEYLEN 2048
 
-class CryptRSA : public ICrypt {
+class CryptRSA : public ICryptAlgo {
   public:
     CryptRSA();
     ~CryptRSA();

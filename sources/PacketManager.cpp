@@ -7,22 +7,28 @@ std::string const PacketManager::waitingColName = "waiting";
 
 PacketManager::PacketManager(IDataBase *db,
                              PacketManager::PacketHandler handler,
+                             PacketManager::PacketHandler decryptor,
                              PacketManager::SuccessHandler successHandler,
                              PacketManager::ErrorHandler errorHandler)
-    : _handler(handler), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
-{}
+    : _handler(handler), _decryptor(decryptor), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
+{ }
 
 void PacketManager::setDB(IDataBase *db) {
     this->_db = db;
 }
+
 PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
     try {
         Packet packet(data);
+        this->_decryptor(packet);
         if (!packet.checksum()) {
             tools::call(this->_errorHandler, packet, PacketManager::Error::CHECKSUM);
         } else {
             boost::property_tree::ptree query;
             query.put(Packet::fields.at(Packet::Field::ID), packet.get<Packet::Field::ID, std::string>());
+	    std::string cookie = packet.get<Packet::Field::COOKIE, std::string>();
+	    if (cookie.empty())
+	      packet.set(Packet::Field::COOKIE, from.address().to_string() + ":" + std::to_string(from.port()));
             query.put(Packet::fields.at(Packet::Field::COOKIE), packet.get<Packet::Field::COOKIE, std::string>());
             query.put(Packet::fields.at(Packet::Field::PART), packet.get<Packet::Field::PART, std::string>());
             this->_db->update(PacketManager::partsColName, query, packet.getPtree(), true);
@@ -33,17 +39,19 @@ PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::
     return *this;
 }
 
-void PacketManager::complete(boost::property_tree::ptree const &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
+void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
+    query.erase(Packet::fields.at(Packet::Field::PART));
     std::vector<boost::property_tree::ptree> packets = this->_db->find(PacketManager::partsColName, query);
     if (!packets.size()) {
         return ;
     }
+
     if (packets.size() == static_cast<std::size_t>(packets[0].get(Packet::fields.at(Packet::Field::TOTALPART), 0))) {
-        if (!this->joinParts(packets)) {
+        if (!this->joinParts(packets, from)) {
             tools::call(this->_succesHandler, part, from);
         }
         try {
-            this->_db->remove(PacketManager::partsColName, query);
+	    this->_db->remove(PacketManager::partsColName, query);
         } catch (std::exception &) {
         }
     } else {
@@ -51,22 +59,31 @@ void PacketManager::complete(boost::property_tree::ptree const &query, boost::as
     }
 }
 
- bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets) {
+#include <iostream>
+bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets, boost::asio::ip::udp::endpoint const &from) {
     Packet packet = Packet::join(packets);
+
     boost::property_tree::ptree query;
     try {
-        auto ptree = packet.getPtree();
+      boost::property_tree::ptree ptree = packet.getPtree();
+
         if (ptree.get("data.type", "") == "success") {
-            query.put("packet.id", ptree.get("data.id", ""));
-            query.put("packet.part", ptree.get("data.part", ""));
+            query.put(boost::property_tree::ptree::path_type("packet.id", '/'), ptree.get("data.id", ""));
+            query.put(boost::property_tree::ptree::path_type("packet.part", '/'), ptree.get("data.part", ""));
+            query.put("host", from.address().to_string());
+            query.put("port", from.port());
             try {
                 this->_db->remove(PacketManager::waitingColName, query);
             } catch (std::exception &err) {
+	      std::cout << err.what() << std::endl;
             }
             return true;
         }
     } catch (std::exception &) {
     }
-    this->_handler(packet);
+    try {
+        this->_handler(packet);
+    } catch (std::exception &) {
+    }
     return false;
 }

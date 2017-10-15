@@ -22,7 +22,7 @@ public:
     using ErrorHandler = std::function<void(Packet &packet, PacketManager::Error)>;
 
 public:
-    PacketManager(IDataBase *db, PacketHandler handler, SuccessHandler = {}, ErrorHandler = {});
+    PacketManager(IDataBase *db, PacketHandler handler, PacketHandler decryptor, SuccessHandler = {}, ErrorHandler = {});
 
 public:
     void setDB(IDataBase *db);
@@ -31,11 +31,12 @@ public:
     PacketManager &in(std::string const &data, boost::asio::ip::udp::endpoint &from);
 
 private:
-    void complete(boost::property_tree::ptree const &query, boost::asio::ip::udp::endpoint &from, Packet &packet);
-    bool joinParts(std::vector<boost::property_tree::ptree> &packets);
+    void complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &packet);
+    bool joinParts(std::vector<boost::property_tree::ptree> &packets, boost::asio::ip::udp::endpoint const &from);
 
 private:
     PacketHandler _handler;
+    PacketHandler _decryptor;
     ErrorHandler _errorHandler;
     SuccessHandler _succesHandler;
     IDataBase *_db;

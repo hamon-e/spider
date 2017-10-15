@@ -20,6 +20,12 @@ void ModuleCommunication::add(std::string const &module, Order const &order) {
   this->add(module, order.name, order.value);
 }
 
+void ModuleCommunication::add(boost::property_tree::ptree const &ptree) {
+  this->add(ptree.get<std::string>("module"),
+	    ptree.get<std::string>("name"),
+	    ptree.get<std::string>("value"));
+};
+
 bool ModuleCommunication::get(std::string const &module, Order &order) {
   this->_mutex.lock();
   for (auto it = this->_orders.begin(); it != this->_orders.end(); ++it) {
@@ -38,6 +44,6 @@ void ModuleCommunication::send(boost::property_tree::ptree const &data) {
   std::stringstream ss;
   boost::property_tree::json_parser::write_json(ss, data);
 
-  this->_client.send("Cookie", ss.str());
+  this->_client.send(ss.str());
   std::cout << ss.str() << std::endl;
 }

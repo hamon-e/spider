@@ -7,6 +7,7 @@
 
 std::unordered_map<Packet::Field, std::string, EnumClassHash> const Packet::fields = {
     { Packet::Field::ID, "id" },
+    { Packet::Field::CRYPT, "crypt" },
     { Packet::Field::COOKIE, "cookie" },
     { Packet::Field::CHECKSUM, "checksum" },
     { Packet::Field::TIMESTAMP, "timestamp" },
