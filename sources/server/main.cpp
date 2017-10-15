@@ -1,11 +1,9 @@
 #include <stdexcept>
 #include <boost/asio.hpp>
 
+#include "HttpServer.hpp"
 #include "Server.hpp"
-
-#include <boost/property_tree/ptree.hpp>
-#include <sources/MongoDB.hpp>
-#include "json.hpp"
+#include "MongoDB.hpp"
 
 namespace pt = boost::property_tree;
 
@@ -17,9 +15,16 @@ int main(int argc, char const *argv[]) {
 
     try {
         boost::asio::io_service ioService;
-        Server server(ioService, std::atoi(argv[1]));
+
+        MongoDB mongo;
+        HttpServer httpserver(&mongo, 1234);
+        Server server(ioService, std::atoi(argv[1]), &mongo);
+
+        httpserver.start();
         server.start();
+
         ioService.run();
+        httpserver.join();
     } catch (std::exception &err) {
         std::cout << err.what() << std::endl;
         return 1;

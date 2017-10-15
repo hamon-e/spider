@@ -3,9 +3,9 @@
 #include "Server.hpp"
 #include "ssl/Base64.hpp"
 
-Server::Server(boost::asio::io_service &ioService, int port)
-  : APacketServer(ioService, port, new MongoDB()) {
-    this->_crypt.init(this->_db);
+Server::Server(boost::asio::io_service &ioService, int port, IDataBase *db)
+  : APacketServer(ioService, port, db) {
+    this->_crypt.init(db);
     this->setCookie("SERVER");
 }
 

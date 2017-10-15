@@ -56,11 +56,15 @@ set(SOURCE_FILES
 ./sources/ssl/CryptAES.cpp
 ./sources/ssl/CryptRSA.cpp
 ./sources/server/CryptServer.cpp
+./sources/server/HttpServer.cpp
+./sources/server/HttpServer.hpp
 )
 
 add_executable(${EXE_SERVER_NAME} ${SOURCE_FILES})
+
 target_include_directories(${EXE_SERVER_NAME} PUBLIC
     ./sources
+    ./libs
 )
 
 target_link_libraries(${EXE_SERVER_NAME} ${Boost_LIBRARIES})
@@ -74,20 +78,6 @@ target_link_libraries(${EXE_SERVER_NAME} ${OPENSSL_LIBRARIES})
 
 set(EXE_CLIENT_NAME spider_client)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
-#find_package(Boost 1.36.0 COMPONENTS date_time filesystem system thread)
-#
-#if(Boost_FOUND)
-#
-#    include_directories(${Boost_INCLUDE_DIRS})
-#
-#    set(SOURCE_FILES sources/LocalDB.cpp sources/LocalDB.hpp sources/main.cpp)
-#
-#    add_executable(${EXE_CLIENT_NAME} ${SOURCE_FILES})
-#
-#    target_link_libraries(${EXE_CLIENT_NAME} ${Boost_LIBRARIES})
-#
-#endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread")
 
 set(SOURCE_FILES
@@ -145,27 +135,6 @@ add_library(${KEYBOARD_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${KEYBOARD_NAME} ${Boost_LIBRARIES})
 
 #############################################################################
-#####################  Cmake Server HTTP  ###################################
-#############################################################################
-
-set(HTTP_NAME http_server)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
-
-set(SOURCE_FILES
-  ./sources/server/HttpsRestApi.cpp
-  ./sources/MongoDB.cpp sources/server/HttpServer.cpp sources/server/HttpServer.hpp)
-
-add_executable(${HTTP_NAME} ${SOURCE_FILES})
-target_link_libraries(${HTTP_NAME} ${Boost_LIBRARIES})
-target_link_libraries(${HTTP_NAME} ${OPENSSL_LIBRARIES})
-target_link_libraries(${HTTP_NAME} ${LIBMONGOCXX_LIBRARIES})
-target_link_libraries(${HTTP_NAME} ${LIBBSONCXX_LIBRARIES})
-target_include_directories(${HTTP_NAME} PUBLIC
-    ./libs
-    ./sources
-)
-
 #############  Cmake CLIENT MODULE : EXPLORER  ##############################
 #############################################################################
 

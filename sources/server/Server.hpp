@@ -3,7 +3,7 @@
 
 class Server : public APacketServer {
 public:
-    Server(boost::asio::io_service &ioService, int port);
+    Server(boost::asio::io_service &ioService, int port, IDataBase *db);
 
 public:
     void send(std::string const &data,
