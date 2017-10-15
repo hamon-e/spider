@@ -9,6 +9,7 @@
 #include "SimpleWebServer/crypto.hpp"
 
 #include "IDataBase.hpp"
+#include "Server.hpp"
 
 using HttpsServer = SimpleWeb::Server<SimpleWeb::HTTPS>;
 using HttpsClient = SimpleWeb::Client<SimpleWeb::HTTPS>;
@@ -18,7 +19,7 @@ namespace pt = boost::property_tree;
 
 class HttpServer {
 public:
-    HttpServer(IDataBase *db, int port = 443,
+    HttpServer(IDataBase *db, Server *server, int port = 443,
                std::string const &certificate = "server.crt",
                std::string const &key = "server.key");
 
@@ -37,8 +38,12 @@ private:
     std::string genCookie();
 
 private:
+    bool isFirstUser();
+    bool isConnected(std::string const &cookie);
+
+private:
     IDataBase *_db;
-    HttpsServer _server;
+    Server *_server;
+    HttpsServer _hServer;
     boost::thread _threads;
-    int _id;
 };

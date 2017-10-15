@@ -17,8 +17,8 @@ int main(int argc, char const *argv[]) {
         boost::asio::io_service ioService;
 
         MongoDB mongo;
-        HttpServer httpserver(&mongo, 1234);
         Server server(ioService, std::atoi(argv[1]), &mongo);
+        HttpServer httpserver(&mongo, &server, 1234);
 
         httpserver.start();
         server.start();

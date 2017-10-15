@@ -7,18 +7,19 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/filesystem.hpp>
 #include "HttpServer.hpp"
+#include "ssl/Base64.hpp"
+#include "json.hpp"
 
-HttpServer::HttpServer(IDataBase *db, int port,
+HttpServer::HttpServer(IDataBase *db, Server *server, int port,
                        const std::string &certificate,
                        const std::string &key)
-        : _db(db), _server(certificate, key) {
-    this->_server.config.port = port;
-    this->_id = 0;
+        : _db(db), _server(server), _hServer(certificate, key) {
+    this->_hServer.config.port = port;
     init();
 }
 
 void HttpServer::start() {
-    this->_threads = boost::thread([this]() {this->_server.start();});
+    this->_threads = boost::thread([this]() {this->_hServer.start();});
 }
 
 void HttpServer::join() {
@@ -26,12 +27,12 @@ void HttpServer::join() {
 }
 
 void HttpServer::init() {
-    this->_server.resource["^/signup$"]["POST"] = [this](std::shared_ptr<HttpsServer::Response> response,
+    this->_hServer.resource["^/signup$"]["POST"] = [this](std::shared_ptr<HttpsServer::Response> response,
                                                          std::shared_ptr<HttpsServer::Request> request) {
         this->signup(response, request);
     };
 
-    this->_server.resource["^/login$"]["POST"] = [this](std::shared_ptr<HttpsServer::Response> response,
+    this->_hServer.resource["^/login$"]["POST"] = [this](std::shared_ptr<HttpsServer::Response> response,
                                                         std::shared_ptr<HttpsServer::Request> request) {
         this->login(response, request);
     };
@@ -52,6 +53,28 @@ std::string HttpServer::genCookie() {
     return cookie;
 }
 
+bool HttpServer::isFirstUser() {
+    pt::ptree query;
+
+    query.put("id", "0");
+    try {
+        this->_db->findOne("Users", query);
+        return false;
+    } catch (std::exception) {}
+    return true;
+}
+
+bool HttpServer::isConnected(std::string const &cookie) {
+    pt::ptree query;
+
+    query.put("cookie", cookie);
+    try {
+        this->_db->findOne("Users", query);
+        return true;
+    } catch (std::exception) {}
+    return false;
+}
+
 void HttpServer::signup(std::shared_ptr<HttpsServer::Response> response,
                         std::shared_ptr<HttpsServer::Request> request) {
     try {
@@ -59,56 +82,27 @@ void HttpServer::signup(std::shared_ptr<HttpsServer::Response> response,
         pt::read_json(request->content, iptree);
         pt::ptree optree;
 
-        try {
-            pt::ptree query;
-            query.put("id", "0");
-            this->_db->findOne("Users", query);
-            try {
-                pt::ptree query;
-                query.put("cookie", iptree.get<std::string>("cookie"));
-                this->_db->findOne("Users", query);
-                try {
-                    pt::ptree doc;
-                    doc.put("id", std::to_string(this->_id));
-                    doc.put("user", iptree.get<std::string>("user"));
-                    doc.put("password", Crypto::md5(iptree.get<std::string>("password")));
-                    this->_db->insert("Users", doc);
-                    optree.put("status", "ok");
-                    optree.put("message", "New user created");
-                    optree.put("id", std::to_string(this->_id));
-                    ++this->_id;
-                } catch (const std::exception &e) {
-                    response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
-                }
-            } catch (const std::exception &e) {
-                optree.put("status", "ko");
-                optree.put("message", "User not logged in");
-                optree.put("ErrorCode", e.what());
-            }
-        } catch (const std::exception &e) {
-            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
-            try {
-                pt::ptree doc;
-                doc.put("id", std::to_string(this->_id));
-                doc.put("user", iptree.get<std::string>("user"));
-                doc.put("password", Crypto::md5(iptree.get<std::string>("password")));
-                pt::write_json(std::cout, iptree);
-                pt::write_json(std::cout, doc);
-                pt::write_json(std::cout, doc);
-                this->_db->insert("Users", doc);
-                optree.put("status", "ok");
-                optree.put("message", "New user created");
-                optree.put("message", e.what());
-                optree.put("id", std::to_string(this->_id));
-                ++this->_id;
-            } catch (const std::exception &e) {
-                response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
-            }
+        bool status = true;
+        if (!this->isFirstUser()) {
+            std::string cookie = iptree.get<std::string>("cookie");
+            if (!this->isConnected(cookie))
+                status = false;
         }
 
-        std::stringstream json;
-        pt::write_json(json, optree);
-        response->write(json);
+        if (status) {
+            pt::ptree doc;
+
+            doc.put("user", iptree.get<std::string>("user"));
+            doc.put("password", Base64::encrypt(Crypto::md5(iptree.get<std::string>("password"))));
+            this->_db->insert("Users", doc);
+            optree.put("status", "ok");
+            optree.put("message", "New user created");
+        } else {
+            optree.put("status", "ko");
+            optree.put("message", "User not logged in");
+        }
+
+        response->write(json::stringify(optree));
     } catch (const std::exception &e) {
         response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
     }
@@ -124,29 +118,21 @@ void HttpServer::login(std::shared_ptr<HttpsServer::Response> response,
         try {
             pt::ptree query;
             query.put("user", iptree.get<std::string>("user"));
-            query.put("password", Crypto::md5(iptree.get<std::string>("password")));
+            query.put("password", Base64::encrypt(Crypto::md5(iptree.get<std::string>("password"))));
             pt::ptree user = this->_db->findOne("Users", query);
-            try {
-                std::string cookie = this->genCookie();
-                user.put("cookie", cookie);
-                this->_db->update("Users", query, user);
-                optree.put("status", "ok");
-                optree.put("message", "User Connected");
-                optree.put("user", iptree.get<std::string>("user"));
-                optree.put("id", user.get<std::string>("id"));
-                optree.put("cookie", cookie);
-            } catch (const std::exception &e) {
-                response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
-            }
+
+            std::string cookie = this->genCookie();
+            user.put("cookie", cookie);
+            this->_db->update("Users", query, user);
+            optree.put("status", "ok");
+            optree.put("message", "User Connected");
+            optree.put("cookie", cookie);
         } catch (const std::exception &e) {
             optree.put("status", "ko");
             optree.put("message", "Bad crementials");
-            optree.put("ErrorCode", e.what());
         }
 
-        std::stringstream json;
-        pt::write_json(json, optree);
-        response->write(json);
+        response->write(json::stringify(optree));
     } catch (const std::exception &e) {
         response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
     }

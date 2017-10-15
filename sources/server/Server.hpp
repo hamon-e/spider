@@ -1,3 +1,5 @@
+#pragma once
+
 #include "APacketServer.hpp"
 #include "CryptServer.hpp"
 
@@ -12,7 +14,7 @@ public:
     void send(std::string const &data,
               boost::asio::ip::udp::endpoint &clientEndpoint);
     void send(std::string const &data,
-	      std::string const &cookie);
+			  std::string const &cookie);
 
 private:
     bool requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint);
