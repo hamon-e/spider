@@ -58,7 +58,16 @@ jQuery(function($){
             dataType : 'JSON',
             data : JSON.stringify(query),
             success : function(data, statut) {
-                console.log(data);
+                var display = "";
+                for (var i = 0 ; i < data['list'].length; i += 1) {
+                    var value;
+                    if (data['list'][i]['name'])
+                        value = data['list'][i]['name'];
+                    else
+                        value = data['list'][i]['cookie'];
+                    display += "<p>" + value + "</p>";
+                }
+                $('#clientlist_display').html(display);
             }
         });
         return false;
