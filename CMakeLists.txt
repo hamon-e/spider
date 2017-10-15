@@ -147,7 +147,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 
 set(SOURCE_FILES
   ./sources/server/HttpsRestApi.cpp
-  ./sources/MongoDB.cpp)
+  ./sources/MongoDB.cpp sources/server/HttpServer.cpp sources/server/HttpServer.hpp)
 
 add_executable(${HTTP_NAME} ${SOURCE_FILES})
 target_link_libraries(${HTTP_NAME} ${Boost_LIBRARIES})
