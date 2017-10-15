@@ -32,6 +32,8 @@ private:
                 std::shared_ptr<HttpsServer::Request> request);
     void login(std::shared_ptr<HttpsServer::Response> response,
                std::shared_ptr<HttpsServer::Request> request);
+    void defaultGet(std::shared_ptr<HttpsServer::Response> response,
+                    std::shared_ptr<HttpsServer::Request> request);
 
 private:
     void init();

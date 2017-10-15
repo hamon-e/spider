@@ -36,6 +36,10 @@ void HttpServer::init() {
                                                         std::shared_ptr<HttpsServer::Request> request) {
         this->login(response, request);
     };
+    this->_hServer.default_resource["GET"] = [this](std::shared_ptr<HttpsServer::Response> response,
+                                                    std::shared_ptr<HttpsServer::Request> request) {
+        this->defaultGet(response, request);
+    };
 }
 
 std::string HttpServer::genCookie() {
@@ -110,7 +114,7 @@ void HttpServer::signup(std::shared_ptr<HttpsServer::Response> response,
 
 void HttpServer::login(std::shared_ptr<HttpsServer::Response> response,
                        std::shared_ptr<HttpsServer::Request> request) {
-    try {
+   try {
         pt::ptree iptree;
         pt::read_json(request->content, iptree);
         pt::ptree optree;
@@ -129,11 +133,35 @@ void HttpServer::login(std::shared_ptr<HttpsServer::Response> response,
             optree.put("cookie", cookie);
         } catch (const std::exception &e) {
             optree.put("status", "ko");
-            optree.put("message", "Bad crementials");
+            optree.put("message", "Bad credidentials");
         }
 
         response->write(json::stringify(optree));
     } catch (const std::exception &e) {
         response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+    }
+}
+
+void HttpServer::defaultGet(std::shared_ptr<HttpsServer::Response> response,
+                            std::shared_ptr<HttpsServer::Request> request) {
+    try {
+        auto web_root_path = boost::filesystem::canonical("web");
+        auto path = boost::filesystem::canonical(web_root_path / request->path);
+
+        if (std::distance(web_root_path.begin(), web_root_path.end())
+            > std::distance(path.begin(), path.end()) ||
+                !std::equal(web_root_path.begin(), web_root_path.end(), path.begin()))
+            throw std::invalid_argument("path must be within root path");
+        if (boost::filesystem::is_directory(path))
+            path /= "index.html";
+
+        auto ifs = std::make_shared<std::ifstream>();
+        ifs->open(path.string(), std::ifstream::in | std::ios::binary | std::ios::ate);
+
+        if (*ifs)
+            response->write(*ifs);
+
+    } catch(const std::exception &e) {
+        response->write(SimpleWeb::StatusCode::client_error_bad_request, "Could not open path " + request->path + ": " + e.what());
     }
 }
