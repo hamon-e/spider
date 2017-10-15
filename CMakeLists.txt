@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.6)
 project(cpp_spider)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 if (WIN32)
   set(BOOST_ROOT "C:/local/boost_1_65_1")
   link_directories("${BOOST_ROOT}/lib64-msvc-14.1")
 
+  find_package(OPENSSL)
+elseif(APPLE)
   find_package(OPENSSL)
 else()
   find_package(PkgConfig)
@@ -71,7 +74,6 @@ target_link_libraries(${EXE_SERVER_NAME} ${OPENSSL_LIBRARIES})
 
 set(EXE_CLIENT_NAME spider_client)
 
-#<<<<<<< HEAD
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 #find_package(Boost 1.36.0 COMPONENTS date_time filesystem system thread)
 #
@@ -86,7 +88,6 @@ set(EXE_CLIENT_NAME spider_client)
 #    target_link_libraries(${EXE_CLIENT_NAME} ${Boost_LIBRARIES})
 #
 #endif()
-#=======
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pthread")
 
 set(SOURCE_FILES
@@ -144,6 +145,27 @@ add_library(${KEYBOARD_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${KEYBOARD_NAME} ${Boost_LIBRARIES})
 
 #############################################################################
+#####################  Cmake Server HTTP  ###################################
+#############################################################################
+
+set(HTTP_NAME http_server)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+
+set(SOURCE_FILES
+  ./sources/server/HttpsRestApi.cpp
+  ./sources/MongoDB.cpp sources/server/HttpServer.cpp sources/server/HttpServer.hpp)
+
+add_executable(${HTTP_NAME} ${SOURCE_FILES})
+target_link_libraries(${HTTP_NAME} ${Boost_LIBRARIES})
+target_link_libraries(${HTTP_NAME} ${OPENSSL_LIBRARIES})
+target_link_libraries(${HTTP_NAME} ${LIBMONGOCXX_LIBRARIES})
+target_link_libraries(${HTTP_NAME} ${LIBBSONCXX_LIBRARIES})
+target_include_directories(${HTTP_NAME} PUBLIC
+    ./libs
+    ./sources
+)
+
 #############  Cmake CLIENT MODULE : EXPLORER  ##############################
 #############################################################################
 
@@ -157,4 +179,3 @@ target_link_libraries(${EXPLORER_NAME} ${Boost_LIBRARIES})
 target_include_directories(${EXPLORER_NAME} PUBLIC
     ./sources/
 )
-#>>>>>>> origin
