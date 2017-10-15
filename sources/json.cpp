@@ -13,3 +13,12 @@ boost::property_tree::ptree json::parse(std::string const &data) {
     boost::property_tree::json_parser::read_json(ss, ptree);
     return ptree;
 }
+
+boost::property_tree::ptree json::parse(std::vector<boost::property_tree::ptree> const &vec) {
+    boost::property_tree::ptree res;
+
+    for (auto const &elem: vec) {
+        res.push_back(std::make_pair("", elem));
+    }
+    return res;
+}

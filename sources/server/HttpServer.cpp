@@ -36,6 +36,10 @@ void HttpServer::init() {
                                                         std::shared_ptr<HttpsServer::Request> request) {
         this->login(response, request);
     };
+    this->_hServer.resource["^/client_list$"]["POST"] = [this](std::shared_ptr<HttpsServer::Response> response,
+                                                         std::shared_ptr<HttpsServer::Request> request) {
+        this->listClients(response, request);
+    };
     this->_hServer.default_resource["GET"] = [this](std::shared_ptr<HttpsServer::Response> response,
                                                     std::shared_ptr<HttpsServer::Request> request) {
         this->defaultGet(response, request);
@@ -134,6 +138,29 @@ void HttpServer::login(std::shared_ptr<HttpsServer::Response> response,
         } catch (const std::exception &e) {
             optree.put("status", "ko");
             optree.put("message", "Bad credidentials");
+        }
+
+        response->write(json::stringify(optree));
+    } catch (const std::exception &e) {
+        response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+    }
+}
+
+void HttpServer::listClients(std::shared_ptr<HttpsServer::Response> response,
+                             std::shared_ptr<HttpsServer::Request> request) {
+    try {
+        pt::ptree iptree;
+        pt::read_json(request->content, iptree);
+        pt::ptree optree;
+
+        if (this->isConnected(iptree.get<std::string>("cookie"))) {
+            pt::ptree query;
+            pt::ptree res = json::parse(this->_db->find("client", query));
+
+            optree.put("status", "ok");
+            optree.add_child("list", res);
+        } else {
+            optree.put("status", "ko");
         }
 
         response->write(json::stringify(optree));
