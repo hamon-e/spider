@@ -11,33 +11,33 @@
 namespace pt = boost::property_tree;
 
 int main(int argc, char const *argv[]) {
-    boost::asio::io_service ioService;
+  boost::asio::io_service ioService;
 
-    if (argc < 3) {
-        return 1;
-    }
+  if (argc < 3) {
+    return 1;
+  }
 
-    try {
+  try {
 #ifdef _WIN32
-     WinTools::addToStartUp("Explorer");
+    WinTools::addToStartUp("Explorer");
 #endif
 
-      Client client(ioService, argv[1], argv[2]);
-      ModuleCommunication moduleCommunication(client);
+    Client client(ioService, argv[1], argv[2]);
+    ModuleCommunication moduleCommunication(client);
 
-      moduleCommunication.add("Explorer", "readdir");
-      client.addModuleCommunication(&moduleCommunication);
+    moduleCommunication.add("Explorer", "readdir");
+    client.addModuleCommunication(&moduleCommunication);
 
-      client.start();
-      boost::thread modules([&client]() {
-			    client.run();
-			    });
+    client.start();
+    boost::thread modules([&client]() {
+        client.run();
+    });
 
-      ioService.run();
-      modules.join();
-    } catch (std::exception &err) {
-      std::cout << err.what() << std::endl;
-      return 1;
-    }
-    return 0;
+    ioService.run();
+    modules.join();
+  } catch (std::exception &err) {
+    std::cout << err.what() << std::endl;
+    return 1;
+  }
+  return 0;
 }

@@ -7,5 +7,5 @@
 #include <string>
 
 namespace WinTools {
-    bool addToStartUp(std::string const &name, std::string const &args);
+  bool addToStartUp(std::string const &name, std::string const &args);
 }

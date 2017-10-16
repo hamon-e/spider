@@ -9,11 +9,11 @@
 #include "json.hpp"
 
 class Packet {
-public:
+  public:
     enum class Field {
         ID,
         CRYPT,
-	COOKIE,
+        COOKIE,
         CHECKSUM,
         TIMESTAMP,
         PART,
@@ -28,46 +28,46 @@ public:
 
     using PartPair = std::pair<std::size_t, std::size_t>;
 
-public:
+  public:
     Packet() = default;
     Packet(boost::property_tree::ptree const &);
     Packet(std::string const &data);
 
-public:
+  public:
     template <typename T>
     void set(Packet::Field field, T &&value) {
-        this->_ptree.put(Packet::fields.at(field), std::forward<T>(value));
+      this->_ptree.put(Packet::fields.at(field), std::forward<T>(value));
     }
     void set(Packet::Field field, boost::property_tree::ptree const &ptree);
     void set(Packet::Field field, boost::property_tree::ptree &&ptree);
 
     template<Field field, typename T>
     T get() const {
-        return this->_ptree.get<T>(Packet::fields.at(field));
+      return this->_ptree.get<T>(Packet::fields.at(field));
     }
     template<Field field, typename T>
     T get(T defaultValue) const {
-        return this->_ptree.get<T>(Packet::fields.at(field), defaultValue);
+      return this->_ptree.get<T>(Packet::fields.at(field), defaultValue);
     }
 
     boost::property_tree::ptree const getPtree() const;
 
-public:
+  public:
     void updateChecksum();
     bool checksum() const;
     PartPair getPartPair() const;
 
-public:
+  public:
     std::string stringify(bool pretty = false) const;
 
-public:
+  public:
     std::vector<Packet> split(std::size_t size = Packet::defaultSize) const;
     static Packet join(std::vector<boost::property_tree::ptree> &packets);
 
-private:
+  private:
     std::string calcChecksum() const;
 
-private:
+  private:
     boost::property_tree::ptree _ptree;
 };
 

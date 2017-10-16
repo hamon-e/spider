@@ -7,7 +7,7 @@
 #include "IDataBase.hpp"
 
 class PacketManager {
-public:
+  public:
     enum class Error {
         CHECKSUM
     };
@@ -16,25 +16,24 @@ public:
     static std::string const dataColName;
     static std::string const waitingColName;
 
-public:
+  public:
     using PacketHandler = std::function<void(Packet &packet)>;
     using SuccessHandler = std::function<void(Packet &packet, boost::asio::ip::udp::endpoint &from)>;
     using ErrorHandler = std::function<void(Packet &packet, PacketManager::Error)>;
 
-public:
+  public:
     PacketManager(IDataBase *db, PacketHandler handler, PacketHandler decryptor, SuccessHandler = {}, ErrorHandler = {});
 
-public:
+  public:
     void setDB(IDataBase *db);
 
-public:
+  public:
     PacketManager &in(std::string const &data, boost::asio::ip::udp::endpoint &from);
 
-private:
+  private:
     void complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &packet);
-    bool joinParts(std::vector<boost::property_tree::ptree> &packets, boost::asio::ip::udp::endpoint const &from);
 
-private:
+  private:
     PacketHandler _handler;
     PacketHandler _decryptor;
     ErrorHandler _errorHandler;

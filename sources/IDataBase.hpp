@@ -5,13 +5,13 @@
 #include <vector>
 
 class IDataBase {
-public:
+  public:
     using ptree = boost::property_tree::ptree;
 
-public:
+  public:
     virtual ~IDataBase() = default;
 
-public:
+  public:
     virtual void insert(std::string const &collection, ptree const &doc) = 0;
     virtual ptree findOne(std::string const &collection, ptree const &query) = 0;
     virtual std::vector<ptree> find(std::string const &collection, ptree const &query) = 0;

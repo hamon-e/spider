@@ -4,20 +4,20 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 class AIntervalService {
-public:
+  public:
     AIntervalService(boost::asio::io_service &ioService, std::size_t seconds);
 
-public:
+  public:
     virtual ~AIntervalService() = default;
 
-public:
+  public:
     void start();
     void stop();
 
-private:
+  private:
     void run();
     virtual void service(boost::system::error_code const &ec) = 0;
-private:
+  private:
     bool _started;
     boost::asio::deadline_timer _timer;
     boost::posix_time::seconds _interval;

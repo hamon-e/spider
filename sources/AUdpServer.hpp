@@ -4,21 +4,21 @@
 #include <iostream>
 
 class AUdpServer {
-public:
+  public:
     AUdpServer(boost::asio::io_service &io_service, int port);
     ~AUdpServer() = default;
 
-public:
+  public:
     bool start();
     bool isStarted() const;
 
-private:
+  private:
     void listen();
     virtual void requestHandler(boost::system::error_code ec,
                                 std::string req,
                                 boost::asio::ip::udp::endpoint client_endpoint) = 0;
 
-protected:
+  protected:
     bool started;
     boost::asio::ip::udp::socket _socket;
     boost::asio::ip::udp::endpoint _clientEndpoint;

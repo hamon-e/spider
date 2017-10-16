@@ -68,7 +68,7 @@ bool CryptRSA::encrypt(std::string const &message, std::string &encryptedMessage
     return false;
 
   encryptMessageLength = RSA_public_encrypt(message.length(), (unsigned char *)message.c_str(),
-					    tmp, this->_publicKey, RSA_PKCS1_OAEP_PADDING);
+                                            tmp, this->_publicKey, RSA_PKCS1_OAEP_PADDING);
   if (encryptMessageLength == -1)
     return false;
 
@@ -78,21 +78,21 @@ bool CryptRSA::encrypt(std::string const &message, std::string &encryptedMessage
 }
 
 bool CryptRSA::decrypt(std::string const &encryptedMessage, std::string &message) {
- unsigned char *tmp = (unsigned char *)malloc(encryptedMessage.length());
- int messageLenght = 0;
+  unsigned char *tmp = (unsigned char *)malloc(encryptedMessage.length());
+  int messageLenght = 0;
 
- if (!tmp)
-   return false;
+  if (!tmp)
+    return false;
 
- messageLenght = RSA_private_decrypt(encryptedMessage.length(),
-				     (unsigned char *)encryptedMessage.c_str(), tmp,
-				     this->_privateKey, RSA_PKCS1_OAEP_PADDING);
- if (messageLenght == -1)
-   return false;
+  messageLenght = RSA_private_decrypt(encryptedMessage.length(),
+                                      (unsigned char *)encryptedMessage.c_str(), tmp,
+                                      this->_privateKey, RSA_PKCS1_OAEP_PADDING);
+  if (messageLenght == -1)
+    return false;
 
- message.assign(tmp, tmp + messageLenght);
- ::free(tmp);
- return true;
+  message.assign(tmp, tmp + messageLenght);
+  ::free(tmp);
+  return true;
 }
 
 bool CryptRSA::genKey() {
@@ -111,7 +111,7 @@ bool CryptRSA::genKey() {
   this->_privateKey = this->_publicKey;
   return true;
 
-err:
+  err:
   RSA_free(this->_publicKey);
   BN_free(bn);
   this->_publicKey = NULL;
@@ -143,7 +143,7 @@ bool CryptRSA::saveKeyInFile(KeyType type, std::string const &filename) {
     return false;
 
   if (type == RSA_PUB)
-   PEM_write_RSA_PUBKEY(fp, this->_publicKey);
+    PEM_write_RSA_PUBKEY(fp, this->_publicKey);
   else
     PEM_write_RSAPrivateKey(fp, this->_privateKey, NULL, NULL, 0, NULL, NULL);
   ::fclose(fp);

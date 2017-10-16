@@ -9,23 +9,23 @@
 #include "IntervalService.hpp"
 
 class APacketServer : public AUdpServer {
-public:
+  public:
     APacketServer(boost::asio::io_service &ioService, int port, IDataBase *db = nullptr);
     ~APacketServer();
 
-public:
+  public:
     void setCookie(std::string const &cookie);
     void sendPacket(
-        std::string const &data,
-        boost::asio::ip::udp::endpoint const &to,
-        std::string const &id,
-        bool reserve = true);
+            std::string const &data,
+            boost::asio::ip::udp::endpoint const &to,
+            std::string const &id,
+            bool reserve = true);
     void sendPacket(
-        std::string const &data,
-        boost::asio::ip::udp::endpoint &to,
-        bool reserve = true);
+            std::string const &data,
+            boost::asio::ip::udp::endpoint &to,
+            bool reserve = true);
 
-private:
+  private:
     void requestHandler(boost::system::error_code ec,
                         std::string req,
                         boost::asio::ip::udp::endpoint clientEndpoint);
@@ -38,21 +38,21 @@ private:
     virtual std::string encryptorMethod(Packet &packet, boost::asio::ip::udp::endpoint const &to) = 0;
     virtual void decryptor(Packet &packet) = 0;
 
-protected:
+  protected:
     void saveClient(std::string const &cookie, boost::asio::ip::udp::endpoint const &from);
     void sendSuccess(Packet &packet, boost::asio::ip::udp::endpoint &from);
 
-protected:
+  protected:
     void setDB(IDataBase *db);
 
-private:
+  private:
     void reservePackets(std::vector<Packet> const &packets, boost::asio::ip::udp::endpoint const &to);
     void checkReserve(boost::system::error_code const &ec);
 
-protected:
+  protected:
     static std::size_t id;
 
-protected:
+  protected:
     IDataBase *_db;
     std::string _cookie;
     PacketManager _packetManager;

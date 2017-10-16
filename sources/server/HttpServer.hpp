@@ -18,34 +18,36 @@ using Crypto = SimpleWeb::Crypto;
 namespace pt = boost::property_tree;
 
 class HttpServer {
-public:
+  public:
     HttpServer(IDataBase *db, Server *server, int port = 443,
                std::string const &certificate = "server.crt",
                std::string const &key = "server.key");
 
-public:
+  public:
     void start();
     void join();
 
-private:
+  private:
     void signup(std::shared_ptr<HttpsServer::Response> response,
                 std::shared_ptr<HttpsServer::Request> request);
     void login(std::shared_ptr<HttpsServer::Response> response,
                std::shared_ptr<HttpsServer::Request> request);
-    void listClients(std::shared_ptr<HttpsServer::Response> response,
+    void client_list(std::shared_ptr<HttpsServer::Response> response,
                      std::shared_ptr<HttpsServer::Request> request);
+    void send(std::shared_ptr<HttpsServer::Response> response,
+              std::shared_ptr<HttpsServer::Request> request);
     void defaultGet(std::shared_ptr<HttpsServer::Response> response,
                     std::shared_ptr<HttpsServer::Request> request);
 
-private:
+  private:
     void init();
     std::string genCookie();
 
-private:
+  private:
     bool isFirstUser();
     bool isConnected(std::string const &cookie);
 
-private:
+  private:
     IDataBase *_db;
     Server *_server;
     HttpsServer _hServer;

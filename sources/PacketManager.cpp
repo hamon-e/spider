@@ -10,80 +10,75 @@ PacketManager::PacketManager(IDataBase *db,
                              PacketManager::PacketHandler decryptor,
                              PacketManager::SuccessHandler successHandler,
                              PacketManager::ErrorHandler errorHandler)
-    : _handler(handler), _decryptor(decryptor), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
+        : _handler(handler), _decryptor(decryptor), _errorHandler(errorHandler), _succesHandler(successHandler), _db(db)
 { }
 
 void PacketManager::setDB(IDataBase *db) {
-    this->_db = db;
-}
-
-PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
-    try {
-        Packet packet(data);
-        this->_decryptor(packet);
-        if (!packet.checksum()) {
-            tools::call(this->_errorHandler, packet, PacketManager::Error::CHECKSUM);
-        } else {
-            boost::property_tree::ptree query;
-            query.put(Packet::fields.at(Packet::Field::ID), packet.get<Packet::Field::ID, std::string>());
-	    std::string cookie = packet.get<Packet::Field::COOKIE, std::string>();
-	    if (cookie.empty())
-	      packet.set(Packet::Field::COOKIE, from.address().to_string() + ":" + std::to_string(from.port()));
-            query.put(Packet::fields.at(Packet::Field::COOKIE), packet.get<Packet::Field::COOKIE, std::string>());
-            query.put(Packet::fields.at(Packet::Field::PART), packet.get<Packet::Field::PART, std::string>());
-            this->_db->update(PacketManager::partsColName, query, packet.getPtree(), true);
-            this->complete(query, from, packet);
-        }
-    } catch (boost::property_tree::json_parser::json_parser_error &err) {
-    }
-    return *this;
-}
-
-void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
-    query.erase(Packet::fields.at(Packet::Field::PART));
-    std::vector<boost::property_tree::ptree> packets = this->_db->find(PacketManager::partsColName, query);
-    if (!packets.size()) {
-        return ;
-    }
-
-    if (packets.size() == static_cast<std::size_t>(packets[0].get(Packet::fields.at(Packet::Field::TOTALPART), 0))) {
-        if (!this->joinParts(packets, from)) {
-            tools::call(this->_succesHandler, part, from);
-        }
-        try {
-	    this->_db->remove(PacketManager::partsColName, query);
-        } catch (std::exception &) {
-        }
-    } else {
-        tools::call(this->_succesHandler, part, from);
-    }
+  this->_db = db;
 }
 
 #include <iostream>
-bool PacketManager::joinParts(std::vector<boost::property_tree::ptree> &packets, boost::asio::ip::udp::endpoint const &from) {
-    Packet packet = Packet::join(packets);
 
-    boost::property_tree::ptree query;
-    try {
-      boost::property_tree::ptree ptree = packet.getPtree();
-
-        if (ptree.get("data.type", "") == "success") {
-            query.put(boost::property_tree::ptree::path_type("packet.id", '/'), ptree.get("data.id", ""));
-            query.put(boost::property_tree::ptree::path_type("packet.part", '/'), ptree.get("data.part", ""));
-            query.put("host", from.address().to_string());
-            query.put("port", from.port());
-            try {
-                this->_db->remove(PacketManager::waitingColName, query);
-            } catch (std::exception &err) {
-	      std::cout << err.what() << std::endl;
-            }
-            return true;
+PacketManager &PacketManager::in(std::string const &data, boost::asio::ip::udp::endpoint &from) {
+  try {
+    Packet packet(data);
+    this->_decryptor(packet);
+    if (!packet.checksum()) {
+      tools::call(this->_errorHandler, packet, PacketManager::Error::CHECKSUM);
+    } else {
+      boost::property_tree::ptree query;
+      query.put(Packet::fields.at(Packet::Field::ID), packet.get<Packet::Field::ID, std::string>());
+      std::string cookie = packet.get<Packet::Field::COOKIE, std::string>();
+      if (cookie.empty()) {
+        try {
+          boost::property_tree::ptree query;
+          boost::property_tree::ptree ptree;
+          query.put("host", from.address().to_string());
+          query.put("port", std::to_string(from.port()));
+          ptree = this->_db->findOne("client", query);
+          std::cout << "FOUND" << std::endl;
+          std::cout << ptree << std::endl;
+          packet.set(Packet::Field::COOKIE, ptree.get<std::string>("cookie"));
+        } catch (std::exception) {
+          packet.set(Packet::Field::COOKIE, from.address().to_string() + ":" + std::to_string(from.port()));
         }
-    } catch (std::exception &) {
+      }
+      query.put(Packet::fields.at(Packet::Field::COOKIE), packet.get<Packet::Field::COOKIE, std::string>());
+      query.put(Packet::fields.at(Packet::Field::PART), packet.get<Packet::Field::PART, std::string>());
+      this->_db->update(PacketManager::partsColName, query, packet.getPtree(), true);
+      this->complete(query, from, packet);
     }
+  } catch (boost::property_tree::json_parser::json_parser_error &err) {
+  }
+  return *this;
+}
+
+void PacketManager::complete(boost::property_tree::ptree &query, boost::asio::ip::udp::endpoint &from, Packet &part) {
+  query.erase(Packet::fields.at(Packet::Field::PART));
+  std::vector<boost::property_tree::ptree> packets = this->_db->find(PacketManager::partsColName, query);
+  if (!packets.size()) {
+    return ;
+  }
+
+  if (packets.size() == static_cast<std::size_t>(packets[0].get(Packet::fields.at(Packet::Field::TOTALPART), 0))) {
     try {
+      Packet packet = Packet::join(packets);
+      boost::property_tree::ptree ptree = packet.getPtree();
+      if (ptree.get("data.type", "") != "success") {
+        tools::call(this->_succesHandler, part, from);
         this->_handler(packet);
-    } catch (std::exception &) {
-    }
-    return false;
+      } else {
+        boost::property_tree::ptree tree;
+        tree.put(boost::property_tree::ptree::path_type("packet.id", '/'), ptree.get("data.id", ""));
+        tree.put(boost::property_tree::ptree::path_type("packet.part", '/'), ptree.get("data.part", ""));
+        this->_db->remove(PacketManager::waitingColName, tree);
+      }
+    } catch (std::exception) {}
+
+    try {
+      this->_db->remove(PacketManager::partsColName, query);
+    } catch (std::exception &) {}
+  } else {
+    tools::call(this->_succesHandler, part, from);
+  }
 }

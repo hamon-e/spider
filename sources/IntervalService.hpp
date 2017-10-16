@@ -5,15 +5,15 @@
 #include "AIntervalService.hpp"
 
 class IntervalService : public AIntervalService {
-public:
+  public:
     using Handler = std::function<void(boost::system::error_code const &ec)>;
 
-public:
+  public:
     IntervalService(boost::asio::io_service &ioService, std::size_t seconds, Handler handler);
 
-private:
+  private:
     void service(boost::system::error_code const &ec);
 
-private:
+  private:
     Handler _handler;
 };
