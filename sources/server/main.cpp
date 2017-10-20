@@ -9,9 +9,8 @@ namespace pt = boost::property_tree;
 
 int main(int argc, char const *argv[]) {
   std::string configFile = "config.json";
-  if (argc != 2) {
+  if (argc == 2) {
     configFile = argv[1];
-    return 1;
   }
 
   try {
