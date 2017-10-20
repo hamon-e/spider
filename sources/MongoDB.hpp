@@ -30,7 +30,9 @@ class MongoDB : public IDataBase {
     boost::mutex _mutex;
 
   public:
-    MongoDB(int const &port = 27017, std::string const &dbName = "cpp_spider");
+    MongoDB(std::string const &host = "",
+            int const &port = 27017,
+            std::string const &dbName = "cpp_spider");
     ~MongoDB();
 
   public:

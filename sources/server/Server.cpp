@@ -23,7 +23,7 @@ void Server::packetHandler(Packet &packet) {
     this->send(this->_crypt.initAES(Base64::decrypt(ptree.get("data.key", "")), cookie),
                cookie);
   } else {
-    this->_db->update(PacketManager::dataColName, ptree, ptree, true);
+    this->_db->insert(PacketManager::dataColName, ptree);
   }
 }
 

@@ -2,9 +2,9 @@
 
 #include "MongoDB.hpp"
 
-MongoDB::MongoDB(int const &port, std::string const &dbName) {
+MongoDB::MongoDB(std::string const &host, int const &port, std::string const &dbName) {
   mongocxx::instance instance{};
-  mongocxx::uri uri("mongodb://localhost:" + std::to_string(port));
+  mongocxx::uri uri("mongodb://" + host + ":" + std::to_string(port));
   this->_mongodbClient = new mongocxx::client(uri);
   this->_dbAccess = (*_mongodbClient)[dbName];
 }
@@ -28,7 +28,7 @@ bsoncxx::builder::stream::document MongoDB::generateBson(ptree const &doc) {
   this->generateBson(doc, bson);
   return bson;
 }
-#include "json.hpp"
+
 void MongoDB::insert(std::string const &collection, ptree const &doc) {
   boost::mutex::scoped_lock lock(this->_mutex);
 

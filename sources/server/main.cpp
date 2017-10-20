@@ -8,17 +8,27 @@
 namespace pt = boost::property_tree;
 
 int main(int argc, char const *argv[]) {
+  std::string configFile = "config.json";
   if (argc != 2) {
-    std::cerr << "Usage : " << argv[0] << " port" << std::endl;
+    configFile = argv[1];
     return 1;
   }
 
   try {
+    boost::property_tree::ptree config;
+    std::ifstream jsonFile(configFile);
+
+    boost::property_tree::read_json(jsonFile, config);
+
     boost::asio::io_service ioService;
 
-    MongoDB mongo;
-    Server server(ioService, std::atoi(argv[1]), &mongo);
-    HttpServer httpserver(&mongo, &server, 1234);
+    MongoDB mongo(config.get("db.host", "localhost"),
+                  config.get("db.port", 27017),
+                  config.get("db.name", "cpp_spider"));
+
+    Server server(ioService, config.get("port", 1234), &mongo);
+
+    HttpServer httpserver(&mongo, &server, config.get("https.port", 443));
 
     httpserver.start();
     server.start();
