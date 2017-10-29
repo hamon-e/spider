@@ -9,6 +9,6 @@
 #include "IModuleCommunication.hpp"
 
 class IModule {
-public:
+  public:
     virtual void start() = 0;
 };

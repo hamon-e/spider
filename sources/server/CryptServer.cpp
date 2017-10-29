@@ -41,8 +41,8 @@ std::string CryptServer::encryptAES(std::string const &cookie, std::string const
 
   query.put("cookie", cookie);
   ptree = this->_db->findOne("keys", query);
-  aes.setKey(ICryptAlgo::KeyType::AES_KEY, ptree.get<std::string>("AES_KEY"));
-  aes.setKey(ICryptAlgo::KeyType::AES_IV, ptree.get<std::string>("AES_IV"));
+  aes.setKey(ICryptAlgo::KeyType::AES_KEY, Base64::decrypt(ptree.get<std::string>("AES_KEY")));
+  aes.setKey(ICryptAlgo::KeyType::AES_IV, Base64::decrypt(ptree.get<std::string>("AES_IV")));
 
   std::string encryptedMessage;
   aes.encrypt(message, encryptedMessage);
@@ -121,7 +121,6 @@ std::string CryptServer::decryptAES(std::string const &cookie, std::string const
   aes.setKey(ICryptAlgo::KeyType::AES_KEY, Base64::decrypt(ptree.get<std::string>("AES_KEY")));
   aes.setKey(ICryptAlgo::KeyType::AES_IV, Base64::decrypt(ptree.get<std::string>("AES_IV")));
 
-
   std::string message;
   aes.decrypt(Base64::decrypt(encryptedMessage), message);
   return message;
@@ -162,6 +161,8 @@ std::string CryptServer::genCookie(std::string const &cookie) {
   query.put("cookie", cookie);
   ptree = this->_db->findOne("client", query);
   ptree.put("cookie", nCookie);
+  std::cout << query << std::endl;
+  std::cout << ptree << std::endl;
   this->_db->update("client", query, ptree);
   return nCookie;
 }

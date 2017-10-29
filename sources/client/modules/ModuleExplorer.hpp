@@ -8,20 +8,20 @@
 #include "../IModuleCommunication.hpp"
 
 class ModuleExplorer : public IModule {
-public:
+  public:
     ModuleExplorer(IModuleCommunication *);
 
-public:
+  public:
     void start() override;
 
-public:
+  public:
     static boost::shared_ptr<ModuleExplorer> create(IModuleCommunication *);
 
-private:
+  private:
     void changeDir(std::string const &path);
     std::vector<std::string> readDir();
     void sendFiles();
 
-private:
+  private:
     IModuleCommunication *_moduleCommunication;
 };

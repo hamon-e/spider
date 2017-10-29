@@ -72,6 +72,7 @@ void CryptClient::decrypt(Packet &packet) {
   std::string crypt = packet.get<Packet::Field::CRYPT, std::string>();
   std::string res;
 
+  std::cout << packet << std::endl;
   if (!data.empty()) {
     if (crypt == "AES")
       this->_aes.decrypt(Base64::decrypt(data), res);

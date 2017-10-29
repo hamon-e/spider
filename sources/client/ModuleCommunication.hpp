@@ -11,25 +11,25 @@
 #include "Client.hpp"
 
 class ModuleCommunication : public IModuleCommunication {
-public:
+  public:
     ModuleCommunication(Client &client);
     ~ModuleCommunication();
 
-public:
+  public:
     void add(std::string const &module, std::string const &name, std::string const &value = "") override;
     void add(std::string const &module, Order const &order) override;
     void add(boost::property_tree::ptree const &ptree) override;
     bool get(std::string const &module, Order &order) override;
     void send(boost::property_tree::ptree const &data) override;
 
-private:
+  private:
     struct ModOrder {
       std::string module;
       std::string name;
       std::string value;
     };
 
-private:
+  private:
     Client &_client;
     boost::mutex _mutex;
     std::vector<ModOrder> _orders;

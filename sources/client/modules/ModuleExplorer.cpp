@@ -12,7 +12,7 @@
 #include "ModuleExplorer.hpp"
 
 ModuleExplorer::ModuleExplorer(IModuleCommunication *moduleCommunication)
-  : _moduleCommunication(moduleCommunication) {}
+        : _moduleCommunication(moduleCommunication) {}
 
 void ModuleExplorer::start() {
   IModuleCommunication::Order order;
@@ -20,17 +20,18 @@ void ModuleExplorer::start() {
   while (true) {
     if (this->_moduleCommunication->get("Explorer", order)) {
       if (order.name == "chdir")
-	this->changeDir(order.value);
+        this->changeDir(order.value);
       else if (order.name == "readdir")
-	this->sendFiles();
+        this->sendFiles();
     }
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
   }
 }
 
 boost::shared_ptr<ModuleExplorer> ModuleExplorer::create(IModuleCommunication *moduleCommunication) {
-    return boost::shared_ptr<ModuleExplorer>(
-            new ModuleExplorer(moduleCommunication)
-    );
+  return boost::shared_ptr<ModuleExplorer>(
+          new ModuleExplorer(moduleCommunication)
+  );
 }
 
 void ModuleExplorer::changeDir(std::string const &path) {

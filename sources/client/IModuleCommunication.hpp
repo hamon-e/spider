@@ -9,13 +9,13 @@
 #include <boost/property_tree/ptree.hpp>
 
 class IModuleCommunication {
-public:
+  public:
     struct Order {
-        std::string name;
-        std::string value;
+      std::string name;
+      std::string value;
     };
 
-public:
+  public:
     virtual void add(std::string const &module, std::string const &name, std::string const &value = "") = 0;
     virtual void add(std::string const &module, Order const &order) = 0;
     virtual void add(boost::property_tree::ptree const &ptree) = 0;

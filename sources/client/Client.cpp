@@ -2,10 +2,9 @@
 #include "Client.hpp"
 
 Client::Client(boost::asio::io_service &ioService, std::string const &host, std::string const &port)
-    : APacketServer(ioService, 0, new LocalDB())
-{
-    this->_serverEndpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
-    this->saveClient("SERVER", this->_serverEndpoint);
+        : APacketServer(ioService, 0, new LocalDB()) {
+  this->_serverEndpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
+  this->saveClient("SERVER", this->_serverEndpoint);
 }
 
 void Client::run() {
@@ -20,14 +19,14 @@ void Client::addModuleCommunication(IModuleCommunication *moduleCommunication) {
 }
 
 bool Client::requestCheck(boost::system::error_code &ec, std::string &req, boost::asio::ip::udp::endpoint &clientEndpoint) {
-    if (this->_serverEndpoint != clientEndpoint) {
-        return false;
-    }
-    return true;
+  if (this->_serverEndpoint != clientEndpoint) {
+    return false;
+  }
+  return true;
 }
 
 void Client::packetHandler(Packet &packet) {
-std::cout << packet << std::endl;
+  std::cout << packet << std::endl;
   auto data = packet.get<Packet::Field::DATA, std::string>();
   boost::property_tree::ptree ptree = packet.getPtree();
 
@@ -37,7 +36,7 @@ std::cout << packet << std::endl;
     this->_moduleManager.addLibrary(ptree.get_child("data.lib"));
   else if (ptree.get<std::string>("data.type") == "AesKey") {
     this->_crypt.init(ptree.get<std::string>("data.key.AES_KEY"),
-		      ptree.get<std::string>("data.key.AES_IV"));
+                      ptree.get<std::string>("data.key.AES_IV"));
     this->_cookie = ptree.get<std::string>("data.key.cookie");
   }
 }
@@ -56,9 +55,9 @@ void Client::decryptor(Packet &packet) {
 
 void Client::send(std::string const &data,
                   std::string const &id) {
-    this->sendPacket(data, this->_serverEndpoint, id);
+  this->sendPacket(data, this->_serverEndpoint, id);
 }
 
 void Client::send(std::string const &data) {
-    this->sendPacket(data, this->_serverEndpoint);
+  this->sendPacket(data, this->_serverEndpoint);
 }

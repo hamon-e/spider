@@ -1,0 +1,40 @@
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+
+<script src="/vendor/js.cookie.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.10.0.custom.css">
+<body>
+<div id="bar">
+    <a id="login" href="">Login</a>
+    <a id="signup" href="">Sign Up</a>
+    <a id="clientlist" href="">List Clients</a>
+</div>
+
+<div id="login_dialog" title="Login">
+    <form>
+        User:<br>
+        <input type="text" name="user" placeholder="user"><br>
+        Password:<br>
+        <input type="password" name="password" placeholder="password"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+<div id="signup_dialog" title="Sign Up">
+    <form>
+        User:<br>
+        <input type="text" name="user" placeholder="user"><br>
+        Password:<br>
+        <input type="password" name="password" placeholder="password"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+<div id="clientlist_display">
+</div>
+</body>
+
+<script src="/js/script.js"></script>
+</html>

@@ -43,16 +43,16 @@ bool CryptAES::encrypt(std::string const &message, std::string &encryptedMessage
     return false;
 
   if (!EVP_EncryptInit_ex(this->_aesEncryptContext, EVP_aes_256_cbc(), NULL,
-			  this->_aesKey, this->_aesIv))
+                          this->_aesKey, this->_aesIv))
     return false;
 
   if (!EVP_EncryptUpdate(this->_aesEncryptContext, tmp, (int *)&blockLength,
-			 (unsigned char *)message.c_str(), message.length()))
+                         (unsigned char *)message.c_str(), message.length()))
     return false;
 
   encryptedMessageLength += blockLength;
   if (!EVP_EncryptFinal_ex(this->_aesEncryptContext, tmp + encryptedMessageLength,
-			   (int *)&blockLength))
+                           (int *)&blockLength))
     return false;
   encryptedMessageLength += blockLength;
 
@@ -71,11 +71,11 @@ bool CryptAES::decrypt(std::string const &encryptedMessage, std::string &message
     return false;
 
   if (!EVP_DecryptInit_ex(this->_aesDecryptContext, EVP_aes_256_cbc(), NULL,
-			  this->_aesKey, this->_aesIv))
+                          this->_aesKey, this->_aesIv))
     return false;
 
   if (!EVP_DecryptUpdate(this->_aesDecryptContext, tmp, (int*)&blockLength,
-			 (unsigned char *)encryptedMessage.c_str(), encryptedMessage.length()))
+                         (unsigned char *)encryptedMessage.c_str(), encryptedMessage.length()))
     return false;
   messageLength += blockLength;
 

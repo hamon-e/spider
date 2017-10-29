@@ -1,0 +1,14 @@
+version: '3'
+services:
+  web:
+    build: .
+    command: ./spider_serveur
+    ports:
+      - "1234:1234/udp"
+      - "443:443"
+    depends_on:
+      - "db"
+    links:
+      - "db"
+  db:
+    image: mongo

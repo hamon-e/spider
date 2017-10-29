@@ -13,29 +13,29 @@
 typedef boost::shared_ptr<IModule> (module_t)(IModuleCommunication *);
 
 class ModuleManager {
-public:
+  public:
     ModuleManager(IModuleCommunication *moduleCommunication = nullptr,
-		  std::string const &dirname = "./");
+                  std::string const &dirname = "./");
     ~ModuleManager();
 
-public:
+  public:
     void run();
     void addModuleCommunication(IModuleCommunication *moduleCommunication);
     void addLibrary(boost::property_tree::ptree const &ptree);
 
-private:
+  private:
     struct Library {
-        std::string name;
-        boost::shared_ptr<IModule> module;
-        boost::function<module_t> creator;
+      std::string name;
+      boost::shared_ptr<IModule> module;
+      boost::function<module_t> creator;
     };
 
-private:
+  private:
     void runLibraries();
     void runLibrary(std::string const &libraryName);
     std::vector<std::string> readDirectory();
 
-private:
+  private:
     std::string _dirname;
     std::vector<Library> _libraries;
     boost::thread_group _threads;

@@ -9,6 +9,7 @@
 #include "SimpleWebServer/crypto.hpp"
 
 #include "IDataBase.hpp"
+#include "Server.hpp"
 
 using HttpsServer = SimpleWeb::Server<SimpleWeb::HTTPS>;
 using HttpsClient = SimpleWeb::Client<SimpleWeb::HTTPS>;
@@ -17,28 +18,38 @@ using Crypto = SimpleWeb::Crypto;
 namespace pt = boost::property_tree;
 
 class HttpServer {
-public:
-    HttpServer(IDataBase *db, int port = 443,
+  public:
+    HttpServer(IDataBase *db, Server *server, int port = 443,
                std::string const &certificate = "server.crt",
                std::string const &key = "server.key");
 
-public:
+  public:
     void start();
     void join();
 
-private:
+  private:
     void signup(std::shared_ptr<HttpsServer::Response> response,
                 std::shared_ptr<HttpsServer::Request> request);
     void login(std::shared_ptr<HttpsServer::Response> response,
                std::shared_ptr<HttpsServer::Request> request);
+    void client_list(std::shared_ptr<HttpsServer::Response> response,
+                     std::shared_ptr<HttpsServer::Request> request);
+    void send(std::shared_ptr<HttpsServer::Response> response,
+              std::shared_ptr<HttpsServer::Request> request);
+    void defaultGet(std::shared_ptr<HttpsServer::Response> response,
+                    std::shared_ptr<HttpsServer::Request> request);
 
-private:
+  private:
     void init();
     std::string genCookie();
 
-private:
+  private:
+    bool isFirstUser();
+    bool isConnected(std::string const &cookie);
+
+  private:
     IDataBase *_db;
-    HttpsServer _server;
+    Server *_server;
+    HttpsServer _hServer;
     boost::thread _threads;
-    int _id;
 };
