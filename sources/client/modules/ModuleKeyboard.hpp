@@ -8,24 +8,25 @@
 #include <boost/shared_ptr.hpp>
 
 #include "../IModule.hpp"
+#include "../IModuleCommunication.hpp"
 
 class ModuleKeyboard : public IModule {
-  public
-    ModuleKeyboard(Client &client);
+public:
+    ModuleKeyboard(IModuleCommunication *);
 
-  public:
-    void start(ModuleCommunication &com) override;
+public:
+    void start() override;
 
-  public:
-    static boost::shared_ptr<ModuleKeyboard> create(Client &client);
+public:
+    static boost::shared_ptr<ModuleKeyboard> create(IModuleCommunication *);
 
-  public:
+public:
     static LRESULT CALLBACK hookCallback(int nCode, WPARAM wParam, LPARAM lParam);
 
-  private:
+private:
     void sendKeys();
 
-  private:
-    Client &client;
+private:
+    IModuleCommunication *_moduleCommunication;
     bool _running;
 };
