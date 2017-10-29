@@ -16,17 +16,6 @@ RUN chmod +x /tmp/mongo.sh && /tmp/mongo.sh
 
 ENV LD_LIBRARY_PATH /usr/local/lib:/usr/lib/x86_64-linux-gnu
 
-
-#WORKDIR /root/
-#RUN mkdir -p .ssh
-
-#ADD id_rsa .ssh/id_rsa
-#RUN ssh-keyscan -T 60 git.epitech.eu >> .ssh/known_hosts
-
-#RUN git clone git@git.epitech.eu:/gusmin_m/cpp_spider
-
-#WORKDIR /root/cpp_spider
-
 RUN mkdir -p /root/spider
 WORKDIR /root/spider
 
