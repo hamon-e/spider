@@ -48,9 +48,13 @@ void Server::send(std::string const &data,
   std::string host = client.get<std::string>("host");
   std::string port = client.get<std::string>("port");
 
-  boost::asio::ip::udp::endpoint endpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
+  try {
+    boost::asio::ip::udp::endpoint endpoint = *this->_resolver.resolve({boost::asio::ip::udp::v4(), host, port});
+    this->send(data, endpoint);
+  }catch(std::exception &e) {
+    std::cout << e.what() << std::endl;
+  }
 
-  this->send(data, endpoint);
 }
 
 void Server::send(std::string const &data,
