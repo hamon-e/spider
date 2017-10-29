@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 17:50:33 2017 Benoit Hamon
-// Last update Wed Oct 11 23:42:58 2017 Benoit Hamon
+// Last update Sun Oct 29 12:09:47 2017 Benoit Hamon
 //
 
 #include <boost/filesystem.hpp>
@@ -15,9 +15,10 @@
 #include <iostream>
 
 void CryptClient::init() {
-  if (!boost::filesystem::exists("aesiv.key") || !boost::filesystem::exists("aeskey.key")) {
+  if (!boost::filesystem::exists("./keys/aesiv.key")
+      || !boost::filesystem::exists("./keys/aeskey.key")) {
     this->_rsaClient.genKey();
-    this->_rsaServer.setKeyFromFile(ICryptAlgo::KeyType::RSA_PUB, "serverPubKey.key");
+    this->_rsaServer.setKeyFromFile(ICryptAlgo::KeyType::RSA_PUB, "./keys/serverPubKey.key");
 
     this->_current = &this->_rsaServer;
     this->_currentType = "RSA";
@@ -28,8 +29,8 @@ void CryptClient::init() {
     ptree.add("key", Base64::encrypt(key));
     this->_moduleCommunication->send(ptree);
   } else {
-    this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_KEY, "aeskey.key");
-    this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_IV, "aesiv.key");
+    this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_KEY, "./keys/aeskey.key");
+    this->_aes.setKeyFromFile(ICryptAlgo::KeyType::AES_IV, "./keys/aesiv.key");
     this->_current = &this->_aes;
     this->_currentType = "AES";
   }
@@ -38,8 +39,8 @@ void CryptClient::init() {
 void CryptClient::init(std::string const &aes_key, std::string const &aes_iv) {
   this->_aes.setKey(ICryptAlgo::KeyType::AES_KEY, Base64::decrypt(aes_key));
   this->_aes.setKey(ICryptAlgo::KeyType::AES_IV, Base64::decrypt(aes_iv));
-  this->_aes.saveKeyInFile(ICryptAlgo::KeyType::AES_KEY, "aeskey.key");
-  this->_aes.saveKeyInFile(ICryptAlgo::KeyType::AES_IV, "aesiv.key");
+  this->_aes.saveKeyInFile(ICryptAlgo::KeyType::AES_KEY, "./keys/aeskey.key");
+  this->_aes.saveKeyInFile(ICryptAlgo::KeyType::AES_IV, "./keys/aesiv.key");
   this->_current = &this->_aes;
   this->_currentType = "AES";
 }

@@ -20,8 +20,8 @@ namespace pt = boost::property_tree;
 class HttpServer {
   public:
     HttpServer(IDataBase *db, Server *server, int port = 443,
-               std::string const &certificate = "server.crt",
-               std::string const &key = "server.key");
+               std::string const &certificate = "keys/server.crt",
+               std::string const &key = "keys/server.key");
 
   public:
     void start();

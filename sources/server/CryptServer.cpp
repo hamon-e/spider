@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Sun Oct 08 22:42:24 2017 Benoit Hamon
-// Last update Wed Oct 11 23:51:19 2017 Benoit Hamon
+// Last update Sun Oct 29 12:07:44 2017 Benoit Hamon
 //
 
 #include "ssl/ICryptAlgo.hpp"
@@ -16,7 +16,7 @@
 #include <iostream>
 void CryptServer::init(IDataBase *db) {
   this->_db = db;
-  this->_rsaServer.setKeyFromFile(ICryptAlgo::KeyType::RSA_PRIV, "./serverPrivKey.key");
+  this->_rsaServer.setKeyFromFile(ICryptAlgo::KeyType::RSA_PRIV, "./keys/serverPrivKey.key");
 }
 
 std::string CryptServer::encryptRSA(std::string const &cookie, std::string const &message) {
