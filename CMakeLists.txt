@@ -5,6 +5,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 include(./cmake/deps.cmake)
 
+if(NOT DEFINED target)
+    set(target all)
+endif()
+
 if(${target} STREQUAL "server" OR ${target} STREQUAL "all")
   include(./cmake/server-deps.cmake)
   include(./cmake/server.cmake)
