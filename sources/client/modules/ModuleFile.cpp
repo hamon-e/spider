@@ -20,7 +20,7 @@ void ModuleFile::start() {
 
   while (true) {
     if (this->_moduleCommunication->get("File", order)) {
-      if (order.name == "get")
+      if (order.name == "send")
 	this->sendFile(order.value);
     }
   }
